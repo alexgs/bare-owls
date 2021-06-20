@@ -3,8 +3,9 @@
  * the Open Software License version 3.0.
  */
 
-import { Box, Button, Heading } from 'grommet';
+import { Box, Button, Collapsible, Heading } from 'grommet';
 import { Notification } from 'grommet-icons';
+import * as React from 'react';
 
 const AppBar = (props) => (
   <Box
@@ -21,25 +22,33 @@ const AppBar = (props) => (
 );
 
 function HomePage() {
+  const [showSidebar, setShowSidebar] = React.useState(false);
+
   return (
     <Box fill>
       <AppBar>
-        <Heading level='3' margin='none'>My App</Heading>
-        <Button icon={<Notification />} onClick={() => {}} />
+        <Heading level="3" margin="none">My App</Heading>
+        <Button
+          icon={<Notification />}
+          onClick={() => setShowSidebar(!showSidebar)}
+        />
       </AppBar>
-      <Box direction='row' flex overflow={{ horizontal: 'hidden' }}>
-        <Box flex align='center' justify='center'>
+      <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
+        <Box flex align="center" justify="center">
           Welcome to Next.js!
         </Box>
-        <Box
-          width='medium'
-          background='light-2'
-          elevation='small'
-          align='center'
-          justify='center'
-        >
-          sidebar
-        </Box>
+        <Collapsible direction="horizontal" open={showSidebar}>
+          <Box
+            flex
+            width="medium"
+            background="light-2"
+            elevation="small"
+            align="center"
+            justify="center"
+          >
+            sidebar
+          </Box>
+        </Collapsible>
       </Box>
     </Box>
   );
