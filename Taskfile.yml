@@ -1,0 +1,27 @@
+version: '3'
+
+includes:
+  db: ./taskfiles/database.yml
+  srv: ./taskfiles/webapp.yml
+
+dotenv: ['.env']
+
+vars:
+  COMPOSE: docker-compose
+  NPM: "PATH=$TASKFILE_NPM_PATH npm"
+
+tasks:
+  config:
+    cmds:
+      - "{{.COMPOSE}} config"
+    desc: Print the compose file with variables expanded
+
+  down:
+    cmds:
+      - "{{.COMPOSE}} down --remove-orphans"
+    desc: Tear down the application
+
+  up:
+    cmds:
+      - "{{.COMPOSE}} up -d"
+    desc: Spin-up the application

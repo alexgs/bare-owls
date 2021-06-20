@@ -1,0 +1,17 @@
+{
+  "name": "bare-owls",
+  "version": "0.0.0",
+  "description": "A platform for content creators",
+  "author": {
+    "email": "alex.nebula99@gmail.com",
+    "name": "Alex Gates-Shannon"
+  },
+  "engines": {
+    "node": "^14.16.0"
+  },
+  "license": "OSL-3.0",
+  "private": true,
+  "scripts": {},
+  "dependencies": {},
+  "devDependencies": {}
+}
