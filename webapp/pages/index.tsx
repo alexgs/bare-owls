@@ -22,13 +22,26 @@ const AppBar = (props) => (
 
 function HomePage() {
   return (
-    <>
+    <Box fill>
       <AppBar>
         <Heading level='3' margin='none'>My App</Heading>
         <Button icon={<Notification />} onClick={() => {}} />
       </AppBar>
-      <div>Welcome to Next.js!</div>
-    </>
+      <Box direction='row' flex overflow={{ horizontal: 'hidden' }}>
+        <Box flex align='center' justify='center'>
+          Welcome to Next.js!
+        </Box>
+        <Box
+          width='medium'
+          background='light-2'
+          elevation='small'
+          align='center'
+          justify='center'
+        >
+          sidebar
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

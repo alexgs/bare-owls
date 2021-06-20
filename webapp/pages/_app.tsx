@@ -26,7 +26,7 @@ const App = ({ Component, pageProps }: AppProps): React.ReactNode => {
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500" />
         <title>Bare Owls</title>
       </Head>
-      <Grommet theme={theme}>
+      <Grommet theme={theme} full>
         <Component {...pageProps} />
       </Grommet>
     </>
