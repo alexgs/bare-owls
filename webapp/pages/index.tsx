@@ -3,7 +3,8 @@
  * the Open Software License version 3.0.
  */
 
-import { Box } from 'grommet';
+import { Box, Button, Heading } from 'grommet';
+import { Notification } from 'grommet-icons';
 
 const AppBar = (props) => (
   <Box
@@ -22,7 +23,10 @@ const AppBar = (props) => (
 function HomePage() {
   return (
     <>
-      <AppBar>Hello Grommet!</AppBar>
+      <AppBar>
+        <Heading level='3' margin='none'>My App</Heading>
+        <Button icon={<Notification />} onClick={() => {}} />
+      </AppBar>
       <div>Welcome to Next.js!</div>
     </>
   );
