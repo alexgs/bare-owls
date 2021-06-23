@@ -46,10 +46,16 @@ REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO $DATABASE_USER;
 
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO $DATABASE_USER;
+
+ALTER ROLE $DATABASE_USER WITH CREATEDB;
 ```
+NB: The last command is required for the [shadow database][3] used by Prisma 2.25 and later.
+
 7. Use `\q` to exit the client.
 1. Run `rm ~/.psql_history` to clear the client history (which contains the `$DATABASE_PASSWORD`).
 1. Use `pg_restore` or other tools to add data to the database.
+
+[3]: https://www.prisma.io/docs/concepts/components/prisma-migrate/shadow-database
 
 ## Getting started in production
 

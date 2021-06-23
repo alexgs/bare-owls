@@ -13,6 +13,7 @@ import {
 } from 'grommet';
 import { FormClose, Notification } from 'grommet-icons';
 import * as React from 'react';
+import { db } from '../lib';
 
 const AppBar = (props) => (
   <Box
@@ -28,7 +29,7 @@ const AppBar = (props) => (
   />
 );
 
-function HomePage() {
+function HomePage(props) {
   const [showSidebar, setShowSidebar] = React.useState(false);
 
   return (
@@ -44,7 +45,9 @@ function HomePage() {
           </AppBar>
           <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
             <Box flex align="center" justify="center">
-              Welcome to Next.js!<br />Screen size is {size}
+              Welcome to Next.js!<br />
+              Screen size is {size}.<br />
+              There are {props.posts} posts in the database.
             </Box>
             {(!showSidebar || size !== 'small') ? (
               <Collapsible direction="horizontal" open={showSidebar}>
@@ -88,6 +91,11 @@ function HomePage() {
       )}
     </ResponsiveContext.Consumer>
   );
+}
+
+export const getServerSideProps = async ({ req }) => {
+  const posts = await db.post.count();
+  return { props: { posts } }
 }
 
 export default HomePage;
