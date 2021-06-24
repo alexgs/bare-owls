@@ -54,9 +54,8 @@ services:
     image: alexgs99/node:2
     container_name: webapp
     restart: unless-stopped
-#    ports:
-#      - "${WEBAPP_PORT}:3000"
-#      - "5555:5555"
+    ports:
+      - "5555:5555"
     volumes:
       - .:/bare-owls
     working_dir: /bare-owls/webapp
@@ -66,14 +65,7 @@ services:
       - DATABASE_URL
     command: npm run dev
     labels:
-      - "traefik.http.routers.studio.entrypoints=prisma-studio"
-      - "traefik.http.routers.studio.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.studio.service=studio"
-      - "traefik.http.routers.studio.tls=true"
-      - "traefik.http.services.studio.loadbalancer.server.port=5555"
-      - "traefik.http.routers.webapp.entrypoints=web-secure"
       - "traefik.http.routers.webapp.rule=PathPrefix(`/`)"
-      - "traefik.http.routers.webapp.service=webapp"
       - "traefik.http.routers.webapp.tls=true"
       - "traefik.http.services.webapp.loadbalancer.server.port=3000"
 

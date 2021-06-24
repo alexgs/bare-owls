@@ -13,8 +13,6 @@ entryPoints:
           to: web-secure
   web-secure:
     address: ":443"
-  prisma-studio:
-    address: ":5555"
 log:
   filePath: /host/traefik.log
 providers:
