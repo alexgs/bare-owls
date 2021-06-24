@@ -21,6 +21,7 @@
   "dependencies": {
     "@prisma/client": "^2.25.0",
     "@types/react": "^17.0.11",
+    "env-var": "^7.0.1",
     "grommet": "^2.17.3",
     "grommet-icons": "^4.6.0",
     "next": "^11.0.0",
