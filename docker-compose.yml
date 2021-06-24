@@ -37,7 +37,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "8080:8080"
+      - "${TRAEFIK_DASHBOARD_PORT}:8080"
     volumes:
       - ./traefik:/etc/traefik
       - ./host/traefik:/host
@@ -55,7 +55,7 @@ services:
     container_name: webapp
     restart: unless-stopped
     ports:
-      - "5555:5555"
+      - "${PRISMA_STUDIO_PORT}:5555"
     volumes:
       - .:/bare-owls
     working_dir: /bare-owls/webapp
@@ -63,11 +63,12 @@ services:
       - owl-network
     environment:
       - DATABASE_URL
+      - WEBAPP_PORT
     command: npm run dev
     labels:
       - "traefik.http.routers.webapp.rule=PathPrefix(`/`)"
       - "traefik.http.routers.webapp.tls=true"
-      - "traefik.http.services.webapp.loadbalancer.server.port=3000"
+      - "traefik.http.services.webapp.loadbalancer.server.port=${WEBAPP_PORT}"
 
 networks:
   owl-network:
