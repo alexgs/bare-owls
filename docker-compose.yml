@@ -11,14 +11,51 @@ services:
     working_dir: /host
     networks:
       - owl-network
+    labels:
+      - "traefik.enable=false"
+
+  # https://github.com/Tecnativa/docker-socket-proxy
+  soxy:
+    image: tecnativa/docker-socket-proxy
+    container_name: soxy
+    networks:
+      - soxy-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      CONTAINERS: 1
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
+    labels:
+      - "traefik.enable=false"
+
+  traefik:
+    image: traefik:2.4
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "${TRAEFIK_DASHBOARD_PORT}:8080"
+    volumes:
+      - ./traefik:/etc/traefik
+      - ./host/traefik:/host
+    networks:
+      - owl-network
+      - soxy-net
+    depends_on:
+      - soxy
+      - webapp
+    labels:
+      - "traefik.enable=false"
 
   webapp:
     image: alexgs99/node:2
     container_name: webapp
     restart: unless-stopped
     ports:
-      - "${WEBAPP_PORT}:3000"
-      - "5555:5555"
+      - "${PRISMA_STUDIO_PORT}:5555"
     volumes:
       - .:/bare-owls
     working_dir: /bare-owls/webapp
@@ -26,9 +63,19 @@ services:
       - owl-network
     environment:
       - DATABASE_URL
+      - WEBAPP_PORT
     command: npm run dev
+    labels:
+      - "traefik.http.routers.webapp.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.webapp.tls=true"
+      - "traefik.http.services.webapp.loadbalancer.server.port=${WEBAPP_PORT}"
 
 networks:
   owl-network:
     driver: bridge
     name: owl-network
+  soxy-net:
+    driver: bridge
+    driver_opts:
+      encrypted: 'true' # We're passing Docker socket stuff over TCP, so encrypt
+    name: soxy-net

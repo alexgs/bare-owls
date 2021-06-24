@@ -12,9 +12,10 @@
   "license": "OSL-3.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p $WEBAPP_PORT",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p $WEBAPP_PORT",
+    "studio": "npx prisma studio",
     "lint": "next lint"
   },
   "dependencies": {
