@@ -12,6 +12,7 @@ import {
   ResponsiveContext,
 } from 'grommet';
 import { FormClose, Notification } from 'grommet-icons';
+import { useRouter } from 'next/router'
 import * as React from 'react';
 import { db } from '../lib';
 
@@ -30,6 +31,7 @@ const AppBar = (props) => (
 );
 
 function HomePage(props) {
+  const router = useRouter();
   const [showSidebar, setShowSidebar] = React.useState(false);
 
   return (
@@ -44,10 +46,8 @@ function HomePage(props) {
             />
           </AppBar>
           <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
-            <Box flex align="center" justify="center">
-              Welcome to Next.js!<br />
-              Screen size is {size}.<br />
-              There are {props.posts} posts in the database.
+            <Box flex align="start" direction="column" justify="start" pad="medium">
+              <Button label="Login" onClick={() => router.push('/login')} primary />
             </Box>
             {(!showSidebar || size !== 'small') ? (
               <Collapsible direction="horizontal" open={showSidebar}>
