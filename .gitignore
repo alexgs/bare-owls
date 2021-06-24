@@ -39,7 +39,7 @@
 **/dist
 **/generated
 **/node_modules
-logs/**/*.log
+host/**/*.log
 
 # misc
 .DS_Store

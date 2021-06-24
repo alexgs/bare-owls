@@ -12,13 +12,45 @@ services:
     networks:
       - owl-network
 
+  # https://github.com/Tecnativa/docker-socket-proxy
+  soxy:
+    image: tecnativa/docker-socket-proxy
+    container_name: soxy
+    networks:
+      - soxy-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      CONTAINERS: 1
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
+
+  traefik:
+    image: traefik:2.4
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - ./traefik:/etc/traefik
+      - ./host/traefik:/host
+    networks:
+      - owl-network
+      - soxy-net
+    depends_on:
+      - soxy
+      - webapp
+
   webapp:
     image: alexgs99/node:2
     container_name: webapp
     restart: unless-stopped
-    ports:
-      - "${WEBAPP_PORT}:3000"
-      - "5555:5555"
+#    ports:
+#      - "${WEBAPP_PORT}:3000"
+#      - "5555:5555"
     volumes:
       - .:/bare-owls
     working_dir: /bare-owls/webapp
@@ -27,8 +59,21 @@ services:
     environment:
       - DATABASE_URL
     command: npm run dev
+    labels:
+#      - "traefik.http.routers.studio.entrypoints=prisma-studio"
+#      - "traefik.http.routers.studio.rule=PathPrefix(`/`)"
+#      - "traefik.http.routers.studio.tls=true"
+#      - "traefik.http.services.studio.loadbalancer.server.port=5555"
+      - "traefik.http.routers.webapp.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.webapp.tls=true"
+      - "traefik.http.services.webapp.loadbalancer.server.port=3000"
 
 networks:
   owl-network:
     driver: bridge
     name: owl-network
+  soxy-net:
+    driver: bridge
+    driver_opts:
+      encrypted: 'true' # We're passing Docker socket stuff over TCP, so encrypt
+    name: soxy-net

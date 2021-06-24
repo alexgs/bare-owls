@@ -1,0 +1,25 @@
+accessLog:
+  filePath: /host/access.log
+api:
+  insecure: true
+  dashboard: true
+  debug: true
+entryPoints:
+  web-default:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: web-secure
+  web-secure:
+    address: ":443"
+#  prisma-studio:
+#    address: ":5555"
+log:
+  filePath: /host/traefik.log
+providers:
+  docker:
+    endpoint: "http://soxy:2375"
+    network: soxy-net
+  file:
+    directory: /etc/traefik
