@@ -11,6 +11,8 @@ services:
     working_dir: /host
     networks:
       - owl-network
+    labels:
+      - "traefik.enable=false"
 
   # https://github.com/Tecnativa/docker-socket-proxy
   soxy:
@@ -25,6 +27,8 @@ services:
       NETWORKS: 1
       SERVICES: 1
       TASKS: 1
+    labels:
+      - "traefik.enable=false"
 
   traefik:
     image: traefik:2.4
@@ -43,6 +47,8 @@ services:
     depends_on:
       - soxy
       - webapp
+    labels:
+      - "traefik.enable=false"
 
   webapp:
     image: alexgs99/node:2
@@ -60,11 +66,14 @@ services:
       - DATABASE_URL
     command: npm run dev
     labels:
-#      - "traefik.http.routers.studio.entrypoints=prisma-studio"
-#      - "traefik.http.routers.studio.rule=PathPrefix(`/`)"
-#      - "traefik.http.routers.studio.tls=true"
-#      - "traefik.http.services.studio.loadbalancer.server.port=5555"
+      - "traefik.http.routers.studio.entrypoints=prisma-studio"
+      - "traefik.http.routers.studio.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.studio.service=studio"
+      - "traefik.http.routers.studio.tls=true"
+      - "traefik.http.services.studio.loadbalancer.server.port=5555"
+      - "traefik.http.routers.webapp.entrypoints=web-secure"
       - "traefik.http.routers.webapp.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.webapp.service=webapp"
       - "traefik.http.routers.webapp.tls=true"
       - "traefik.http.services.webapp.loadbalancer.server.port=3000"
 
