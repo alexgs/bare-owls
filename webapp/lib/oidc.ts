@@ -10,11 +10,13 @@ const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
 const CLIENT_ID = env.get('AUTH0_CLIENT_ID').required().asString();
 const DOMAIN = env.get('AUTH0_DOMAIN').required().asString();
 
+export const CALLBACK = `${BASE_URL}/api/callback`;
+
 export async function getAuth0Client() {
   const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
   return new issuer.Client({
     client_id: CLIENT_ID,
-    redirect_uris: [`${BASE_URL}/callback`],
+    redirect_uris: [CALLBACK],
     response_types: ['id_token token'],
   });
 }

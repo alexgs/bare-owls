@@ -10,11 +10,12 @@ import {
 } from 'next';
 import { generators } from 'openid-client';
 import * as React from 'react';
-import { getAuth0Client } from '../lib/oidc';
+import { getAuth0Client } from 'lib';
 
 const COOKIE_OPTIONS: cookie.CookieSerializeOptions = {
   httpOnly: true,
   maxAge: 180,
+  path: '/',
   secure: true,
 };
 
@@ -23,15 +24,15 @@ const Login: React.FC = () => {
 };
 
 export async function getServerSideProps(
-  context: GetServerSidePropsContext
+  context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<unknown>> {
   const nonce = generators.nonce();
 
   const client = await getAuth0Client();
   const url = client.authorizationUrl({
     nonce,
-    scope: 'openid email profile',
     response_mode: 'form_post',
+    scope: 'openid email profile',
   });
 
   const nonceCookie = cookie.serialize('bare-owls-nonce', nonce, COOKIE_OPTIONS);

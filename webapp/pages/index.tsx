@@ -39,7 +39,7 @@ function HomePage(props) {
       {(size) => (
         <Box fill>
           <AppBar>
-            <Heading level="3" margin="none">My App</Heading>
+            <Heading level="3" margin="none">Bare Owls</Heading>
             <Button
               icon={<Notification />}
               onClick={() => setShowSidebar(!showSidebar)}

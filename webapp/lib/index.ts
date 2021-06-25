@@ -3,6 +3,5 @@
  * the Open Software License version 3.0.
  */
 
+export * from './oidc';
 export { default as db } from './prisma';
-
-import './oidc';
