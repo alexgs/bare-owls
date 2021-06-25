@@ -66,6 +66,7 @@ services:
       - AUTH0_CLIENT_SECRET
       - AUTH0_DOMAIN
       - DATABASE_URL
+      - WEBAPP_BASE_URL
       - WEBAPP_PORT
     command: npm run dev
     labels:

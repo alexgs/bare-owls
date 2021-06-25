@@ -47,7 +47,7 @@ function HomePage(props) {
           </AppBar>
           <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
             <Box flex align="start" direction="column" justify="start" pad="medium">
-              <Button label="Login" onClick={() => router.push('/login')} primary />
+              <Button label="Login" onClick={() => router.push('/api/login')} primary />
             </Box>
             {(!showSidebar || size !== 'small') ? (
               <Collapsible direction="horizontal" open={showSidebar}>

@@ -4,3 +4,5 @@
  */
 
 export { default as db } from './prisma';
+
+import './oidc';
