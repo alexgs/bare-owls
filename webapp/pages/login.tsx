@@ -10,7 +10,7 @@ import {
 } from 'next';
 import { generators } from 'openid-client';
 import * as React from 'react';
-import { getAuth0Client } from 'lib';
+import { COOKIE, getAuth0Client } from 'lib';
 
 const COOKIE_OPTIONS: cookie.CookieSerializeOptions = {
   httpOnly: true,
@@ -35,7 +35,7 @@ export async function getServerSideProps(
     scope: 'openid email profile',
   });
 
-  const nonceCookie = cookie.serialize('bare-owls-nonce', nonce, COOKIE_OPTIONS);
+  const nonceCookie = cookie.serialize(COOKIE.NONCE, nonce, COOKIE_OPTIONS);
   context.res.setHeader('set-cookie', nonceCookie);
   return {
     redirect: {
