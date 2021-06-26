@@ -18,7 +18,7 @@ import * as React from 'react';
 import { LOGIN_PATH } from 'lib';
 import db from 'server-lib/prisma';
 
-const AppBar = (props) => (
+const AppBar = (props: Record<string, unknown>) => (
   <Box
     tag="header"
     direction="row"
@@ -27,12 +27,12 @@ const AppBar = (props) => (
     background="brand"
     pad={{ left: 'medium', right: 'small', vertical: 'small' }}
     elevation="medium"
-    style={{ zIndex: '1' }}
+    style={{ zIndex: 1 }}
     {...props}
   />
 );
 
-function HomePage(props) {
+function HomePage() {
   const router = useRouter();
   const [showSidebar, setShowSidebar] = React.useState(false);
 
@@ -95,7 +95,7 @@ function HomePage(props) {
   );
 }
 
-export const getServerSideProps = async ({ req }) => {
+export const getServerSideProps = async () => {
   const posts = await db.post.count();
   return { props: { posts } }
 }

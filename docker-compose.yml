@@ -71,6 +71,7 @@ services:
       - IRON_CURRENT_PWD
       - IRON_PASSWORDS
       - IRON_SEAL_TTL
+      - SESSION_TTL
       - WEBAPP_BASE_URL
       - WEBAPP_PORT
     command: npm run dev
