@@ -20,9 +20,12 @@ interface SealPassword {
 
 const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
 const CLIENT_ID = env.get('AUTH0_CLIENT_ID').required().asString();
-const COOKIE_CURRENT_PWD = env.get('COOKIE_CURRENT_PWD').required().asString();
-const COOKIE_PASSWORDS = env.get('COOKIE_PASSWORDS').required().asJsonArray();
+const COOKIE_NONCE_TTL = env.get('COOKIE_NONCE_TTL').required().asString();
+const COOKIE_SESSION_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
 const DOMAIN = env.get('AUTH0_DOMAIN').required().asString();
+const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
+const IRON_PASSWORDS = env.get('IRON_PASSWORDS').required().asJsonArray();
+const IRON_SEAL_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
 
 export const CALLBACK_URL = `${BASE_URL}/api/callback`;
 export const COOKIE = {
@@ -38,7 +41,7 @@ export const COOKIE_OPTIONS: CookieOptionsSet = {
   },
   NONCE_SET: {
     httpOnly: true,
-    maxAge: seconds('3m'),
+    maxAge: seconds(COOKIE_NONCE_TTL),
     path: '/',
     secure: true,
   },
@@ -51,7 +54,7 @@ export const COOKIE_OPTIONS: CookieOptionsSet = {
   },
   SESSION_SET: {
     httpOnly: true,
-    maxAge: seconds('7d'),
+    maxAge: seconds(COOKIE_SESSION_TTL),
     path: '/',
     sameSite: 'strict',
     secure: true,
@@ -72,7 +75,7 @@ export const IRON_OPTIONS: SealOptions = {
     iterations: 1,
     minPasswordlength: 32,
   },
-  ttl: ms('30d'),
+  ttl: ms(IRON_SEAL_TTL),
   timestampSkewSec: 60,
   localtimeOffsetMsec: 0,
 };
@@ -80,16 +83,16 @@ export const IRON_SEAL = formatSealPassword();
 export const IRON_UNSEAL = formatUnsealPasswords();
 
 function formatSealPassword(): SealPassword {
-  const output = COOKIE_PASSWORDS.find(value => value.id === COOKIE_CURRENT_PWD);
+  const output = IRON_PASSWORDS.find(value => value.id === IRON_CURRENT_PWD);
   if (!output) {
-    throw new Error('No record matching value of COOKIE_CURRENT_PWD found in COOKIE_PASSWORDS.');
+    throw new Error('No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.');
   }
   return output;
 }
 
 function formatUnsealPasswords() {
   const output = {};
-  COOKIE_PASSWORDS.forEach((value: SealPassword) => {
+  IRON_PASSWORDS.forEach((value: SealPassword) => {
     output[value.id] = value.secret;
   });
   return output;

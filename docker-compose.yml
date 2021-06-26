@@ -65,9 +65,12 @@ services:
       - AUTH0_CLIENT_ID
       - AUTH0_CLIENT_SECRET
       - AUTH0_DOMAIN
-      - COOKIE_CURRENT_PWD
-      - COOKIE_PASSWORDS
+      - COOKIE_NONCE_TTL
+      - COOKIE_SESSION_TTL
       - DATABASE_URL
+      - IRON_CURRENT_PWD
+      - IRON_PASSWORDS
+      - IRON_SEAL_TTL
       - WEBAPP_BASE_URL
       - WEBAPP_PORT
     command: npm run dev
