@@ -11,8 +11,10 @@ import { NextApiRequest } from 'next';
 import { IdTokenClaims, Issuer } from 'openid-client';
 
 import { seconds } from 'lib';
-import { startSession } from 'server-lib/session';
+import { prisma } from 'server-lib';
 import { UserData } from 'types';
+
+import { startSession } from './session';
 
 type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
 
@@ -119,21 +121,20 @@ export async function handleOidcResponse(req: NextApiRequest): Promise<string> {
   const client = await getOidcClient();
   const params = client.callbackParams(req);
   const tokens = await client.callback(CALLBACK_URL, params, { nonce });
-
   const claims = tokens.claims();
 
-  let userData: UserData | null = null;
-  const isRegisteredSubject = 'query'; // TODO
-  if (isRegisteredSubject) {
-    userData = await login(claims);
-  } else {
-    userData = await register(claims);
-  }
-
+  const isRegisteredSubject = await isRegistered(claims);
+  const userData = isRegisteredSubject ? await login(claims) : await register(claims);
   return startSession(userData);
 }
 
-
+async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
+  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
+  if (count > 1) {
+    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
+  }
+  return count === 1;
+}
 
 async function login(claims: IdTokenClaims): Promise<UserData> {
   // TODO
