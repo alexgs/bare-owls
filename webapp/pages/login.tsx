@@ -10,14 +10,7 @@ import {
 } from 'next';
 import { generators } from 'openid-client';
 import * as React from 'react';
-import { COOKIE, getOidcClient } from 'lib';
-
-const COOKIE_OPTIONS: cookie.CookieSerializeOptions = {
-  httpOnly: true,
-  maxAge: 180,
-  path: '/',
-  secure: true,
-};
+import { COOKIE, COOKIE_OPTIONS, getOidcClient } from 'lib';
 
 const Login: React.FC = () => {
   return (<div>Login Page</div>);
@@ -35,7 +28,7 @@ export async function getServerSideProps(
     scope: 'openid email profile',
   });
 
-  const nonceCookie = cookie.serialize(COOKIE.NONCE, nonce, COOKIE_OPTIONS);
+  const nonceCookie = cookie.serialize(COOKIE.NONCE, nonce, COOKIE_OPTIONS.NONCE_SET);
   context.res.setHeader('set-cookie', nonceCookie);
   return {
     redirect: {

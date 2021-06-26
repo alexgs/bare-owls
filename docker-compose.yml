@@ -65,6 +65,8 @@ services:
       - AUTH0_CLIENT_ID
       - AUTH0_CLIENT_SECRET
       - AUTH0_DOMAIN
+      - COOKIE_CURRENT_PWD
+      - COOKIE_PASSWORDS
       - DATABASE_URL
       - WEBAPP_BASE_URL
       - WEBAPP_PORT
