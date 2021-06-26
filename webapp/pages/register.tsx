@@ -3,9 +3,19 @@
  * the Open Software License version 3.0.
  */
 
+import {
+  Box,
+  Button,
+  Form, FormExtendedEvent,
+  FormField,
+  Heading,
+  Paragraph,
+  TextInput,
+} from 'grommet';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
 
+import { AppBar } from 'components';
 import { prisma } from 'server-lib';
 
 interface Props {
@@ -14,8 +24,66 @@ interface Props {
   tokenId: string;
 }
 
+interface State {
+  email: string;
+  name: string;
+  username: string;
+}
+
 const Register: React.FC<Props> = (props: Props) => {
-  return (<div>Hello {props.displayName}!</div>);
+  const initialState: State = {
+    name: props.displayName ?? '',
+    email: props.email ?? '',
+    username: '',
+  };
+  const [value, setValue] = React.useState<State>(initialState);
+
+  function handleChange(nextValue: State) {
+    setValue(nextValue);
+  }
+
+  function handleReset() {
+    setValue(initialState);
+  }
+
+  function handleSubmit(event: FormExtendedEvent<State>) {
+    console.log(`<<- ${JSON.stringify(event.value)} ->>`);
+  }
+
+  return (
+    <>
+      <AppBar>
+        <Heading level="3" margin="none">Bare Owls</Heading>
+      </AppBar>
+
+      <Box align="center" pad="medium" width={'100%'}>
+        <Heading level={1} margin="none">Welcome!</Heading>
+        <Paragraph>Please check your details before you get started.</Paragraph>
+        <Box width={'50%'}>
+          <Form
+            value={value}
+            onChange={handleChange}
+            onReset={handleReset}
+            onSubmit={handleSubmit}
+          >
+            <FormField name="username" htmlFor="username-input" label="Username">
+              <TextInput id="username-input" name="username" />
+            </FormField>
+            <FormField name="name" htmlFor="name-input" label="Name">
+              <TextInput id="name-input" name="name" />
+            </FormField>
+            <FormField name="email" htmlFor="email-input" label="Email address">
+              <TextInput id="email-input" name="email" />
+            </FormField>
+            <Box direction="row" gap="medium" margin={{ top: 'large' }}>
+              <Button type="submit" primary label="Submit" />
+              <Button type="reset" label="Reset" />
+            </Box>
+          </Form>
+        </Box>
+      </Box>
+    </>
+  );
 };
 
 export const getServerSideProps = async (
