@@ -10,7 +10,7 @@ import {
 } from 'next';
 import { generators } from 'openid-client';
 import * as React from 'react';
-import { COOKIE, getAuth0Client } from 'lib';
+import { COOKIE, getOidcClient } from 'lib';
 
 const COOKIE_OPTIONS: cookie.CookieSerializeOptions = {
   httpOnly: true,
@@ -28,7 +28,7 @@ export async function getServerSideProps(
 ): Promise<GetServerSidePropsResult<unknown>> {
   const nonce = generators.nonce();
 
-  const client = await getAuth0Client();
+  const client = await getOidcClient();
   const url = client.authorizationUrl({
     nonce,
     response_mode: 'form_post',

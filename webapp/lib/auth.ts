@@ -17,7 +17,7 @@ export const COOKIE = {
 };
 export const LOGIN_PATH = '/login';
 
-export async function getAuth0Client() {
+export async function getOidcClient() {
   const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
   return new issuer.Client({
     client_id: CLIENT_ID,

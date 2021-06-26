@@ -4,7 +4,7 @@
  */
 
 import * as cookie from 'cookie';
-import { CALLBACK, COOKIE, getAuth0Client } from 'lib';
+import { CALLBACK, COOKIE, getOidcClient } from 'lib';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 const COOKIE_OPTIONS: cookie.CookieSerializeOptions = {
@@ -25,7 +25,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const nonceCookie = cookie.serialize(COOKIE.NONCE, '', COOKIE_OPTIONS);
     res.setHeader('set-cookie', nonceCookie);
 
-    const client = await getAuth0Client();
+    const client = await getOidcClient();
     const params = client.callbackParams(req);
     const tokens = await client.callback(CALLBACK, params, { nonce });
 
