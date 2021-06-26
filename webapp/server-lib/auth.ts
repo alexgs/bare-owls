@@ -34,14 +34,12 @@ export const COOKIE_OPTIONS: CookieOptionsSet = {
     httpOnly: true,
     expires: new Date(0),
     path: '/',
-    sameSite: 'strict',
     secure: true,
   },
   NONCE_SET: {
     httpOnly: true,
     maxAge: seconds('3m'),
     path: '/',
-    sameSite: 'strict',
     secure: true,
   },
   SESSION_RM: {

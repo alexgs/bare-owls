@@ -27,7 +27,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // Delete the nonce cookie
     const nonceCookie = cookie.serialize(COOKIE.NONCE, '', COOKIE_OPTIONS.NONCE_RM);
-    res.setHeader('set-cookie', nonceCookie);
 
     const client = await getOidcClient();
     const params = client.callbackParams(req);
@@ -41,7 +40,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     });
     const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
     const sessionCookie = cookie.serialize(COOKIE.SESSION, sealedId, COOKIE_OPTIONS.SESSION_SET);
-    res.setHeader('set-cookie', sessionCookie);
+    res.setHeader('set-cookie', [nonceCookie, sessionCookie]);
   }
 
   res.redirect(302, '/');

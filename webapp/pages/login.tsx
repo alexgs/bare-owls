@@ -4,6 +4,7 @@
  */
 
 import * as cookie from 'cookie';
+import { Anchor, Box } from 'grommet';
 import {
   GetServerSidePropsContext,
   GetServerSidePropsResult,
@@ -12,7 +13,20 @@ import { generators } from 'openid-client';
 import * as React from 'react';
 import { COOKIE, COOKIE_OPTIONS, getOidcClient } from 'server-lib';
 
-const Login: React.FC = () => {
+const showLink = false; // Useful for debugging
+
+interface Props {
+  url?: string;
+}
+
+const Login: React.FC<Props> = (props: Props) => {
+  if (showLink && props.url) {
+    return (
+      <Box flex align="start" direction="column" justify="start" pad="medium">
+        <Anchor label="Do it" href={props.url} />
+      </Box>
+    );
+  }
   return (<div>Login Page</div>);
 };
 
@@ -30,6 +44,9 @@ export async function getServerSideProps(
 
   const nonceCookie = cookie.serialize(COOKIE.NONCE, nonce, COOKIE_OPTIONS.NONCE_SET);
   context.res.setHeader('set-cookie', nonceCookie);
+  if (showLink) {
+    return { props: { url } };
+  }
   return {
     redirect: {
       destination: url,

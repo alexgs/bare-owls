@@ -8,7 +8,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getSession } from 'server-lib';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session = getSession(req);
+  const session = await getSession(req);
+  res.json( session );
 }
 
 export default handler;

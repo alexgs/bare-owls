@@ -9,6 +9,7 @@ import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
 
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL } from 'server-lib';
+import store from './session-store';
 
 interface Session {
   user?: UserData;
@@ -22,8 +23,6 @@ interface UserData {
   id: string;
   name: string;
 }
-
-const store: Record<string, Session> = {};
 
 function generateSessionId(): string {
   return nanoid();
