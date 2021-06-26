@@ -11,7 +11,7 @@ import { NextApiRequest } from 'next';
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL } from 'server-lib';
 import store from './session-store';
 
-interface Session {
+export interface Session {
   user?: UserData;
   expires: Date;
 }

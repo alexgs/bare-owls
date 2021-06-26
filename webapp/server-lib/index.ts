@@ -5,4 +5,3 @@
 
 export * from './auth';
 export * from './session';
-export { default as db } from './prisma';

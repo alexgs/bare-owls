@@ -16,7 +16,7 @@ import { useRouter } from 'next/router'
 import * as React from 'react';
 
 import { LOGIN_PATH } from 'lib';
-import { db } from 'server-lib';
+import db from 'server-lib/prisma';
 
 const AppBar = (props) => (
   <Box
