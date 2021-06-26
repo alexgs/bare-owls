@@ -91,7 +91,7 @@ function formatSealPassword(): SealPassword {
 }
 
 function formatUnsealPasswords() {
-  const output = {};
+  const output: Record<string, string> = {};
   IRON_PASSWORDS.forEach((value: SealPassword) => {
     output[value.id] = value.secret;
   });

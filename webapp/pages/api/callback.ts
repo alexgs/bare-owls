@@ -33,7 +33,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     const tokens = await client.callback(CALLBACK_URL, params, { nonce });
 
     const claims = tokens.claims();
-    const sessionId = startSession({
+    const sessionId = await startSession({
       email: claims.email as string,
       id: nanoid(),
       name: claims.name as string,

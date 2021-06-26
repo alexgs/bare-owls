@@ -3,7 +3,6 @@
  * the Open Software License version 3.0.
  */
 
-// If this continues to be a problem, we can import from `.prisma/client` instead.
 import { PrismaClient } from '@prisma/client';
 
 // add prisma to the NodeJS global type
