@@ -87,7 +87,10 @@ export const IRON_OPTIONS: SealOptions = {
 export const IRON_SEAL = formatSealPassword();
 export const IRON_UNSEAL = formatUnsealPasswords();
 
-function formatSealPassword(): SealPassword {
+// --- INTERNAL FUNCTIONS ---
+
+/** @internal */
+export function formatSealPassword(): SealPassword {
   const output = IRON_PASSWORDS.find(value => value.id === IRON_CURRENT_PWD);
   if (!output) {
     throw new Error('No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.');
@@ -95,13 +98,35 @@ function formatSealPassword(): SealPassword {
   return output;
 }
 
-function formatUnsealPasswords() {
+/** @internal */
+export function formatUnsealPasswords() {
   const output: Record<string, string> = {};
   IRON_PASSWORDS.forEach((value: SealPassword) => {
     output[value.id] = value.secret;
   });
   return output;
 }
+
+/** @internal */
+async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
+  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
+  if (count > 1) {
+    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
+  }
+  return count === 1;
+}
+
+/** @internal */
+async function login(claims: IdTokenClaims): Promise<UserData> {
+  // TODO
+}
+
+/** @internal */
+async function register(claims: IdTokenClaims): Promise<UserData> {
+  // TODO
+}
+
+// --- PUBLIC FUNCTIONS ---
 
 export async function getOidcClient() {
   const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
@@ -128,18 +153,3 @@ export async function handleOidcResponse(req: NextApiRequest): Promise<string> {
   return startSession(userData);
 }
 
-async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
-  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
-  if (count > 1) {
-    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
-  }
-  return count === 1;
-}
-
-async function login(claims: IdTokenClaims): Promise<UserData> {
-  // TODO
-}
-
-async function register(claims: IdTokenClaims): Promise<UserData> {
-  // TODO
-}

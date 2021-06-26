@@ -96,7 +96,7 @@ function HomePage() {
 }
 
 export const getServerSideProps = async () => {
-  const posts = await db.post.count();
+  const posts = await db.userAccount.count();
   return { props: { posts } }
 }
 
