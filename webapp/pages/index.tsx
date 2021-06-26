@@ -14,7 +14,9 @@ import {
 import { FormClose, Notification } from 'grommet-icons';
 import { useRouter } from 'next/router'
 import * as React from 'react';
-import { LOGIN_PATH, db } from 'lib';
+
+import { LOGIN_PATH } from 'lib';
+import { db } from 'server-lib';
 
 const AppBar = (props) => (
   <Box

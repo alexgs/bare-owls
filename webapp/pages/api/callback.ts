@@ -5,6 +5,9 @@
 
 import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
+import { nanoid } from 'nanoid';
+import type { NextApiRequest, NextApiResponse } from 'next';
+
 import {
   CALLBACK_URL,
   COOKIE,
@@ -12,10 +15,8 @@ import {
   IRON_OPTIONS,
   IRON_SEAL,
   getOidcClient,
-} from 'lib';
-import { startSession } from 'lib/session';
-import { nanoid } from 'nanoid';
-import type { NextApiRequest, NextApiResponse } from 'next';
+  startSession,
+} from 'server-lib';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {

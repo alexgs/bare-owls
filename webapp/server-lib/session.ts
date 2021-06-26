@@ -8,7 +8,7 @@ import add from 'date-fns/add'
 import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
 
-import { COOKIE, IRON_OPTIONS, IRON_UNSEAL } from 'lib';
+import { COOKIE, IRON_OPTIONS, IRON_UNSEAL } from 'server-lib';
 
 interface Session {
   user?: UserData;

@@ -9,7 +9,7 @@ import * as env from 'env-var';
 import ms from 'ms';
 import { Issuer } from 'openid-client';
 
-import { seconds } from './seconds';
+import { seconds } from 'lib';
 
 type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
 
@@ -80,7 +80,6 @@ export const IRON_OPTIONS: SealOptions = {
 };
 export const IRON_SEAL = formatSealPassword();
 export const IRON_UNSEAL = formatUnsealPasswords();
-export const LOGIN_PATH = '/login';
 
 function formatSealPassword(): SealPassword {
   const output = COOKIE_PASSWORDS.find(value => value.id === COOKIE_CURRENT_PWD);
