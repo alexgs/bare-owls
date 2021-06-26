@@ -31,6 +31,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
     // console.log('received and validated tokens %j', tokens);
     console.log('validated ID Token claims %j', tokens.claims());
+    // TODO Save session data, get back a session ID
+    // TODO Seal the session ID
+    // TODO Put the sealed data in a cookie
   }
 
   res.redirect(302, '/');

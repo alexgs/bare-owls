@@ -12,8 +12,10 @@ const DOMAIN = env.get('AUTH0_DOMAIN').required().asString();
 
 export const CALLBACK = `${BASE_URL}/api/callback`;
 export const COOKIE = {
+  SESSION: 'iron-owl',
   NONCE: 'bare-owls-nonce',
 };
+export const LOGIN_PATH = '/login';
 
 export async function getAuth0Client() {
   const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
