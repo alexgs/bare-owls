@@ -49,13 +49,18 @@ model UserEmail {
 }
 
 model UserOpenIdToken {
-  sub       String      @id
-  iss       String
-  aud       String
-  exp       DateTime
-  iat       DateTime
-  account   UserAccount @relation(fields: [accountId], references: [id])
-  accountId String
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id            String       @id
+  sub           String       @unique
+  iss           String
+  aud           String
+  exp           DateTime
+  iat           DateTime
+  email         String?
+  emailVerified Boolean      @default(false)
+  name          String?
+  nickname      String?
+  account       UserAccount? @relation(fields: [accountId], references: [id])
+  accountId     String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }

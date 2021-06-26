@@ -7,6 +7,7 @@ import { SealOptions } from '@hapi/iron';
 import * as cookie from 'cookie';
 import * as env from 'env-var';
 import ms from 'ms';
+import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
 import { IdTokenClaims, Issuer } from 'openid-client';
 
@@ -108,25 +109,35 @@ export function formatUnsealPasswords() {
 }
 
 /** @internal */
-async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
-  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
-  if (count > 1) {
-    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
-  }
-  return count === 1;
-}
-
-/** @internal */
-async function login(claims: IdTokenClaims): Promise<UserData> {
+export async function login(claims: IdTokenClaims): Promise<UserData> {
   // TODO
 }
 
 /** @internal */
-async function register(claims: IdTokenClaims): Promise<UserData> {
+export async function register(claims: IdTokenClaims): Promise<UserData> {
   // TODO
+  // const account = await prisma.userAccount.create({
+  //   data: {
+  //     id: nanoid(),
+  //     displayName: claims.name,
+  //     username: claims.email,
+  //   }
+  // })
 }
 
 // --- PUBLIC FUNCTIONS ---
+
+export async function extractOpenIdToken(req: NextApiRequest): Promise<IdTokenClaims> {
+  const nonce = req.cookies[COOKIE.NONCE];
+  if (!nonce) {
+    throw new Error('Unable to load nonce from cookie');
+  }
+
+  const client = await getOidcClient();
+  const params = client.callbackParams(req);
+  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+  return tokens.claims();
+}
 
 export async function getOidcClient() {
   const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
@@ -153,3 +164,29 @@ export async function handleOidcResponse(req: NextApiRequest): Promise<string> {
   return startSession(userData);
 }
 
+export async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
+  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
+  if (count > 1) {
+    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
+  }
+  return count === 1;
+}
+
+export async function storeOpenIdToken(claims: IdTokenClaims): Promise<string> {
+  const aud = Array.isArray(claims.aud) ? JSON.stringify(claims.aud) : claims.aud;
+  const token = await prisma.userOpenIdToken.create({
+    data: {
+      aud,
+      id: nanoid(),
+      sub: claims.sub,
+      iss: claims.iss,
+      exp: new Date(claims.exp * 1000),
+      iat: new Date(claims.iat * 1000),
+      email: claims.email,
+      emailVerified: claims.email_verified,
+      name: claims.name,
+      nickname: claims.nickname,
+    }
+  });
+  return token.id;
+}

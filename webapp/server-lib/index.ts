@@ -9,8 +9,11 @@ export {
   IRON_OPTIONS,
   IRON_SEAL,
   IRON_UNSEAL,
+  extractOpenIdToken,
   getOidcClient,
   handleOidcResponse,
+  isRegistered,
+  storeOpenIdToken,
 } from './auth';
 export * from './session';
 export { default as prisma } from './prisma';

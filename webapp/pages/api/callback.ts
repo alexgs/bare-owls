@@ -6,41 +6,41 @@
 import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import queryString from 'query-string';
 
 import {
   COOKIE,
   COOKIE_OPTIONS,
   IRON_OPTIONS,
   IRON_SEAL,
+  extractOpenIdToken,
   handleOidcResponse,
+  isRegistered,
+  storeOpenIdToken,
 } from 'server-lib';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const nonceCookie = cookie.serialize(COOKIE.NONCE, '', COOKIE_OPTIONS.NONCE_RM);
+  const cookies = [nonceCookie];
+  let path = '/';
+
   if (req.method === 'POST') {
-    const sessionId = await handleOidcResponse(req);
-    const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
+    const claims = await extractOpenIdToken(req);
+    const isRegisteredSubject = await isRegistered(claims);
+    if (isRegisteredSubject) {
+      const sessionId = await handleOidcResponse(req);
+      const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
 
-    const nonceCookie = cookie.serialize(COOKIE.NONCE, '', COOKIE_OPTIONS.NONCE_RM);
-    const sessionCookie = cookie.serialize(COOKIE.SESSION, sealedId, COOKIE_OPTIONS.SESSION_SET);
-    res.setHeader('set-cookie', [nonceCookie, sessionCookie]);
+      const sessionCookie = cookie.serialize(COOKIE.SESSION, sealedId, COOKIE_OPTIONS.SESSION_SET);
+      cookies.push(sessionCookie);
+    } else {
+      const tokenId = await storeOpenIdToken(claims);
+      const query = queryString.stringify({ tokenId });
+      path = `/register?${query}`;
+    }
   }
-
-  res.redirect(302, '/');
+  res.setHeader('set-cookie', cookies);
+  res.redirect(302, path);
 }
-
-const exampleClaims = {
-  'nickname': 'alex.nebula99',
-  'name': 'alex.nebula99@gmail.com',
-  'updated_at': '2021-06-25T19:01:43.605Z',
-  'email': 'alex.nebula99@gmail.com',
-  'email_verified': true,
-  'iss': 'https://ickyzoo.auth0.com/',
-  'sub': 'auth0|5f9a2086418fef0068432d33',
-  'aud': '4b8knwdjR5LP5qKIJnXlzvD8sEag3c2L',
-  'iat': 1624647703,
-  'exp': 1624683703,
-  'at_hash': '1hcZboNe_MaFYTZ-jsCWJw',
-  'nonce': 'JXRW6XKlLc0GR6WeneyOex5QtAACS4x43SdTHKSvI14',
-};
 
 export default handler;
