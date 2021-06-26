@@ -14,7 +14,9 @@ import {
 import { FormClose, Notification } from 'grommet-icons';
 import { useRouter } from 'next/router'
 import * as React from 'react';
-import { db } from '../lib';
+
+import { LOGIN_PATH } from 'lib';
+import db from 'server-lib/prisma';
 
 const AppBar = (props) => (
   <Box
@@ -47,7 +49,7 @@ function HomePage(props) {
           </AppBar>
           <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
             <Box flex align="start" direction="column" justify="start" pad="medium">
-              <Button label="Login" onClick={() => router.push('/login')} primary />
+              <Button label="Login" onClick={() => router.push(LOGIN_PATH)} primary />
             </Box>
             {(!showSidebar || size !== 'small') ? (
               <Collapsible direction="horizontal" open={showSidebar}>

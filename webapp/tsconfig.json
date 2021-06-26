@@ -21,6 +21,8 @@
       "components": ["./components"],
       "components/*": ["./components/*"],
       "lib": ["./lib"],
+      "server-lib": ["./server-lib"],
+      "server-lib/*": ["./server-lib/*"],
       "types": ["./types"]
     },
     "resolveJsonModule": true,
