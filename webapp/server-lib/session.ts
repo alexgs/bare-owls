@@ -48,7 +48,7 @@ export async function getSession(req: NextApiRequest): Promise<Session> {
   return {
     expires: data.expires,
     user: {
-      id: data.userId,
+      id: data.accountId,
       email: data.email,
       name: data.displayName,
     },
@@ -65,10 +65,10 @@ export async function startSession(data: UserData): Promise<SessionId> {
   await prisma.session.create({
     data: {
       id,
+      accountId: data.id,
       displayName: data.name,
       email: data.email,
       expires: session.expires,
-      userId: data.id,
     }
   });
   return id;
