@@ -10,21 +10,9 @@ import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
 
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL, prisma } from 'server-lib';
+import { Session, SessionId, UserData } from 'types';
 
 const SESSION_TTL = env.get('SESSION_TTL').required().asString();
-
-export interface Session {
-  user?: UserData;
-  expires: Date;
-}
-
-type SessionId = string;
-
-interface UserData {
-  email: string;
-  id: string;
-  name: string;
-}
 
 function generateSessionId(): string {
   return nanoid();

@@ -7,9 +7,12 @@ import { SealOptions } from '@hapi/iron';
 import * as cookie from 'cookie';
 import * as env from 'env-var';
 import ms from 'ms';
-import { Issuer } from 'openid-client';
+import { NextApiRequest } from 'next';
+import { IdTokenClaims, Issuer } from 'openid-client';
 
 import { seconds } from 'lib';
+import { startSession } from 'server-lib/session';
+import { UserData } from 'types';
 
 type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
 
@@ -105,4 +108,37 @@ export async function getOidcClient() {
     redirect_uris: [CALLBACK_URL],
     response_types: ['id_token token'],
   });
+}
+
+export async function handleOidcResponse(req: NextApiRequest): Promise<string> {
+  const nonce = req.cookies[COOKIE.NONCE];
+  if (!nonce) {
+    throw new Error('Unable to load nonce from cookie');
+  }
+
+  const client = await getOidcClient();
+  const params = client.callbackParams(req);
+  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+
+  const claims = tokens.claims();
+
+  let userData: UserData | null = null;
+  const isRegisteredSubject = 'query'; // TODO
+  if (isRegisteredSubject) {
+    userData = await login(claims);
+  } else {
+    userData = await register(claims);
+  }
+
+  return startSession(userData);
+}
+
+
+
+async function login(claims: IdTokenClaims): Promise<UserData> {
+  // TODO
+}
+
+async function register(claims: IdTokenClaims): Promise<UserData> {
+  // TODO
 }

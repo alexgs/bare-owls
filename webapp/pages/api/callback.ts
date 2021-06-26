@@ -5,40 +5,22 @@
 
 import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
-import { nanoid } from 'nanoid';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 import {
-  CALLBACK_URL,
   COOKIE,
   COOKIE_OPTIONS,
   IRON_OPTIONS,
   IRON_SEAL,
-  getOidcClient,
-  startSession,
+  handleOidcResponse,
 } from 'server-lib';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const nonce = req.cookies[COOKIE.NONCE];
-    if (!nonce) {
-      throw new Error('Unable to load nonce from cookie');
-    }
-
-    // Delete the nonce cookie
-    const nonceCookie = cookie.serialize(COOKIE.NONCE, '', COOKIE_OPTIONS.NONCE_RM);
-
-    const client = await getOidcClient();
-    const params = client.callbackParams(req);
-    const tokens = await client.callback(CALLBACK_URL, params, { nonce });
-
-    const claims = tokens.claims();
-    const sessionId = await startSession({
-      email: claims.email as string,
-      id: nanoid(),
-      name: claims.name as string,
-    });
+    const sessionId = await handleOidcResponse(req);
     const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
+
+    const nonceCookie = cookie.serialize(COOKIE.NONCE, '', COOKIE_OPTIONS.NONCE_RM);
     const sessionCookie = cookie.serialize(COOKIE.SESSION, sealedId, COOKIE_OPTIONS.SESSION_SET);
     res.setHeader('set-cookie', [nonceCookie, sessionCookie]);
   }
