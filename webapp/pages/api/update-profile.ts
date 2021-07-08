@@ -9,6 +9,7 @@ import { getSession } from 'server-lib';
 
 async function handleFormPost(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession(req);
+  res.json({ body: req.body });
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

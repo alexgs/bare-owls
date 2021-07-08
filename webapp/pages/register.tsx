@@ -81,17 +81,20 @@ const Register: React.FC<Props> = (props: Props) => {
     setData(initialData);
   }
 
-  async function handleSubmit(event: FormExtendedEvent<Data>) {
-    console.log(`<<- ${JSON.stringify(event.value)} ->>`);
+  async function handleSubmit() {
+    setFetchStatus(FetchStatus.Fetching);
     const response = await fetch('/api/update-profile', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(data),
     });
+    const resJson = await response.json();
+    console.log(`<<- ${JSON.stringify(resJson)} ->>`);
   }
 
-  const disableSubmit = formStatus !== FormStatus.Ready;
+  const disableSubmit = formStatus !== FormStatus.Ready || fetchStatus === FetchStatus.Fetching;
   return (
     <>
       <AppBar>
