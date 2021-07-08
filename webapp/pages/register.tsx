@@ -12,6 +12,7 @@ import {
   Paragraph,
   TextInput,
 } from 'grommet';
+import { isEqual } from 'lodash';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
 
@@ -24,32 +25,73 @@ interface Props {
   tokenId: string;
 }
 
-interface State {
+interface Data {
   email: string;
   name: string;
   username: string;
 }
 
+enum FetchStatus {
+  Done = 'Done',
+  Error = 'Error',
+  Fetching = 'Fetching',
+  Ready = 'Ready',
+}
+
+enum FormStatus {
+  Error = 'Error',
+  Ready = 'Ready',
+  Untouched = 'Untouched',
+}
+
 const Register: React.FC<Props> = (props: Props) => {
-  const initialState: State = {
+  const initialData: Data = {
     name: props.displayName ?? '',
     email: props.email ?? '',
     username: '',
   };
-  const [value, setValue] = React.useState<State>(initialState);
 
-  function handleChange(nextValue: State) {
-    setValue(nextValue);
+  const [data, setData] = React.useState<Data>(initialData);
+  const [fetchStatus, setFetchStatus] = React.useState<FetchStatus>(FetchStatus.Ready);
+  const [formStatus, setFormStatus] = React.useState<FormStatus>(FormStatus.Untouched);
+  const [response, setResponse] = React.useState<Record<string, unknown>>({});
+
+  React.useEffect(() => {
+    const formStatus = getFormStatus(data);
+    setFormStatus(formStatus);
+    console.log()
+  }, [data]);
+
+  function getFormStatus(currentData: Data): FormStatus {
+    if (isEqual(currentData, initialData)) {
+      return FormStatus.Untouched;
+    }
+    if (currentData.email.length > 0 && currentData.name.length > 0 && currentData.username.length > 0) {
+      return FormStatus.Ready;
+    }
+    return FormStatus.Error;
+  }
+
+  function handleChange(nextValue: Data) {
+    setData(nextValue);
   }
 
   function handleReset() {
-    setValue(initialState);
+    setFormStatus(FormStatus.Untouched);
+    setData(initialData);
   }
 
-  function handleSubmit(event: FormExtendedEvent<State>) {
+  async function handleSubmit(event: FormExtendedEvent<Data>) {
     console.log(`<<- ${JSON.stringify(event.value)} ->>`);
+    const response = await fetch('/api/update-profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 
+  const disableSubmit = formStatus !== FormStatus.Ready;
   return (
     <>
       <AppBar>
@@ -61,7 +103,7 @@ const Register: React.FC<Props> = (props: Props) => {
         <Paragraph>Please check your details before you get started.</Paragraph>
         <Box width={'50%'}>
           <Form
-            value={value}
+            value={data}
             onChange={handleChange}
             onReset={handleReset}
             onSubmit={handleSubmit}
@@ -76,7 +118,7 @@ const Register: React.FC<Props> = (props: Props) => {
               <TextInput id="email-input" name="email" />
             </FormField>
             <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-              <Button type="submit" primary label="Submit" />
+              <Button type="submit" disabled={disableSubmit} primary label="Submit" />
               <Button type="reset" label="Reset" />
             </Box>
           </Form>
