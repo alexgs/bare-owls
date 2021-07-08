@@ -9,7 +9,10 @@ import { getSession } from 'server-lib';
 
 async function handleFormPost(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession(req);
-  res.json({ body: req.body });
+  if (session.tokenId !== req.body?.tokenId) {
+    res.status(500).json({ message: 'Mismatch in token IDs.'});
+  }
+  res.json({ body: req.body, msg: 'It works!' });
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

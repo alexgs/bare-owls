@@ -4,8 +4,9 @@
  */
 
 export interface Session {
-  user?: UserData;
   expires: Date;
+  tokenId?: string;
+  user?: UserData;
 }
 
 export type SessionId = string;

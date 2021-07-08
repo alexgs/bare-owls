@@ -22,6 +22,7 @@ import { prisma } from 'server-lib';
 interface Props {
   displayName: string | null;
   email: string | null;
+  subject: string;
   tokenId: string;
 }
 
@@ -59,7 +60,7 @@ const Register: React.FC<Props> = (props: Props) => {
   React.useEffect(() => {
     const formStatus = getFormStatus(data);
     setFormStatus(formStatus);
-    console.log()
+    console.log();
   }, [data]);
 
   function getFormStatus(currentData: Data): FormStatus {
@@ -81,17 +82,31 @@ const Register: React.FC<Props> = (props: Props) => {
     setData(initialData);
   }
 
-  async function handleSubmit() {
-    setFetchStatus(FetchStatus.Fetching);
-    const response = await fetch('/api/update-profile', {
+  function handleSubmit() {
+    const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
-    });
-    const resJson = await response.json();
-    console.log(`<<- ${JSON.stringify(resJson)} ->>`);
+    };
+
+    setFetchStatus(FetchStatus.Fetching);
+    fetch('/api/update-profile', options)
+      .then((response) => {
+        if (response.ok) {
+          setFetchStatus(FetchStatus.Done);
+          return response.json();
+        }
+        throw new Error(JSON.stringify(response));
+      })
+      .then((payload) => {
+        console.log(`<<- ${JSON.stringify(payload)} ->>`);
+      })
+      .catch((e) => {
+        setFetchStatus(FetchStatus.Error);
+        console.log(e);
+      });
   }
 
   const disableSubmit = formStatus !== FormStatus.Ready || fetchStatus === FetchStatus.Fetching;
@@ -111,6 +126,7 @@ const Register: React.FC<Props> = (props: Props) => {
             onReset={handleReset}
             onSubmit={handleSubmit}
           >
+            <input name="tokenId" type="hidden" value={props.tokenId} />
             <FormField name="username" htmlFor="username-input" label="Username">
               <TextInput id="username-input" name="username" />
             </FormField>
@@ -149,9 +165,10 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      tokenId: token.id,
       displayName: token.nickname ?? token.name,
       email: token.email,
+      subject: token.sub,
+      tokenId: token.id,
     },
   };
 };
