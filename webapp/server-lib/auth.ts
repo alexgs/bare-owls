@@ -13,7 +13,7 @@ import { IdTokenClaims, Issuer } from 'openid-client';
 
 import { seconds } from 'lib';
 import { prisma } from 'server-lib';
-import { UserData } from 'types';
+import { JsonObject, UserData } from 'types';
 
 import { startSession } from './session';
 
@@ -108,21 +108,68 @@ export function formatUnsealPasswords() {
   return output;
 }
 
-/** @internal */
-export async function login(claims: IdTokenClaims): Promise<UserData> {
-  // TODO
+interface ClaimsHandlerOutput {
+  user: UserData,
+  data?: JsonObject,
+}
+
+/**
+ * @internal
+ * @precondition prisma.userOpenIdToken.count({ where: { sub: claims.sub } }) === 1
+ */
+export async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
+  const accounts = await prisma.userAccount.findMany({
+    where: {
+      token: {
+        some: { sub: claims.sub },
+      },
+    },
+    include: {
+      email: {
+        orderBy: { createdAt: 'asc' },
+        take: 1,
+      },
+    },
+  });
+
+  if (accounts.length === 0) {
+    throw new Error(`No account found for OIDC subject "${claims.sub}".`);
+  }
+  if (accounts.length > 1) {
+    throw new Error(`Multiple accounts found for OIDC subject "${claims.sub}".`);
+  }
+
+  const account = accounts[0];
+  return {
+    user: {
+      id: account.id,
+      name: account.displayName ?? account.username,
+      email: account.email[0].original,
+    },
+  };
 }
 
 /** @internal */
-export async function register(claims: IdTokenClaims): Promise<UserData> {
-  // TODO
-  // const account = await prisma.userAccount.create({
-  //   data: {
-  //     id: nanoid(),
-  //     displayName: claims.name,
-  //     username: claims.email,
-  //   }
-  // })
+export async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
+  // TODO What if the account exists and the user is just using a new OIDC provider? Look for duplicate email addresses.
+  const account = await prisma.userAccount.create({
+    data: {
+      id: nanoid(),
+      displayName: claims.name,
+      username: `new-user-${nanoid()}`,
+    },
+  });
+  const tokenId = await storeOpenIdToken(claims, account.id);
+  return {
+    user: {
+      id: account.id,
+      name: account.displayName ?? account.username,
+      email: claims.email ?? '',
+    },
+    data: {
+      tokenId
+    }
+  };
 }
 
 // --- PUBLIC FUNCTIONS ---
@@ -148,7 +195,13 @@ export async function getOidcClient() {
   });
 }
 
-export async function handleOidcResponse(req: NextApiRequest): Promise<string> {
+interface ResponseHandlerOutput {
+  registerNewUser: boolean;
+  sessionId: string;
+  tokenId?: string;
+}
+
+export async function handleOidcResponse(req: NextApiRequest): Promise<ResponseHandlerOutput> {
   const nonce = req.cookies[COOKIE.NONCE];
   if (!nonce) {
     throw new Error('Unable to load nonce from cookie');
@@ -160,8 +213,13 @@ export async function handleOidcResponse(req: NextApiRequest): Promise<string> {
   const claims = tokens.claims();
 
   const isRegisteredSubject = await isRegistered(claims);
-  const userData = isRegisteredSubject ? await login(claims) : await register(claims);
-  return startSession(userData);
+  const { user, data } = isRegisteredSubject ? await login(claims) : await register(claims);
+  const sessionId = await startSession(user, data);
+  return {
+    sessionId,
+    registerNewUser: !isRegisteredSubject,
+    tokenId: data?.tokenId as string|undefined,
+  };
 }
 
 export async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
@@ -172,10 +230,11 @@ export async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
   return count === 1;
 }
 
-export async function storeOpenIdToken(claims: IdTokenClaims): Promise<string> {
+export async function storeOpenIdToken(claims: IdTokenClaims, accountId: string): Promise<string> {
   const aud = Array.isArray(claims.aud) ? JSON.stringify(claims.aud) : claims.aud;
   const token = await prisma.userOpenIdToken.create({
     data: {
+      accountId,
       aud,
       id: nanoid(),
       sub: claims.sub,
@@ -186,7 +245,7 @@ export async function storeOpenIdToken(claims: IdTokenClaims): Promise<string> {
       emailVerified: claims.email_verified,
       name: claims.name,
       nickname: claims.nickname,
-    }
+    },
   });
   return token.id;
 }

@@ -3,9 +3,11 @@
  * the Open Software License version 3.0.
  */
 
+import { JsonObject } from './json';
+
 export interface Session {
+  data?: JsonObject;
   expires: Date;
-  tokenId?: string;
   user?: UserData;
 }
 

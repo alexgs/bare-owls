@@ -10,7 +10,7 @@ import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
 
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL, prisma } from 'server-lib';
-import { Session, SessionId, UserData } from 'types';
+import { JsonObject, JsonValue, Session, SessionId, UserData } from 'types';
 
 const SESSION_TTL = env.get('SESSION_TTL').required().asString();
 
@@ -34,6 +34,7 @@ export async function getSession(req: NextApiRequest): Promise<Session> {
     };
   }
   return {
+    data: data.data as JsonObject,
     expires: data.expires,
     user: {
       id: data.accountId,
@@ -43,20 +44,18 @@ export async function getSession(req: NextApiRequest): Promise<Session> {
   };
 }
 
-export async function startSession(data: UserData): Promise<SessionId> {
+export async function startSession(user: UserData, data?: JsonValue): Promise<SessionId> {
   const expiry = Date.now() + ms(SESSION_TTL);
-  const session: Session = {
-    user: data,
-    expires: new Date(expiry),
-  }
+  const expires = new Date(expiry);
   const id = generateSessionId();
   await prisma.session.create({
     data: {
+      data,
+      expires,
       id,
-      accountId: data.id,
-      displayName: data.name,
-      email: data.email,
-      expires: session.expires,
+      accountId: user.id,
+      displayName: user.name,
+      email: user.email,
     }
   });
   return id;
