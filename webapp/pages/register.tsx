@@ -6,7 +6,7 @@
 import {
   Box,
   Button,
-  Form, FormExtendedEvent,
+  Form,
   FormField,
   Heading,
   Paragraph,
@@ -17,7 +17,7 @@ import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
 
 import { AppBar } from 'components';
-import { prisma } from 'server-lib';
+import { getSession, prisma } from 'server-lib';
 
 interface Props {
   displayName: string | null;
@@ -150,12 +150,10 @@ const Register: React.FC<Props> = (props: Props) => {
 export const getServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<Props>> => {
-  const { tokenId } = context.query;
+  const session = await getSession(context.req);
+  const { tokenId } = session.data as { tokenId: string };
   if (!tokenId) {
-    throw new Error('Unable to get token ID from query string.');
-  }
-  if (Array.isArray(tokenId)) {
-    throw new Error(`Query string must contain exactly one token ID, ${tokenId.length} found`);
+    throw new Error('Unable to get token ID from session data.');
   }
 
   const token = await prisma.userOpenIdToken.findUnique({ where: { id: tokenId } });

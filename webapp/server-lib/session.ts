@@ -7,7 +7,7 @@ import Iron from '@hapi/iron';
 import * as env from 'env-var';
 import ms from 'ms';
 import { nanoid } from 'nanoid';
-import { NextApiRequest } from 'next';
+import { NextApiRequestCookies } from 'next/dist/next-server/server/api-utils';
 
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL, prisma } from 'server-lib';
 import { JsonObject, JsonValue, Session, SessionId, UserData } from 'types';
@@ -18,7 +18,7 @@ function generateSessionId(): string {
   return nanoid();
 }
 
-export async function getSession(req: NextApiRequest): Promise<Session> {
+export async function getSession(req: {cookies: NextApiRequestCookies}): Promise<Session> {
   const cookie = req.cookies[COOKIE.SESSION];
   if (!cookie) {
     return {

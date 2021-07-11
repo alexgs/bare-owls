@@ -25,18 +25,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   let path = '/';
 
   if (req.method === 'POST') {
-    const claims = await extractOpenIdToken(req);
-    const { registerNewUser, sessionId, tokenId } = await handleOidcResponse(req);
+    const { registerNewUser, sessionId } = await handleOidcResponse(req);
     const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
     const sessionCookie = cookie.serialize(COOKIE.SESSION, sealedId, COOKIE_OPTIONS.SESSION_SET);
     cookies.push(sessionCookie);
 
     if (registerNewUser) {
-      if (!tokenId) {
-        throw new Error('Missing token ID.');
-      }
-      const query = queryString.stringify({ tokenId });
-      path = `/register?${query}`;
+      path = `/register`;
     }
   }
   res.setHeader('set-cookie', cookies);

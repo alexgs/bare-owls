@@ -198,7 +198,6 @@ export async function getOidcClient() {
 interface ResponseHandlerOutput {
   registerNewUser: boolean;
   sessionId: string;
-  tokenId?: string;
 }
 
 export async function handleOidcResponse(req: NextApiRequest): Promise<ResponseHandlerOutput> {
@@ -218,7 +217,6 @@ export async function handleOidcResponse(req: NextApiRequest): Promise<ResponseH
   return {
     sessionId,
     registerNewUser: !isRegisteredSubject,
-    tokenId: data?.tokenId as string|undefined,
   };
 }
 

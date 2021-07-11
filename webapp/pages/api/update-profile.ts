@@ -9,19 +9,8 @@ import { getSession } from 'server-lib';
 
 async function handleFormPost(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession(req);
-
-  // TODO ??? Is this really working? ???
-  if (typeof session.data?.tokenId === 'undefined') {
-    // res.status(500).json({ message: 'No token ID' });
-    // return;
-    throw new Error('No token ID.');
-  }
-  if (session.data?.tokenId !== req.body?.tokenId) {
-    // res.status(500).json({ message: 'Mismatch in token IDs.'}); // TODO Send a user-safe error message
-    // return;
-    // TODO Logger with informative server error
-    throw new Error('Mismatch in token IDs.');
-  }
+  // TODO Check the session with something like
+  //   const isValid = validateSession(session)
 
   // TODO Create user account
   // TODO Link account to token
