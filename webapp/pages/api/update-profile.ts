@@ -5,12 +5,15 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getSession } from 'server-lib';
+import { getSession, validateSession } from 'server-lib';
 
 async function handleFormPost(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession(req);
-  // TODO Check the session with something like
-  //   const isValid = validateSession(session)
+  const isValid = validateSession(session)
+
+  if (!isValid) {
+    return res.status(403).json({ message: 'Not authorized' });
+  }
 
   // TODO Create user account
   // TODO Link account to token

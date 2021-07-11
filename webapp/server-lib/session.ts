@@ -12,6 +12,7 @@ import { NextApiRequestCookies } from 'next/dist/next-server/server/api-utils';
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL, prisma } from 'server-lib';
 import { JsonObject, JsonValue, Session, SessionId, UserData } from 'types';
 
+const SESSION_ID_NULL = 'null';
 const SESSION_TTL = env.get('SESSION_TTL').required().asString();
 
 function generateSessionId(): string {
@@ -23,6 +24,7 @@ export async function getSession(req: {cookies: NextApiRequestCookies}): Promise
   if (!cookie) {
     return {
       expires: new Date(0),
+      id: SESSION_ID_NULL,
     };
   }
 
@@ -31,11 +33,13 @@ export async function getSession(req: {cookies: NextApiRequestCookies}): Promise
   if (!data) {
     return {
       expires: new Date(0),
+      id: SESSION_ID_NULL,
     };
   }
   return {
     data: data.data as JsonObject,
     expires: data.expires,
+    id: sessionId,
     user: {
       id: data.accountId,
       email: data.email,
@@ -59,4 +63,15 @@ export async function startSession(user: UserData, data?: JsonValue): Promise<Se
     }
   });
   return id;
+}
+
+export async function validateSession(session: Session): Promise<boolean> {
+  // TODO [Future] Check to see if the session has been canceled
+  // TODO What if the session expiry is changed in the database after the cookie is issued to the client?
+
+  if (session.expires.getTime() <= Date.now()) {
+    return false;
+  }
+
+  return true;
 }

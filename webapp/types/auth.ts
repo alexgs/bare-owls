@@ -8,6 +8,7 @@ import { JsonObject } from './json';
 export interface Session {
   data?: JsonObject;
   expires: Date;
+  id: SessionId;
   user?: UserData;
 }
 
