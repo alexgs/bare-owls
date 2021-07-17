@@ -15,22 +15,9 @@ import { FormClose, Notification } from 'grommet-icons';
 import { useRouter } from 'next/router'
 import * as React from 'react';
 
+import { AppBar } from 'components';
 import { LOGIN_PATH } from 'lib';
 import db from 'server-lib/prisma';
-
-const AppBar = (props: Record<string, unknown>) => (
-  <Box
-    tag="header"
-    direction="row"
-    align="center"
-    justify="between"
-    background="brand"
-    pad={{ left: 'medium', right: 'small', vertical: 'small' }}
-    elevation="medium"
-    style={{ zIndex: 1 }}
-    {...props}
-  />
-);
 
 function HomePage() {
   const router = useRouter();
@@ -96,7 +83,7 @@ function HomePage() {
 }
 
 export const getServerSideProps = async () => {
-  const posts = await db.post.count();
+  const posts = await db.userAccount.count();
   return { props: { posts } }
 }
 

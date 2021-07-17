@@ -7,9 +7,15 @@ import { SealOptions } from '@hapi/iron';
 import * as cookie from 'cookie';
 import * as env from 'env-var';
 import ms from 'ms';
-import { Issuer } from 'openid-client';
+import { nanoid } from 'nanoid';
+import { NextApiRequest } from 'next';
+import { IdTokenClaims, Issuer } from 'openid-client';
 
 import { seconds } from 'lib';
+import { prisma } from 'server-lib';
+import { JsonObject, UserData } from 'types';
+
+import { startSession } from './session';
 
 type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
 
@@ -49,14 +55,12 @@ export const COOKIE_OPTIONS: CookieOptionsSet = {
     httpOnly: true,
     expires: new Date(0),
     path: '/',
-    sameSite: 'strict',
     secure: true,
   },
   SESSION_SET: {
     httpOnly: true,
     maxAge: seconds(COOKIE_SESSION_TTL),
     path: '/',
-    sameSite: 'strict',
     secure: true,
   },
 };
@@ -82,7 +86,10 @@ export const IRON_OPTIONS: SealOptions = {
 export const IRON_SEAL = formatSealPassword();
 export const IRON_UNSEAL = formatUnsealPasswords();
 
-function formatSealPassword(): SealPassword {
+// --- INTERNAL FUNCTIONS ---
+
+/** @internal */
+export function formatSealPassword(): SealPassword {
   const output = IRON_PASSWORDS.find(value => value.id === IRON_CURRENT_PWD);
   if (!output) {
     throw new Error('No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.');
@@ -90,12 +97,98 @@ function formatSealPassword(): SealPassword {
   return output;
 }
 
-function formatUnsealPasswords() {
+/** @internal */
+export function formatUnsealPasswords() {
   const output: Record<string, string> = {};
   IRON_PASSWORDS.forEach((value: SealPassword) => {
     output[value.id] = value.secret;
   });
   return output;
+}
+
+interface ClaimsHandlerOutput {
+  user: UserData,
+  data?: JsonObject,
+}
+
+/**
+ * @internal
+ * @precondition prisma.userOpenIdToken.count({ where: { sub: claims.sub } }) === 1
+ */
+export async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
+  const accounts = await prisma.userAccount.findMany({
+    where: {
+      token: {
+        some: { sub: claims.sub },
+      },
+    },
+    include: {
+      email: {
+        orderBy: { createdAt: 'asc' },
+        take: 1,
+      },
+    },
+  });
+
+  if (accounts.length === 0) {
+    throw new Error(`No account found for OIDC subject "${claims.sub}".`);
+  }
+  if (accounts.length > 1) {
+    throw new Error(`Multiple accounts found for OIDC subject "${claims.sub}".`);
+  }
+
+  const account = accounts[0];
+  return {
+    user: {
+      id: account.id,
+      name: account.displayName ?? account.username,
+      email: account.email[0].original,
+    },
+  };
+}
+
+/** @internal */
+export async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
+  // TODO What if the account exists and the user is just using a new OIDC provider? Look for duplicate email addresses.
+  const account = await prisma.userAccount.create({
+    data: {
+      id: nanoid(),
+      displayName: claims.name,
+      username: `new-user-${nanoid()}`,
+    },
+  });
+  const email = await prisma.userEmail.create({
+    data: {
+      original: claims.email ?? 'invalid',
+      simplified: claims.email ?? 'invalid',
+      accountId: account.id,
+    },
+  })
+  const tokenId = await storeOpenIdToken(claims, account.id);
+  return {
+    user: {
+      id: account.id,
+      name: account.displayName ?? account.username,
+      email: email.original,
+    },
+    data: {
+      tokenId
+    }
+  };
+}
+
+// --- PUBLIC FUNCTIONS ---
+
+export async function extractOpenIdToken(req: NextApiRequest): Promise<IdTokenClaims> {
+  const nonce = req.cookies[COOKIE.NONCE];
+  if (!nonce) {
+    throw new Error('Unable to load nonce from cookie');
+  }
+
+  const client = await getOidcClient();
+  const params = client.callbackParams(req);
+  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+  return tokens.claims();
 }
 
 export async function getOidcClient() {
@@ -105,4 +198,57 @@ export async function getOidcClient() {
     redirect_uris: [CALLBACK_URL],
     response_types: ['id_token token'],
   });
+}
+
+interface ResponseHandlerOutput {
+  registerNewUser: boolean;
+  sessionId: string;
+}
+
+export async function handleOidcResponse(req: NextApiRequest): Promise<ResponseHandlerOutput> {
+  const nonce = req.cookies[COOKIE.NONCE];
+  if (!nonce) {
+    throw new Error('Unable to load nonce from cookie');
+  }
+
+  const client = await getOidcClient();
+  const params = client.callbackParams(req);
+  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+  const claims = tokens.claims();
+
+  const isRegisteredSubject = await isRegistered(claims);
+  const { user, data } = isRegisteredSubject ? await login(claims) : await register(claims);
+  const sessionId = await startSession(user, data);
+  return {
+    sessionId,
+    registerNewUser: !isRegisteredSubject,
+  };
+}
+
+export async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
+  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
+  if (count > 1) {
+    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
+  }
+  return count === 1;
+}
+
+export async function storeOpenIdToken(claims: IdTokenClaims, accountId: string): Promise<string> {
+  const aud = Array.isArray(claims.aud) ? JSON.stringify(claims.aud) : claims.aud;
+  const token = await prisma.userOpenIdToken.create({
+    data: {
+      accountId,
+      aud,
+      id: nanoid(),
+      sub: claims.sub,
+      iss: claims.iss,
+      exp: new Date(claims.exp * 1000),
+      iat: new Date(claims.iat * 1000),
+      email: claims.email,
+      emailVerified: claims.email_verified,
+      name: claims.name,
+      nickname: claims.nickname,
+    },
+  });
+  return token.id;
 }

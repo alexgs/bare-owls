@@ -3,6 +3,17 @@
  * the Open Software License version 3.0.
  */
 
-export * from './auth';
+export {
+  COOKIE,
+  COOKIE_OPTIONS,
+  IRON_OPTIONS,
+  IRON_SEAL,
+  IRON_UNSEAL,
+  extractOpenIdToken,
+  getOidcClient,
+  handleOidcResponse,
+  isRegistered,
+  storeOpenIdToken,
+} from './auth';
 export * from './session';
 export { default as prisma } from './prisma';

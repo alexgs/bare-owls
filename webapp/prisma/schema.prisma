@@ -10,39 +10,57 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String   @db.VarChar(255)
-  content   String?
-  published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-}
-
-model Profile {
-  id     Int     @id @default(autoincrement())
-  bio    String?
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int     @unique
-}
-
 model Session {
-  id          String   @id
+  id          String      @id
   displayName String
   data        Json?
   email       String
   expires     DateTime
-  userId      String
-  //  userId String
-  //  @@index(fields: [userId], name: "Session.userId_index")
+  account     UserAccount @relation(fields: [accountId], references: [id])
+  accountId   String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index(fields: [accountId], name: "Session.accountId_index")
 }
 
-model User {
-  id      Int      @id @default(autoincrement())
-  email   String   @unique
-  name    String?
-  posts   Post[]
-  profile Profile?
+model UserAccount {
+  id          String            @id
+  username    String            @unique
+  displayName String?
+  email       UserEmail[]
+  session     Session[]
+  token       UserOpenIdToken[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model UserEmail {
+  id         Int         @id @default(autoincrement())
+  original   String      @unique
+  simplified String
+  account    UserAccount @relation(fields: [accountId], references: [id])
+  accountId  String
+  verified   Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  @@index(fields: [simplified], name: "UserEmail.simplified_index")
+}
+
+model UserOpenIdToken {
+  id            String       @id
+  sub           String       @unique
+  iss           String
+  aud           String
+  exp           DateTime
+  iat           DateTime
+  email         String?
+  emailVerified Boolean      @default(false)
+  name          String?
+  nickname      String?
+  account       UserAccount? @relation(fields: [accountId], references: [id])
+  accountId     String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 }
