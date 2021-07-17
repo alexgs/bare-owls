@@ -55,14 +55,12 @@ export const COOKIE_OPTIONS: CookieOptionsSet = {
     httpOnly: true,
     expires: new Date(0),
     path: '/',
-    sameSite: 'strict',
     secure: true,
   },
   SESSION_SET: {
     httpOnly: true,
     maxAge: seconds(COOKIE_SESSION_TTL),
     path: '/',
-    sameSite: 'strict',
     secure: true,
   },
 };
@@ -159,12 +157,19 @@ export async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutp
       username: `new-user-${nanoid()}`,
     },
   });
+  const email = await prisma.userEmail.create({
+    data: {
+      original: claims.email ?? 'invalid',
+      simplified: claims.email ?? 'invalid',
+      accountId: account.id,
+    },
+  })
   const tokenId = await storeOpenIdToken(claims, account.id);
   return {
     user: {
       id: account.id,
       name: account.displayName ?? account.username,
-      email: claims.email ?? '',
+      email: email.original,
     },
     data: {
       tokenId

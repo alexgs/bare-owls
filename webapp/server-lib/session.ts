@@ -19,6 +19,7 @@ function generateSessionId(): string {
   return nanoid();
 }
 
+// TODO Validate and retrieve data in one pass
 export async function getSession(req: {cookies: NextApiRequestCookies}): Promise<Session> {
   const cookie = req.cookies[COOKIE.SESSION];
   if (!cookie) {
@@ -70,6 +71,10 @@ export async function validateSession(session: Session): Promise<boolean> {
   // TODO What if the session expiry is changed in the database after the cookie is issued to the client?
 
   if (session.expires.getTime() <= Date.now()) {
+    return false;
+  }
+
+  if (!session.user) {
     return false;
   }
 

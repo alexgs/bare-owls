@@ -17,7 +17,7 @@ import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
 
 import { AppBar } from 'components';
-import { getSession, prisma } from 'server-lib';
+import { getSession, prisma, validateSession } from 'server-lib';
 
 interface Props {
   displayName: string | null;
@@ -164,7 +164,7 @@ export const getServerSideProps = async (
   return {
     props: {
       displayName: token.nickname ?? token.name,
-      email: token.email,
+      email: token.email, // TODO Handle email address missing from claims
       subject: token.sub,
       tokenId: token.id,
     },
