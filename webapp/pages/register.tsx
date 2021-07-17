@@ -17,7 +17,7 @@ import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
 
 import { AppBar } from 'components';
-import { getSession, prisma, validateSession } from 'server-lib';
+import { getSession, prisma } from 'server-lib';
 
 interface Props {
   displayName: string | null;
@@ -151,7 +151,10 @@ export const getServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<Props>> => {
   const session = await getSession(context.req);
-  const { tokenId } = session.data as { tokenId: string };
+  if (!session) {
+    throw new Error('Invalid session.');
+  }
+  const tokenId = session.data?.tokenId as string;
   if (!tokenId) {
     throw new Error('Unable to get token ID from session data.');
   }

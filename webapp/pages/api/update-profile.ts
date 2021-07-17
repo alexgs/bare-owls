@@ -6,7 +6,7 @@
 import Joi from 'joi';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getSession, prisma, validateSession } from 'server-lib';
+import { getSession, prisma } from 'server-lib';
 
 interface HandlerOutput {
   message: Record<string, unknown> | string;
@@ -21,15 +21,13 @@ const inputSchema = Joi.object({
 
 async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {
   const session = await getSession(req);
-  const isValid = validateSession(session);
-
-  if (!isValid) {
+  if (!session) {
     return {
       status: 403,
       message: 'Not authorized',
     };
   }
-  const userId = session.user?.id;
+  const userId = session.user.id;
 
   const { value, error } = inputSchema.validate({
     email: req.body.email,

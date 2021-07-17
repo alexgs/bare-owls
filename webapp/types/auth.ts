@@ -9,7 +9,7 @@ export interface Session {
   data?: JsonObject;
   expires: Date;
   id: SessionId;
-  user?: UserData;
+  user: UserData;
 }
 
 export type SessionId = string;

@@ -12,31 +12,28 @@ import { NextApiRequestCookies } from 'next/dist/next-server/server/api-utils';
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL, prisma } from 'server-lib';
 import { JsonObject, JsonValue, Session, SessionId, UserData } from 'types';
 
-const SESSION_ID_NULL = 'null';
 const SESSION_TTL = env.get('SESSION_TTL').required().asString();
 
 function generateSessionId(): string {
   return nanoid();
 }
 
-// TODO Validate and retrieve data in one pass
-export async function getSession(req: {cookies: NextApiRequestCookies}): Promise<Session> {
+export async function getSession(req: { cookies: NextApiRequestCookies }): Promise<Session | null> {
   const cookie = req.cookies[COOKIE.SESSION];
   if (!cookie) {
-    return {
-      expires: new Date(0),
-      id: SESSION_ID_NULL,
-    };
+    return null;
   }
 
   const sessionId = await Iron.unseal(cookie, IRON_UNSEAL, IRON_OPTIONS);
-  const data = await prisma.session.findUnique({ where: { id: sessionId }});
+  const data = await prisma.session.findUnique({ where: { id: sessionId } });
   if (!data) {
-    return {
-      expires: new Date(0),
-      id: SESSION_ID_NULL,
-    };
+    return null;
   }
+
+  if (data.expires.getTime() <= Date.now()) {
+    return null;
+  }
+
   return {
     data: data.data as JsonObject,
     expires: data.expires,
@@ -61,22 +58,7 @@ export async function startSession(user: UserData, data?: JsonValue): Promise<Se
       accountId: user.id,
       displayName: user.name,
       email: user.email,
-    }
+    },
   });
   return id;
-}
-
-export async function validateSession(session: Session): Promise<boolean> {
-  // TODO [Future] Check to see if the session has been canceled
-  // TODO What if the session expiry is changed in the database after the cookie is issued to the client?
-
-  if (session.expires.getTime() <= Date.now()) {
-    return false;
-  }
-
-  if (!session.user) {
-    return false;
-  }
-
-  return true;
 }
