@@ -16,11 +16,31 @@ import { useRouter } from 'next/router'
 import * as React from 'react';
 
 import { AppBar } from 'components';
-import { LOGIN_PATH } from 'lib';
+import { LOGIN_PATH, useSession } from 'lib';
 import db from 'server-lib/prisma';
 
-function HomePage() {
+function Content() {
   const router = useRouter();
+  const { isError, isLoading, session } = useSession();
+
+  if (isError) {
+    return <div>Error!</div>
+  }
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (session) {
+    return <div>Hello {session.user?.name}</div>
+  }
+
+  return (
+    <Button label="Login" onClick={() => router.push(LOGIN_PATH)} primary />
+  )
+}
+
+function HomePage() {
   const [showSidebar, setShowSidebar] = React.useState(false);
 
   return (
@@ -36,7 +56,7 @@ function HomePage() {
           </AppBar>
           <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
             <Box flex align="start" direction="column" justify="start" pad="medium">
-              <Button label="Login" onClick={() => router.push(LOGIN_PATH)} primary />
+              <Content />
             </Box>
             {(!showSidebar || size !== 'small') ? (
               <Collapsible direction="horizontal" open={showSidebar}>

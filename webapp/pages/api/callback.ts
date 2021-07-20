@@ -6,17 +6,13 @@
 import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import queryString from 'query-string';
 
 import {
   COOKIE,
   COOKIE_OPTIONS,
   IRON_OPTIONS,
   IRON_SEAL,
-  extractOpenIdToken,
   handleOidcResponse,
-  isRegistered,
-  storeOpenIdToken,
 } from 'server-lib';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {

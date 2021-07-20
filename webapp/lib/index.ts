@@ -4,4 +4,5 @@
  */
 
 export * from './constants';
+export * from './use-session';
 export * from './seconds';
