@@ -43,24 +43,28 @@ export const COOKIE_OPTIONS: CookieOptionsSet = {
     httpOnly: true,
     expires: new Date(0),
     path: '/',
+    sameSite: 'none', // This should match NONCE_SET.sameSite
     secure: true,
   },
   NONCE_SET: {
     httpOnly: true,
     maxAge: seconds(COOKIE_NONCE_TTL),
     path: '/',
+    sameSite: 'none',
     secure: true,
   },
   SESSION_RM: {
     httpOnly: true,
     expires: new Date(0),
     path: '/',
+    sameSite: 'strict', // This should match SESSION_SET.sameSite
     secure: true,
   },
   SESSION_SET: {
     httpOnly: true,
     maxAge: seconds(COOKIE_SESSION_TTL),
     path: '/',
+    sameSite: 'strict', // This might need to be "lax"
     secure: true,
   },
 };
