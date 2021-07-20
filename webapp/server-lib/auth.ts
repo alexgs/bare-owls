@@ -17,6 +17,11 @@ import { JsonObject, UserData } from 'types';
 
 import { startSession } from './session';
 
+interface ClaimsHandlerOutput {
+  user: UserData,
+  data?: JsonObject,
+}
+
 type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
 
 interface SealPassword {
@@ -93,7 +98,7 @@ export const IRON_UNSEAL = formatUnsealPasswords();
 // --- INTERNAL FUNCTIONS ---
 
 /** @internal */
-export function formatSealPassword(): SealPassword {
+function formatSealPassword(): SealPassword {
   const output = IRON_PASSWORDS.find(value => value.id === IRON_CURRENT_PWD);
   if (!output) {
     throw new Error('No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.');
@@ -102,7 +107,7 @@ export function formatSealPassword(): SealPassword {
 }
 
 /** @internal */
-export function formatUnsealPasswords() {
+function formatUnsealPasswords() {
   const output: Record<string, string> = {};
   IRON_PASSWORDS.forEach((value: SealPassword) => {
     output[value.id] = value.secret;
@@ -110,16 +115,20 @@ export function formatUnsealPasswords() {
   return output;
 }
 
-interface ClaimsHandlerOutput {
-  user: UserData,
-  data?: JsonObject,
+/** @internal */
+async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
+  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
+  if (count > 1) {
+    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
+  }
+  return count === 1;
 }
 
 /**
  * @internal
  * @precondition prisma.userOpenIdToken.count({ where: { sub: claims.sub } }) === 1
  */
-export async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
+async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
   const accounts = await prisma.userAccount.findMany({
     where: {
       token: {
@@ -152,7 +161,7 @@ export async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput>
 }
 
 /** @internal */
-export async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
+async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
   // TODO What if the account exists and the user is just using a new OIDC provider? Look for duplicate email addresses.
   const account = await prisma.userAccount.create({
     data: {
@@ -179,6 +188,27 @@ export async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutp
       tokenId
     }
   };
+}
+
+/** @internal */
+async function storeOpenIdToken(claims: IdTokenClaims, accountId: string): Promise<string> {
+  const aud = Array.isArray(claims.aud) ? JSON.stringify(claims.aud) : claims.aud;
+  const token = await prisma.userOpenIdToken.create({
+    data: {
+      accountId,
+      aud,
+      id: nanoid(),
+      sub: claims.sub,
+      iss: claims.iss,
+      exp: new Date(claims.exp * 1000),
+      iat: new Date(claims.iat * 1000),
+      email: claims.email,
+      emailVerified: claims.email_verified,
+      name: claims.name,
+      nickname: claims.nickname,
+    },
+  });
+  return token.id;
 }
 
 // --- PUBLIC FUNCTIONS ---
@@ -227,32 +257,4 @@ export async function handleOidcResponse(req: NextApiRequest): Promise<ResponseH
     sessionId,
     registerNewUser: !isRegisteredSubject,
   };
-}
-
-export async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
-  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
-  if (count > 1) {
-    throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
-  }
-  return count === 1;
-}
-
-export async function storeOpenIdToken(claims: IdTokenClaims, accountId: string): Promise<string> {
-  const aud = Array.isArray(claims.aud) ? JSON.stringify(claims.aud) : claims.aud;
-  const token = await prisma.userOpenIdToken.create({
-    data: {
-      accountId,
-      aud,
-      id: nanoid(),
-      sub: claims.sub,
-      iss: claims.iss,
-      exp: new Date(claims.exp * 1000),
-      iat: new Date(claims.iat * 1000),
-      email: claims.email,
-      emailVerified: claims.email_verified,
-      name: claims.name,
-      nickname: claims.nickname,
-    },
-  });
-  return token.id;
 }
