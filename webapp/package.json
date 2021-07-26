@@ -16,8 +16,12 @@
     "check": "npx tsc --noEmit",
     "dev": "next dev -p $WEBAPP_PORT",
     "lint": "next lint",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write .",
     "start": "next start -p $WEBAPP_PORT",
-    "studio": "npx prisma studio"
+    "studio": "npx prisma studio",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "dependencies": {
     "@hapi/iron": "^6.0.0",
@@ -43,6 +47,7 @@
     "@types/cookie": "^0.4.0",
     "@types/lodash": "^4.14.171",
     "@types/ms": "^0.7.31",
+    "prettier": "^2.3.2",
     "prisma": "^2.25.0"
   }
 }
