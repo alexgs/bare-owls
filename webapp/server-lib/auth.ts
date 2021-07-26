@@ -18,8 +18,8 @@ import { JsonObject, UserData } from 'types';
 import { startSession } from './session';
 
 interface ClaimsHandlerOutput {
-  user: UserData,
-  data?: JsonObject,
+  user: UserData;
+  data?: JsonObject;
 }
 
 type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
@@ -99,9 +99,11 @@ export const IRON_UNSEAL = formatUnsealPasswords();
 
 /** @internal */
 function formatSealPassword(): SealPassword {
-  const output = IRON_PASSWORDS.find(value => value.id === IRON_CURRENT_PWD);
+  const output = IRON_PASSWORDS.find((value) => value.id === IRON_CURRENT_PWD);
   if (!output) {
-    throw new Error('No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.');
+    throw new Error(
+      'No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.',
+    );
   }
   return output;
 }
@@ -117,7 +119,9 @@ function formatUnsealPasswords() {
 
 /** @internal */
 async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
-  const count = await prisma.userOpenIdToken.count({ where: { sub: claims.sub } });
+  const count = await prisma.userOpenIdToken.count({
+    where: { sub: claims.sub },
+  });
   if (count > 1) {
     throw new Error(`Found multiple tokens for subject "${claims.sub}".`);
   }
@@ -147,7 +151,9 @@ async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
     throw new Error(`No account found for OIDC subject "${claims.sub}".`);
   }
   if (accounts.length > 1) {
-    throw new Error(`Multiple accounts found for OIDC subject "${claims.sub}".`);
+    throw new Error(
+      `Multiple accounts found for OIDC subject "${claims.sub}".`,
+    );
   }
 
   const account = accounts[0];
@@ -176,7 +182,7 @@ async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
       simplified: claims.email ?? 'invalid',
       accountId: account.id,
     },
-  })
+  });
   const tokenId = await storeOpenIdToken(claims, account.id);
   return {
     user: {
@@ -185,14 +191,19 @@ async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
       email: email.original,
     },
     data: {
-      tokenId
-    }
+      tokenId,
+    },
   };
 }
 
 /** @internal */
-async function storeOpenIdToken(claims: IdTokenClaims, accountId: string): Promise<string> {
-  const aud = Array.isArray(claims.aud) ? JSON.stringify(claims.aud) : claims.aud;
+async function storeOpenIdToken(
+  claims: IdTokenClaims,
+  accountId: string,
+): Promise<string> {
+  const aud = Array.isArray(claims.aud)
+    ? JSON.stringify(claims.aud)
+    : claims.aud;
   const token = await prisma.userOpenIdToken.create({
     data: {
       accountId,
@@ -213,7 +224,9 @@ async function storeOpenIdToken(claims: IdTokenClaims, accountId: string): Promi
 
 // --- PUBLIC FUNCTIONS ---
 
-export async function extractOpenIdToken(req: NextApiRequest): Promise<IdTokenClaims> {
+export async function extractOpenIdToken(
+  req: NextApiRequest,
+): Promise<IdTokenClaims> {
   const nonce = req.cookies[COOKIE.NONCE];
   if (!nonce) {
     throw new Error('Unable to load nonce from cookie');
@@ -239,7 +252,9 @@ interface ResponseHandlerOutput {
   sessionId: string;
 }
 
-export async function handleOidcResponse(req: NextApiRequest): Promise<ResponseHandlerOutput> {
+export async function handleOidcResponse(
+  req: NextApiRequest,
+): Promise<ResponseHandlerOutput> {
   const nonce = req.cookies[COOKIE.NONCE];
   if (!nonce) {
     throw new Error('Unable to load nonce from cookie');
@@ -251,7 +266,9 @@ export async function handleOidcResponse(req: NextApiRequest): Promise<ResponseH
   const claims = tokens.claims();
 
   const isRegisteredSubject = await isRegistered(claims);
-  const { user, data } = isRegisteredSubject ? await login(claims) : await register(claims);
+  const { user, data } = isRegisteredSubject
+    ? await login(claims)
+    : await register(claims);
   const sessionId = await startSession(user, data);
   return {
     sessionId,

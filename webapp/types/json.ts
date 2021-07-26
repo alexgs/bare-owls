@@ -6,21 +6,21 @@
 /**
  * Matches a JSON object. From https://github.com/sindresorhus/type-fest/
  */
-export type JsonObject = { [Key in string]?: JsonValue }
+export type JsonObject = { [Key in string]?: JsonValue };
 
 /**
  * Matches a JSON array. From https://github.com/sindresorhus/type-fest/
  */
 // export interface JsonArray extends Array<JsonValue> {} // Typescript < 4.1
-export type JsonArray = JsonValue[] // Typescript >= 4.1
+export type JsonArray = JsonValue[]; // Typescript >= 4.1
 
 /**
  * Matches any valid JSON value. From https://github.com/sindresorhus/type-fest/
  */
 export type JsonValue =
-  string
+  | string
   | number
   | boolean
   | null
   | JsonArray
-  | JsonObject
+  | JsonObject;
