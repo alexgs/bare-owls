@@ -18,7 +18,9 @@ function generateSessionId(): string {
   return nanoid();
 }
 
-export async function getSession(req: { cookies: NextApiRequestCookies }): Promise<Session | null> {
+export async function getSession(req: {
+  cookies: NextApiRequestCookies;
+}): Promise<Session | null> {
   const cookie = req.cookies[COOKIE.SESSION];
   if (!cookie) {
     return null;
@@ -46,7 +48,10 @@ export async function getSession(req: { cookies: NextApiRequestCookies }): Promi
   };
 }
 
-export async function startSession(user: UserData, data?: JsonValue): Promise<SessionId> {
+export async function startSession(
+  user: UserData,
+  data?: JsonValue,
+): Promise<SessionId> {
   const expiry = Date.now() + ms(SESSION_TTL);
   const expires = new Date(expiry);
   const id = generateSessionId();

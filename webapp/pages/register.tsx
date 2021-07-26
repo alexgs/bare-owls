@@ -53,8 +53,12 @@ const Register: React.FC<Props> = (props: Props) => {
   };
 
   const [data, setData] = React.useState<Data>(initialData);
-  const [fetchStatus, setFetchStatus] = React.useState<FetchStatus>(FetchStatus.Ready);
-  const [formStatus, setFormStatus] = React.useState<FormStatus>(FormStatus.Untouched);
+  const [fetchStatus, setFetchStatus] = React.useState<FetchStatus>(
+    FetchStatus.Ready,
+  );
+  const [formStatus, setFormStatus] = React.useState<FormStatus>(
+    FormStatus.Untouched,
+  );
   const [response, setResponse] = React.useState<Record<string, unknown>>({});
 
   React.useEffect(() => {
@@ -67,7 +71,11 @@ const Register: React.FC<Props> = (props: Props) => {
     if (isEqual(currentData, initialData)) {
       return FormStatus.Untouched;
     }
-    if (currentData.email.length > 0 && currentData.name.length > 0 && currentData.username.length > 0) {
+    if (
+      currentData.email.length > 0 &&
+      currentData.name.length > 0 &&
+      currentData.username.length > 0
+    ) {
       return FormStatus.Ready;
     }
     return FormStatus.Error;
@@ -109,15 +117,20 @@ const Register: React.FC<Props> = (props: Props) => {
       });
   }
 
-  const disableSubmit = formStatus !== FormStatus.Ready || fetchStatus === FetchStatus.Fetching;
+  const disableSubmit =
+    formStatus !== FormStatus.Ready || fetchStatus === FetchStatus.Fetching;
   return (
     <>
       <AppBar>
-        <Heading level="3" margin="none">Bare Owls</Heading>
+        <Heading level="3" margin="none">
+          Bare Owls
+        </Heading>
       </AppBar>
 
       <Box align="center" pad="medium" width={'100%'}>
-        <Heading level={1} margin="none">Welcome!</Heading>
+        <Heading level={1} margin="none">
+          Welcome!
+        </Heading>
         <Paragraph>Please check your details before you get started.</Paragraph>
         <Box width={'50%'}>
           <Form
@@ -127,7 +140,11 @@ const Register: React.FC<Props> = (props: Props) => {
             onSubmit={handleSubmit}
           >
             <input name="tokenId" type="hidden" value={props.tokenId} />
-            <FormField name="username" htmlFor="username-input" label="Username">
+            <FormField
+              name="username"
+              htmlFor="username-input"
+              label="Username"
+            >
               <TextInput id="username-input" name="username" />
             </FormField>
             <FormField name="name" htmlFor="name-input" label="Name">
@@ -137,7 +154,12 @@ const Register: React.FC<Props> = (props: Props) => {
               <TextInput id="email-input" name="email" />
             </FormField>
             <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-              <Button type="submit" disabled={disableSubmit} primary label="Submit" />
+              <Button
+                type="submit"
+                disabled={disableSubmit}
+                primary
+                label="Submit"
+              />
               <Button type="reset" label="Reset" />
             </Box>
           </Form>
@@ -159,7 +181,9 @@ export const getServerSideProps = async (
     throw new Error('Unable to get token ID from session data.');
   }
 
-  const token = await prisma.userOpenIdToken.findUnique({ where: { id: tokenId } });
+  const token = await prisma.userOpenIdToken.findUnique({
+    where: { id: tokenId },
+  });
   if (!token) {
     throw new Error(`Unable to find token ID "${tokenId}" in the database.`);
   }

@@ -16,14 +16,22 @@ import {
 } from 'server-lib';
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const nonceCookie = cookie.serialize(COOKIE.NONCE, '', COOKIE_OPTIONS.NONCE_RM);
+  const nonceCookie = cookie.serialize(
+    COOKIE.NONCE,
+    '',
+    COOKIE_OPTIONS.NONCE_RM,
+  );
   const cookies = [nonceCookie];
   let path = '/';
 
   if (req.method === 'POST') {
     const { registerNewUser, sessionId } = await handleOidcResponse(req);
     const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
-    const sessionCookie = cookie.serialize(COOKIE.SESSION, sealedId, COOKIE_OPTIONS.SESSION_SET);
+    const sessionCookie = cookie.serialize(
+      COOKIE.SESSION,
+      sealedId,
+      COOKIE_OPTIONS.SESSION_SET,
+    );
     cookies.push(sessionCookie);
 
     if (registerNewUser) {

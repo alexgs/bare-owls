@@ -12,7 +12,7 @@ import {
   ResponsiveContext,
 } from 'grommet';
 import { FormClose, Notification } from 'grommet-icons';
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 import * as React from 'react';
 
 import { AppBar } from 'components';
@@ -24,7 +24,7 @@ function Content() {
   const { isError, isLoading, session } = useSession();
 
   if (isError) {
-    return <div>Error!</div>
+    return <div>Error!</div>;
   }
 
   if (isLoading) {
@@ -32,12 +32,12 @@ function Content() {
   }
 
   if (session) {
-    return <div>Hello {session.user?.name}</div>
+    return <div>Hello {session.user?.name}</div>;
   }
 
   return (
     <Button label="Login" onClick={() => router.push(LOGIN_PATH)} primary />
-  )
+  );
 }
 
 function HomePage() {
@@ -48,17 +48,25 @@ function HomePage() {
       {(size) => (
         <Box fill>
           <AppBar>
-            <Heading level="3" margin="none">Bare Owls</Heading>
+            <Heading level="3" margin="none">
+              Bare Owls
+            </Heading>
             <Button
               icon={<Notification />}
               onClick={() => setShowSidebar(!showSidebar)}
             />
           </AppBar>
           <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
-            <Box flex align="start" direction="column" justify="start" pad="medium">
+            <Box
+              flex
+              align="start"
+              direction="column"
+              justify="start"
+              pad="medium"
+            >
               <Content />
             </Box>
-            {(!showSidebar || size !== 'small') ? (
+            {!showSidebar || size !== 'small' ? (
               <Collapsible direction="horizontal" open={showSidebar}>
                 <Box
                   flex
@@ -85,12 +93,7 @@ function HomePage() {
                     onClick={() => setShowSidebar(false)}
                   />
                 </Box>
-                <Box
-                  fill
-                  background="light-2"
-                  align="center"
-                  justify="center"
-                >
+                <Box fill background="light-2" align="center" justify="center">
                   sidebar
                 </Box>
               </Layer>
@@ -104,7 +107,7 @@ function HomePage() {
 
 export const getServerSideProps = async () => {
   const posts = await db.userAccount.count();
-  return { props: { posts } }
-}
+  return { props: { posts } };
+};
 
 export default HomePage;

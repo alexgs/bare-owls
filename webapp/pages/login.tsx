@@ -5,10 +5,7 @@
 
 import * as cookie from 'cookie';
 import { Anchor, Box } from 'grommet';
-import {
-  GetServerSidePropsContext,
-  GetServerSidePropsResult,
-} from 'next';
+import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import { generators } from 'openid-client';
 import * as React from 'react';
 import { COOKIE, COOKIE_OPTIONS, getOidcClient } from 'server-lib';
@@ -27,7 +24,7 @@ const Login: React.FC<Props> = (props: Props) => {
       </Box>
     );
   }
-  return (<div>Login Page</div>);
+  return <div>Login Page</div>;
 };
 
 export async function getServerSideProps(
@@ -42,7 +39,11 @@ export async function getServerSideProps(
     scope: 'openid email profile',
   });
 
-  const nonceCookie = cookie.serialize(COOKIE.NONCE, nonce, COOKIE_OPTIONS.NONCE_SET);
+  const nonceCookie = cookie.serialize(
+    COOKIE.NONCE,
+    nonce,
+    COOKIE_OPTIONS.NONCE_SET,
+  );
   context.res.setHeader('set-cookie', nonceCookie);
   if (showLink) {
     return { props: { url } };

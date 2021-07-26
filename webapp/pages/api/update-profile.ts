@@ -16,7 +16,11 @@ interface HandlerOutput {
 const inputSchema = Joi.object({
   email: Joi.string().trim().email().required(),
   name: Joi.string().trim().required(),
-  username: Joi.string().trim().min(3).pattern(/^[A-Za-z0-9_\-.]+$/).required(),
+  username: Joi.string()
+    .trim()
+    .min(3)
+    .pattern(/^[A-Za-z0-9_\-.]+$/)
+    .required(),
 });
 
 async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {

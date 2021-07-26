@@ -10,7 +10,7 @@ import { getSession } from 'server-lib';
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session = await getSession(req);
   if (session) {
-    return res.json( session );
+    return res.json(session);
   }
 
   res.status(403).json({ message: 'Forbidden' });
