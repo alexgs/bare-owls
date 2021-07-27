@@ -26,7 +26,7 @@ export async function getSession(req: {
     return null;
   }
 
-  const sessionId = await Iron.unseal(cookie, IRON_UNSEAL, IRON_OPTIONS);
+  const sessionId = await Iron.unseal(cookie, IRON_UNSEAL, IRON_OPTIONS) as string;
   const data = await prisma.session.findUnique({ where: { id: sessionId } });
   if (!data) {
     return null;

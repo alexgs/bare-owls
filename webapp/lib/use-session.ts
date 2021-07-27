@@ -5,6 +5,7 @@
 
 import useSWR from 'swr';
 import { Fetcher } from 'swr/dist/types';
+
 import { Session } from 'types';
 
 interface Data {
@@ -12,10 +13,16 @@ interface Data {
   status: number;
 }
 
+interface UseSessionOutput {
+  isError: boolean;
+  isLoading: boolean;
+  session: Session | null;
+}
+
 const fetcher: Fetcher<Data> = async (path: string) => {
   const response = await fetch(path);
   if (response.status === 200) {
-    const payload = await response.json();
+    const payload = await response.json() as Session;
     return {
       payload,
       status: response.status,
@@ -24,15 +31,15 @@ const fetcher: Fetcher<Data> = async (path: string) => {
   return { status: response.status };
 };
 
-export function useSession() {
-  const { data, error } = useSWR<Data>('/api/session', fetcher);
+export function useSession(): UseSessionOutput {
+  const { data, error } = useSWR<Data, Error>('/api/session', fetcher);
   let session = null;
   if (data) {
-    session = data.status === 200 ? data.payload : null;
+    session = data.status === 200 ? data.payload as Session : null;
   }
   return {
     session,
-    isError: error,
+    isError: !!error,
     isLoading: !data && !error,
   };
 }
