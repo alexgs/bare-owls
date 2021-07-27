@@ -40,7 +40,7 @@ function Content() {
   );
 }
 
-function HomePage() {
+const HomePage: React.FC = () => {
   const [showSidebar, setShowSidebar] = React.useState(false);
 
   return (

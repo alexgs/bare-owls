@@ -67,12 +67,9 @@ module.exports = {
       },
     },
     {
-      // Disable rules that cause errors with how we're importing design tokens
       files: ['pages/**/*.tsx'],
       rules: {
-        '@typescript-eslint/no-unsafe-member-access': 'off',
-        '@typescript-eslint/restrict-template-expressions': 'off',
-        '@typescript-eslint/no-unsafe-assignment': 'off',
+        '@typescript-eslint/explicit-module-boundary-types': 'off',
       },
     },
   ],

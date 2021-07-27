@@ -35,7 +35,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
     cookies.push(sessionCookie);
 
     if (registerNewUser) {
-      path = `/register`;
+      path = `/callback?newUser=true`;
+    } else {
+      path = `/callback`;
     }
   }
   res.setHeader('set-cookie', cookies);
