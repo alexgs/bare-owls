@@ -3,8 +3,6 @@
  * the Open Software License version 3.0.
  */
 
-module.exports = {
-  jsxBracketSameLine: false,
-  singleQuote: true,
-  trailingComma: 'all',
-};
+export function add(a: number, b: number): number {
+  return a + b;
+}
