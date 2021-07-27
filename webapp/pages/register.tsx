@@ -14,10 +14,12 @@ import {
 } from 'grommet';
 import { isEqual } from 'lodash';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { NextApiRequestCookies } from 'next/dist/next-server/server/api-utils';
 import * as React from 'react';
 
 import { AppBar } from 'components';
 import { getSession, prisma } from 'server-lib';
+import { Session } from 'types';
 
 interface Props {
   displayName: string | null;
@@ -172,10 +174,7 @@ const Register: React.FC<Props> = (props: Props) => {
 export const getServerSideProps = async (
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<Props>> => {
-  const session = await getSession(context.req);
-  if (!session) {
-    throw new Error('Invalid session.');
-  }
+  const session = await getInitialSession(context.req);
   const tokenId = session.data?.tokenId as string;
   if (!tokenId) {
     throw new Error('Unable to get token ID from session data.');
@@ -197,5 +196,35 @@ export const getServerSideProps = async (
     },
   };
 };
+
+async function getInitialSession(req: {
+  cookies: NextApiRequestCookies;
+}): Promise<Session> {
+  const sleepMs = 25;
+  let done = false;
+  let count = 0;
+  let output: Session | null = null;
+  while (!done) {
+    output = await getSession(req);
+    if (output) {
+      done = true;
+    } else {
+      count = count + 1;
+      if (count > 10) {
+        throw new Error('Unable to get a session after multiple attempts.');
+      }
+      await pause(sleepMs * count);
+    }
+  }
+  return output as Session;
+}
+
+async function pause(timeout: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  });
+}
 
 export default Register;
