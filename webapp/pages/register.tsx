@@ -4,20 +4,13 @@
  */
 
 import { Formik } from 'formik';
-import {
-  Box,
-  Button,
-  Form,
-  FormField,
-  Heading,
-  Paragraph,
-  TextInput,
-} from 'grommet';
+import { Box, Heading, Paragraph } from 'grommet';
 import { isEqual } from 'lodash';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
 
 import { AppBar } from 'components';
+import { RegistrationForm } from 'components/Register';
 import { getSession, prisma } from 'server-lib';
 
 interface Props {
@@ -118,8 +111,6 @@ const Register: React.FC<Props> = (props: Props) => {
       });
   }
 
-  const disableSubmit =
-    formStatus !== FormStatus.Ready || fetchStatus === FetchStatus.Fetching;
   return (
     <>
       <AppBar>
@@ -136,57 +127,11 @@ const Register: React.FC<Props> = (props: Props) => {
         <Box width={'50%'}>
           <Formik initialValues={initialData} onSubmit={handleSubmit}>
             {(formik) => (
-              <form onSubmit={formik.handleSubmit}>
-                <input name="tokenId" type="hidden" value={props.tokenId} />
-                <FormField
-                  error={formik.errors.username}
-                  name="username"
-                  htmlFor="username-input"
-                  label="Username"
-                >
-                  <TextInput
-                    id="username-input"
-                    name="username"
-                    onChange={formik.handleChange}
-                    value={formik.values.username || ''}
-                  />
-                </FormField>
-                <FormField
-                  error={formik.errors.name}
-                  htmlFor="name-input"
-                  label="Name"
-                  name="name"
-                >
-                  <TextInput
-                    id="name-input"
-                    name="name"
-                    onChange={formik.handleChange}
-                    value={formik.values.name || ''}
-                  />
-                </FormField>
-                <FormField
-                  error={formik.errors.email}
-                  htmlFor="email-input"
-                  label="Email address"
-                  name="email"
-                >
-                  <TextInput
-                    id="email-input"
-                    name="email"
-                    onChange={formik.handleChange}
-                    value={formik.values.email || ''}
-                  />
-                </FormField>
-                <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-                  <Button
-                    type="submit"
-                    disabled={disableSubmit}
-                    primary
-                    label="Submit"
-                  />
-                  <Button type="reset" label="Reset" />
-                </Box>
-              </form>
+              <RegistrationForm
+                formik={formik}
+                initialValues={initialData}
+                tokenId={props.tokenId}
+              />
             )}
           </Formik>
         </Box>
