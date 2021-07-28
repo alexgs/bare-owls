@@ -3,6 +3,7 @@
  * the Open Software License version 3.0.
  */
 
+import { Formik } from 'formik';
 import {
   Box,
   Button,
@@ -133,36 +134,61 @@ const Register: React.FC<Props> = (props: Props) => {
         </Heading>
         <Paragraph>Please check your details before you get started.</Paragraph>
         <Box width={'50%'}>
-          <Form
-            value={data}
-            onChange={handleChange}
-            onReset={handleReset}
-            onSubmit={handleSubmit}
-          >
-            <input name="tokenId" type="hidden" value={props.tokenId} />
-            <FormField
-              name="username"
-              htmlFor="username-input"
-              label="Username"
-            >
-              <TextInput id="username-input" name="username" />
-            </FormField>
-            <FormField name="name" htmlFor="name-input" label="Name">
-              <TextInput id="name-input" name="name" />
-            </FormField>
-            <FormField name="email" htmlFor="email-input" label="Email address">
-              <TextInput id="email-input" name="email" />
-            </FormField>
-            <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-              <Button
-                type="submit"
-                disabled={disableSubmit}
-                primary
-                label="Submit"
-              />
-              <Button type="reset" label="Reset" />
-            </Box>
-          </Form>
+          <Formik initialValues={initialData} onSubmit={handleSubmit}>
+            {(formik) => (
+              <form onSubmit={formik.handleSubmit}>
+                <input name="tokenId" type="hidden" value={props.tokenId} />
+                <FormField
+                  error={formik.errors.username}
+                  name="username"
+                  htmlFor="username-input"
+                  label="Username"
+                >
+                  <TextInput
+                    id="username-input"
+                    name="username"
+                    onChange={formik.handleChange}
+                    value={formik.values.username || ''}
+                  />
+                </FormField>
+                <FormField
+                  error={formik.errors.name}
+                  htmlFor="name-input"
+                  label="Name"
+                  name="name"
+                >
+                  <TextInput
+                    id="name-input"
+                    name="name"
+                    onChange={formik.handleChange}
+                    value={formik.values.name || ''}
+                  />
+                </FormField>
+                <FormField
+                  error={formik.errors.email}
+                  htmlFor="email-input"
+                  label="Email address"
+                  name="email"
+                >
+                  <TextInput
+                    id="email-input"
+                    name="email"
+                    onChange={formik.handleChange}
+                    value={formik.values.email || ''}
+                  />
+                </FormField>
+                <Box direction="row" gap="medium" margin={{ top: 'large' }}>
+                  <Button
+                    type="submit"
+                    disabled={disableSubmit}
+                    primary
+                    label="Submit"
+                  />
+                  <Button type="reset" label="Reset" />
+                </Box>
+              </form>
+            )}
+          </Formik>
         </Box>
       </Box>
     </>
