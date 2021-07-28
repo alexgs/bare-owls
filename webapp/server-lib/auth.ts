@@ -180,6 +180,7 @@ async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
     data: {
       original: claims.email ?? 'invalid',
       simplified: claims.email ?? 'invalid',
+      verified: claims.email_verified,
       accountId: account.id,
     },
   });

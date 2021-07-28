@@ -3,7 +3,7 @@
  * the Open Software License version 3.0.
  */
 
-import Joi from 'joi';
+import Joi, { ValidationError } from 'joi';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { getSession, prisma } from 'server-lib';
@@ -13,7 +13,13 @@ interface HandlerOutput {
   status: number;
 }
 
-const inputSchema = Joi.object({
+interface Payload {
+  email: string;
+  name: string;
+  username: string;
+}
+
+const inputSchema = Joi.object<Payload>({
   email: Joi.string().trim().email().required(),
   name: Joi.string().trim().required(),
   username: Joi.string()
@@ -33,11 +39,12 @@ async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {
   }
   const userId = session.user.id;
 
+  const body = req.body as Payload;
   const { value, error } = inputSchema.validate({
-    email: req.body.email,
-    name: req.body.name,
-    username: req.body.username,
-  });
+    email: body.email,
+    name: body.name,
+    username: body.username,
+  }) as { value: Payload; error?: ValidationError };
   if (error) {
     return {
       status: 400,
@@ -49,7 +56,23 @@ async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {
     data: {
       displayName: value.name,
       email: {
-        set: { original: value.email },
+        // TODO This query assumes there's only one email address, which may not always be true
+        updateMany: {
+          where: {},
+          data: {
+            original: value.email,
+            simplified: value.email,
+          },
+        },
+      },
+      session: {
+        updateMany: {
+          where: {},
+          data: {
+            displayName: value.name,
+            email: value.email,
+          },
+        },
       },
       username: value.username,
     },
@@ -65,7 +88,10 @@ async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {
   };
 }
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<void> {
   if (req.method === 'POST') {
     const { message, status } = await handleFormPost(req);
     res.status(status).json({ message });
