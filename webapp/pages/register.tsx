@@ -3,9 +3,8 @@
  * the Open Software License version 3.0.
  */
 
-import { Formik } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import { Box, Heading, Paragraph } from 'grommet';
-import { isEqual } from 'lodash';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
 import * as Yup from 'yup';
@@ -13,19 +12,6 @@ import * as Yup from 'yup';
 import { AppBar } from 'components';
 import { RegFormData, RegistrationForm } from 'components/Register';
 import { getSession, prisma } from 'server-lib';
-
-enum FetchStatus {
-  Done = 'Done',
-  Error = 'Error',
-  Fetching = 'Fetching',
-  Ready = 'Ready',
-}
-
-enum FormStatus {
-  Error = 'Error',
-  Ready = 'Ready',
-  Untouched = 'Untouched',
-}
 
 interface Props {
   displayName: string | null;
@@ -47,58 +33,18 @@ const Register: React.FC<Props> = (props: Props) => {
     username: '',
   };
 
-  const [data, setData] = React.useState<RegFormData>(initialData);
-  const [fetchStatus, setFetchStatus] = React.useState<FetchStatus>(
-    FetchStatus.Ready,
-  );
-  const [formStatus, setFormStatus] = React.useState<FormStatus>(
-    FormStatus.Untouched,
-  );
-  const [response, setResponse] = React.useState<Record<string, unknown>>({});
-
-  React.useEffect(() => {
-    const formStatus = getFormStatus(data);
-    setFormStatus(formStatus);
-    console.log();
-  }, [data]);
-
-  function getFormStatus(currentData: RegFormData): FormStatus {
-    if (isEqual(currentData, initialData)) {
-      return FormStatus.Untouched;
-    }
-    if (
-      currentData.email.length > 0 &&
-      currentData.name.length > 0 &&
-      currentData.username.length > 0
-    ) {
-      return FormStatus.Ready;
-    }
-    return FormStatus.Error;
-  }
-
-  function handleChange(nextValue: RegFormData) {
-    setData(nextValue);
-  }
-
-  function handleReset() {
-    setFormStatus(FormStatus.Untouched);
-    setData(initialData);
-  }
-
-  function handleSubmit() {
+  function handleSubmit(values: RegFormData, formik: FormikHelpers<RegFormData>) {
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(values),
     };
 
-    setFetchStatus(FetchStatus.Fetching);
     fetch('/api/update-profile', options)
       .then((response) => {
         if (response.ok) {
-          setFetchStatus(FetchStatus.Done);
           return response.json();
         }
         throw new Error(JSON.stringify(response));
@@ -107,8 +53,10 @@ const Register: React.FC<Props> = (props: Props) => {
         console.log(`<<- ${JSON.stringify(payload)} ->>`);
       })
       .catch((e) => {
-        setFetchStatus(FetchStatus.Error);
         console.log(e);
+      })
+      .finally(() => {
+        formik.setSubmitting(false);
       });
   }
 

@@ -18,7 +18,9 @@ interface Props {
 
 export const RegistrationForm: React.FC<Props> = (props: Props) => {
   const { formik } = props;
-  const disableSubmit = !formik.dirty || !isEmpty(formik.errors);
+  const disableReset = formik.isSubmitting;
+  const disableSubmit =
+    !formik.dirty || !isEmpty(formik.errors) || formik.isSubmitting;
 
   return (
     <form onReset={formik.handleReset} onSubmit={formik.handleSubmit}>
@@ -66,8 +68,8 @@ export const RegistrationForm: React.FC<Props> = (props: Props) => {
         />
       </FormField>
       <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-        <Button type="submit" disabled={disableSubmit} primary label="Submit" />
-        <Button type="reset" label="Reset" />
+        <Button type="submit" label="Submit" primary disabled={disableSubmit} />
+        <Button type="reset" label="Reset" disabled={disableReset} />
       </Box>
     </form>
   );
