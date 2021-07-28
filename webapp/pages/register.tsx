@@ -8,23 +8,11 @@ import { Box, Heading, Paragraph } from 'grommet';
 import { isEqual } from 'lodash';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
 import * as React from 'react';
+import * as Yup from 'yup';
 
 import { AppBar } from 'components';
-import { RegistrationForm } from 'components/Register';
+import { RegFormData, RegistrationForm } from 'components/Register';
 import { getSession, prisma } from 'server-lib';
-
-interface Props {
-  displayName: string | null;
-  email: string | null;
-  subject: string;
-  tokenId: string;
-}
-
-interface Data {
-  email: string;
-  name: string;
-  username: string;
-}
 
 enum FetchStatus {
   Done = 'Done',
@@ -39,14 +27,27 @@ enum FormStatus {
   Untouched = 'Untouched',
 }
 
+interface Props {
+  displayName: string | null;
+  email: string | null;
+  subject: string;
+  tokenId: string;
+}
+
+const formSchema = Yup.object({
+  email: Yup.string().email('Please enter a valid email address.').required('Please enter a valid email address.'),
+  name: Yup.string().required('Please enter your name.'),
+  username: Yup.string().required('Please select a unique username.'),
+});
+
 const Register: React.FC<Props> = (props: Props) => {
-  const initialData: Data = {
+  const initialData: RegFormData = {
     name: props.displayName ?? '',
     email: props.email ?? '',
     username: '',
   };
 
-  const [data, setData] = React.useState<Data>(initialData);
+  const [data, setData] = React.useState<RegFormData>(initialData);
   const [fetchStatus, setFetchStatus] = React.useState<FetchStatus>(
     FetchStatus.Ready,
   );
@@ -61,7 +62,7 @@ const Register: React.FC<Props> = (props: Props) => {
     console.log();
   }, [data]);
 
-  function getFormStatus(currentData: Data): FormStatus {
+  function getFormStatus(currentData: RegFormData): FormStatus {
     if (isEqual(currentData, initialData)) {
       return FormStatus.Untouched;
     }
@@ -75,7 +76,7 @@ const Register: React.FC<Props> = (props: Props) => {
     return FormStatus.Error;
   }
 
-  function handleChange(nextValue: Data) {
+  function handleChange(nextValue: RegFormData) {
     setData(nextValue);
   }
 
@@ -125,7 +126,11 @@ const Register: React.FC<Props> = (props: Props) => {
         </Heading>
         <Paragraph>Please check your details before you get started.</Paragraph>
         <Box width={'50%'}>
-          <Formik initialValues={initialData} onSubmit={handleSubmit}>
+          <Formik
+            initialValues={initialData}
+            onSubmit={handleSubmit}
+            validationSchema={formSchema}
+          >
             {(formik) => (
               <RegistrationForm
                 formik={formik}

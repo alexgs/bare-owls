@@ -3,5 +3,8 @@
  * the Open Software License version 3.0.
  */
 
-export { RegistrationForm } from './RegistrationForm';
-export * from './types';
+export interface RegFormData {
+  email: string;
+  name: string;
+  username: string;
+}

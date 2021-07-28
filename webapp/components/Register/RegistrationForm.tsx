@@ -5,37 +5,34 @@
 
 import { FormikProps } from 'formik';
 import { Box, Button, FormField, TextInput } from 'grommet';
-import { isEqual } from 'lodash';
+import { isEmpty } from 'lodash';
 import * as React from 'react';
 
-interface Data {
-  email: string;
-  name: string;
-  username: string;
-}
+import { RegFormData } from './types';
 
 interface Props {
-  formik: FormikProps<Data>;
-  initialValues: Data;
+  formik: FormikProps<RegFormData>;
+  initialValues: RegFormData;
   tokenId: string;
 }
 
 export const RegistrationForm: React.FC<Props> = (props: Props) => {
   const { formik } = props;
-  const disableSubmit = isEqual(props.initialValues, props.formik.values);
+  const disableSubmit = !formik.dirty || !isEmpty(formik.errors);
 
   return (
-    <form onSubmit={formik.handleSubmit}>
+    <form onReset={formik.handleReset} onSubmit={formik.handleSubmit}>
       <input name="tokenId" type="hidden" value={props.tokenId} />
       <FormField
         error={formik.errors.username}
-        name="username"
         htmlFor="username-input"
         label="Username"
+        name="username"
       >
         <TextInput
           id="username-input"
           name="username"
+          onBlur={formik.handleBlur}
           onChange={formik.handleChange}
           value={formik.values.username || ''}
         />
@@ -49,6 +46,7 @@ export const RegistrationForm: React.FC<Props> = (props: Props) => {
         <TextInput
           id="name-input"
           name="name"
+          onBlur={formik.handleBlur}
           onChange={formik.handleChange}
           value={formik.values.name || ''}
         />
@@ -62,17 +60,13 @@ export const RegistrationForm: React.FC<Props> = (props: Props) => {
         <TextInput
           id="email-input"
           name="email"
+          onBlur={formik.handleBlur}
           onChange={formik.handleChange}
           value={formik.values.email || ''}
         />
       </FormField>
       <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-        <Button
-          type="submit"
-          disabled={disableSubmit}
-          primary
-          label="Submit"
-        />
+        <Button type="submit" disabled={disableSubmit} primary label="Submit" />
         <Button type="reset" label="Reset" />
       </Box>
     </form>
