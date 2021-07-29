@@ -21,7 +21,9 @@ interface Props {
 }
 
 const formSchema = Yup.object({
-  email: Yup.string().email('Please enter a valid email address.').required('Please enter a valid email address.'),
+  email: Yup.string()
+    .email('Please enter a valid email address.')
+    .required('Please enter a valid email address.'),
   name: Yup.string().required('Please enter your name.'),
   username: Yup.string().required('Please select a unique username.'),
 });
@@ -33,7 +35,10 @@ const Register: React.FC<Props> = (props: Props) => {
     username: '',
   };
 
-  function handleSubmit(values: RegFormData, formik: FormikHelpers<RegFormData>) {
+  async function handleSubmit(
+    values: RegFormData,
+    formik: FormikHelpers<RegFormData>,
+  ) {
     const options = {
       method: 'POST',
       headers: {
@@ -42,22 +47,23 @@ const Register: React.FC<Props> = (props: Props) => {
       body: JSON.stringify(values),
     };
 
-    fetch('/api/update-profile', options)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error(JSON.stringify(response));
-      })
-      .then((payload) => {
-        console.log(`<<- ${JSON.stringify(payload)} ->>`);
-      })
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => {
-        formik.setSubmitting(false);
-      });
+    const response = await fetch('/api/update-profile', options);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const payload = await response.json();
+    if (response.ok) {
+      console.log(`<<- ${JSON.stringify(payload)} ->>`);
+    } else if (response.status === 409) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const details = payload.message.details as string;
+      if (details === 'Duplicate username') {
+        formik.setErrors({ username: `The username "${values.username}" is taken. Please try another one.`});
+      } else {
+        formik.setErrors({ username: `Unknown duplicate error: ${details}.`});
+      }
+    } else {
+      console.log(JSON.stringify(response));
+    }
+    formik.setSubmitting(false);
   }
 
   return (

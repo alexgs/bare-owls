@@ -52,6 +52,14 @@ async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {
     };
   }
 
+  const extantUsernames = await prisma.userAccount.count({where: { username: value.username } });
+  if (extantUsernames !== 0) {
+    return {
+      status: 409,
+      message: { details: 'Duplicate username' },
+    };
+  }
+
   await prisma.userAccount.update({
     data: {
       displayName: value.name,
