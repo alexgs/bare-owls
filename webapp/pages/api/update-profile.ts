@@ -19,6 +19,7 @@ interface Payload {
   username: string;
 }
 
+// TODO Replace Joi with Yup
 const inputSchema = Joi.object<Payload>({
   email: Joi.string().trim().email().required(),
   name: Joi.string().trim().required(),

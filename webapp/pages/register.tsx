@@ -6,6 +6,7 @@
 import { Formik, FormikHelpers } from 'formik';
 import { Box, Heading, Paragraph } from 'grommet';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 import * as Yup from 'yup';
 
@@ -34,6 +35,7 @@ const Register: React.FC<Props> = (props: Props) => {
     email: props.email ?? '',
     username: '',
   };
+  const router = useRouter();
 
   async function handleSubmit(
     values: RegFormData,
@@ -51,14 +53,24 @@ const Register: React.FC<Props> = (props: Props) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const payload = await response.json();
     if (response.ok) {
-      console.log(`<<- ${JSON.stringify(payload)} ->>`);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const action = payload.message.action as string;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const location = payload.message.location as string;
+      if (action === 'REDIRECT') {
+        await router.push(location);
+      } else {
+        console.log(`Unknown action: ${action}.`);
+      }
     } else if (response.status === 409) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       const details = payload.message.details as string;
       if (details === 'Duplicate username') {
-        formik.setErrors({ username: `The username "${values.username}" is taken. Please try another one.`});
+        formik.setErrors({
+          username: `The username "${values.username}" is taken. Please try another one.`,
+        });
       } else {
-        formik.setErrors({ username: `Unknown duplicate error: ${details}.`});
+        formik.setErrors({ username: `Unknown duplicate error: ${details}.` });
       }
     } else {
       console.log(JSON.stringify(response));
