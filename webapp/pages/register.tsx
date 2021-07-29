@@ -10,7 +10,7 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import * as Yup from 'yup';
 
-import { AppBar } from 'components';
+import { NavBar } from 'components';
 import { RegFormData, RegistrationForm } from 'components/Register';
 import { getSession, prisma } from 'server-lib';
 
@@ -80,12 +80,7 @@ const Register: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <AppBar>
-        <Heading level="3" margin="none">
-          Bare Owls
-        </Heading>
-      </AppBar>
-
+      <NavBar />
       <Box align="center" pad="medium" width={'100%'}>
         <Heading level={1} margin="none">
           Welcome!

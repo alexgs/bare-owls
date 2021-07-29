@@ -8,7 +8,7 @@ import { useRouter } from 'next/router';
 import * as queryString from 'query-string';
 import * as React from 'react';
 
-import { AppBar } from 'components';
+import { NavBar } from 'components';
 
 const Callback: React.FC = () => {
   const router = useRouter();
@@ -27,12 +27,7 @@ const Callback: React.FC = () => {
 
   return (
     <>
-      <AppBar>
-        <Heading level="3" margin="none">
-          Bare Owls
-        </Heading>
-      </AppBar>
-
+      <NavBar />
       <Box align="center" pad="medium" width={'100%'}>
         <Heading level={1} margin="none">
           Please wait...
