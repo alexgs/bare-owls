@@ -3,15 +3,54 @@
  * the Open Software License version 3.0.
  */
 
-import { Heading } from 'grommet';
+import { Button, Heading } from 'grommet';
+import { Login, Logout } from 'grommet-icons';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 
+import { LOGIN_PATH, LOGOUT_PATH, useSession } from 'lib';
+
 import { AppBar } from './AppBar';
+
+function LogInOutButton() {
+  const router = useRouter();
+  const { isError, isLoading, session } = useSession();
+
+  if (isError) {
+    console.error('Error loading session.');
+    return null;
+  }
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (session) {
+    return (
+      <Button
+        icon={<Logout />}
+        onClick={() => {
+          void router.push(LOGOUT_PATH);
+        }}
+      />
+    );
+  }
+
+  return (
+    <Button
+      icon={<Login />}
+      onClick={() => {
+        void router.push(LOGIN_PATH);
+      }}
+    />
+  );
+}
 
 export const NavBar: React.FC = () => (
   <AppBar>
     <Heading level="3" margin="none">
       Bare Owls
     </Heading>
+    <LogInOutButton />
   </AppBar>
 );

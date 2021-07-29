@@ -15,7 +15,7 @@ import {
   handleOidcResponse,
 } from 'server-lib';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const nonceCookie = cookie.serialize(
     COOKIE.NONCE,
     '',
