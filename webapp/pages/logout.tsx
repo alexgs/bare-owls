@@ -19,10 +19,28 @@ interface Props {
 const Logout: React.FC<Props> = (props: Props) => {
   const router = useRouter();
 
-  React.useEffect(() => {
-    // TODO Call logout API
-    // TODO Redirect to homepage
-  }, []);
+  React.useEffect(
+    () => {
+      if (props.sessionId) {
+        const options = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ sessionId: props.sessionId }),
+        };
+
+        void fetch('/api/logout', options).then(() => {
+          // Regardless of the result of the API call, redirect to the homepage
+          void router.push('/');
+        });
+      } else {
+        void router.push('/');
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
+  );
 
   return (
     <>
@@ -51,9 +69,8 @@ export async function getServerSideProps(
   );
   context.res.setHeader('set-cookie', sessionCookie);
   return {
-    props: { sessionId: session?.id ?? null }
+    props: { sessionId: session?.id ?? null },
   };
 }
-
 
 export default Logout;
