@@ -5,10 +5,21 @@
 
 /* eslint-env node */
 
-// I *think* this is only used by `babel-jest` and ignored by Next.js
-module.exports = {
-  presets: [
-    ['@babel/preset-env', { targets: { node: 'current' } }],
-    '@babel/preset-typescript',
-  ],
+module.exports = (api) => {
+  if (api.env('test')) {
+    return {
+      presets: [
+        ['@babel/preset-env', { targets: { node: 'current' } }],
+        '@babel/preset-typescript',
+      ],
+    };
+  }
+
+  if (api.env(['development', 'production'])) {
+    return {
+      presets: ['next/babel'],
+    };
+  }
+
+  throw new Error(`Unknown environment: "${api.env()}"`);
 };

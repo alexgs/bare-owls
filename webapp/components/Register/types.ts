@@ -3,5 +3,8 @@
  * the Open Software License version 3.0.
  */
 
-export { AppBar } from './AppBar';
-export { NavBar } from './NavBar';
+export interface RegFormData {
+  email: string;
+  name: string;
+  username: string;
+}

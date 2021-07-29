@@ -3,20 +3,15 @@
  * the Open Software License version 3.0.
  */
 
-import {
-  Box,
-  Button,
-  Form,
-  FormField,
-  Heading,
-  Paragraph,
-  TextInput,
-} from 'grommet';
-import { isEqual } from 'lodash';
+import { Formik, FormikHelpers } from 'formik';
+import { Box, Heading, Paragraph } from 'grommet';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
+import { useRouter } from 'next/router';
 import * as React from 'react';
+import * as Yup from 'yup';
 
-import { AppBar } from 'components';
+import { NavBar } from 'components';
+import { RegFormData, RegistrationForm } from 'components/Register';
 import { getSession, prisma } from 'server-lib';
 
 interface Props {
@@ -26,143 +21,85 @@ interface Props {
   tokenId: string;
 }
 
-interface Data {
-  email: string;
-  name: string;
-  username: string;
-}
-
-enum FetchStatus {
-  Done = 'Done',
-  Error = 'Error',
-  Fetching = 'Fetching',
-  Ready = 'Ready',
-}
-
-enum FormStatus {
-  Error = 'Error',
-  Ready = 'Ready',
-  Untouched = 'Untouched',
-}
+const formSchema = Yup.object({
+  email: Yup.string()
+    .email('Please enter a valid email address.')
+    .required('Please enter a valid email address.'),
+  name: Yup.string().required('Please enter your name.'),
+  username: Yup.string().required('Please select a unique username.'),
+});
 
 const Register: React.FC<Props> = (props: Props) => {
-  const initialData: Data = {
+  const initialData: RegFormData = {
     name: props.displayName ?? '',
     email: props.email ?? '',
     username: '',
   };
+  const router = useRouter();
 
-  const [data, setData] = React.useState<Data>(initialData);
-  const [fetchStatus, setFetchStatus] = React.useState<FetchStatus>(
-    FetchStatus.Ready,
-  );
-  const [formStatus, setFormStatus] = React.useState<FormStatus>(
-    FormStatus.Untouched,
-  );
-  const [response, setResponse] = React.useState<Record<string, unknown>>({});
-
-  React.useEffect(() => {
-    const formStatus = getFormStatus(data);
-    setFormStatus(formStatus);
-    console.log();
-  }, [data]);
-
-  function getFormStatus(currentData: Data): FormStatus {
-    if (isEqual(currentData, initialData)) {
-      return FormStatus.Untouched;
-    }
-    if (
-      currentData.email.length > 0 &&
-      currentData.name.length > 0 &&
-      currentData.username.length > 0
-    ) {
-      return FormStatus.Ready;
-    }
-    return FormStatus.Error;
-  }
-
-  function handleChange(nextValue: Data) {
-    setData(nextValue);
-  }
-
-  function handleReset() {
-    setFormStatus(FormStatus.Untouched);
-    setData(initialData);
-  }
-
-  function handleSubmit() {
+  async function handleSubmit(
+    values: RegFormData,
+    formik: FormikHelpers<RegFormData>,
+  ) {
     const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(values),
     };
 
-    setFetchStatus(FetchStatus.Fetching);
-    fetch('/api/update-profile', options)
-      .then((response) => {
-        if (response.ok) {
-          setFetchStatus(FetchStatus.Done);
-          return response.json();
-        }
-        throw new Error(JSON.stringify(response));
-      })
-      .then((payload) => {
-        console.log(`<<- ${JSON.stringify(payload)} ->>`);
-      })
-      .catch((e) => {
-        setFetchStatus(FetchStatus.Error);
-        console.log(e);
-      });
+    const response = await fetch('/api/update-profile', options);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const payload = await response.json();
+    if (response.ok) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const action = payload.message.action as string;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const location = payload.message.location as string;
+      if (action === 'REDIRECT') {
+        await router.push(location);
+      } else {
+        console.log(`Unknown action: ${action}.`);
+      }
+    } else if (response.status === 409) {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      const details = payload.message.details as string;
+      if (details === 'Duplicate username') {
+        formik.setErrors({
+          username: `The username "${values.username}" is taken. Please try another one.`,
+        });
+      } else {
+        formik.setErrors({ username: `Unknown duplicate error: ${details}.` });
+      }
+    } else {
+      console.log(JSON.stringify(response));
+    }
+    formik.setSubmitting(false);
   }
 
-  const disableSubmit =
-    formStatus !== FormStatus.Ready || fetchStatus === FetchStatus.Fetching;
   return (
     <>
-      <AppBar>
-        <Heading level="3" margin="none">
-          Bare Owls
-        </Heading>
-      </AppBar>
-
+      <NavBar />
       <Box align="center" pad="medium" width={'100%'}>
         <Heading level={1} margin="none">
           Welcome!
         </Heading>
         <Paragraph>Please check your details before you get started.</Paragraph>
         <Box width={'50%'}>
-          <Form
-            value={data}
-            onChange={handleChange}
-            onReset={handleReset}
+          <Formik
+            initialValues={initialData}
             onSubmit={handleSubmit}
+            validationSchema={formSchema}
           >
-            <input name="tokenId" type="hidden" value={props.tokenId} />
-            <FormField
-              name="username"
-              htmlFor="username-input"
-              label="Username"
-            >
-              <TextInput id="username-input" name="username" />
-            </FormField>
-            <FormField name="name" htmlFor="name-input" label="Name">
-              <TextInput id="name-input" name="name" />
-            </FormField>
-            <FormField name="email" htmlFor="email-input" label="Email address">
-              <TextInput id="email-input" name="email" />
-            </FormField>
-            <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-              <Button
-                type="submit"
-                disabled={disableSubmit}
-                primary
-                label="Submit"
+            {(formik) => (
+              <RegistrationForm
+                formik={formik}
+                initialValues={initialData}
+                tokenId={props.tokenId}
               />
-              <Button type="reset" label="Reset" />
-            </Box>
-          </Form>
+            )}
+          </Formik>
         </Box>
       </Box>
     </>
