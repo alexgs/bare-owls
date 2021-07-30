@@ -4,14 +4,11 @@
  */
 
 import { ApolloServer } from 'apollo-server-micro';
-import { DateTimeResolver } from 'graphql-scalars';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { asNexusMethod, makeSchema } from 'nexus';
+import { makeSchema } from 'nexus';
 import path from 'path';
 
 import * as types from './types';
-
-export const GQLDate = asNexusMethod(DateTimeResolver, 'date');
 
 export const schema = makeSchema({
   types,

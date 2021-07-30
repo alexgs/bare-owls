@@ -15,6 +15,8 @@
     "build": "next build",
     "check": "npx tsc --noEmit",
     "dev": "next dev -p $WEBAPP_PORT",
+    "gen": "npm run gen:nexus",
+    "gen:nexus": "npx ts-node --transpile-only -P nexus.tsconfig.json -r tsconfig-paths/register pages/api/graphql",
     "lint": "next lint",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
@@ -70,6 +72,8 @@
     "jest": "^27.0.6",
     "jest-mock-extended": "^1.0.18",
     "prettier": "2.3.x",
-    "prisma": "2.25.x"
+    "prisma": "2.25.x",
+    "ts-node": "^10.1.0",
+    "tsconfig-paths": "^3.10.1"
   }
 }

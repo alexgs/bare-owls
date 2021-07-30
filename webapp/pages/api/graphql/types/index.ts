@@ -3,5 +3,10 @@
  * the Open Software License version 3.0.
  */
 
+import { DateTimeResolver } from 'graphql-scalars';
+import { asNexusMethod } from 'nexus';
+
 export * from './Query';
-export * from './UserAccount';
+export * from './Users';
+
+export const GQLDate = asNexusMethod(DateTimeResolver, 'date');

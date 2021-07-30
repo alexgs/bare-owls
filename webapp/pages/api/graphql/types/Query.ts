@@ -10,6 +10,12 @@ import prisma from 'server-lib/prisma';
 export const Query = objectType({
   name: 'Query',
   definition(t) {
+    t.list.field('emails', {
+      type: 'UserEmail',
+      resolve: () => {
+        return prisma.userEmail.findMany();
+      },
+    });
     t.list.field('users', {
       type: 'UserAccount',
       resolve: () => {
