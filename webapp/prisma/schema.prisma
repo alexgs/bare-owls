@@ -10,6 +10,27 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model Channel {
+  id          String                @id
+  name        String                @unique
+  title       String
+  owner       UserAccount           @relation(fields: [ownerId], references: [id])
+  ownerId     String
+  subscribers ChannelSubscription[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+}
+
+model ChannelSubscription {
+  id        Int         @id @default(autoincrement())
+  channel   Channel     @relation(fields: [channelId], references: [id])
+  channelId String
+  user      UserAccount @relation(fields: [userId], references: [id])
+  userId    String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
 model Session {
   id          String      @id
   displayName String
@@ -25,14 +46,32 @@ model Session {
 }
 
 model UserAccount {
-  id          String            @id
-  username    String            @unique
-  displayName String?
-  email       UserEmail[]
-  session     Session[]
-  token       UserOpenIdToken[]
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  id            String                @id
+  username      String                @unique
+  displayName   String?
+  role          UserRole              @relation(fields: [roleId], references: [id])
+  channel       Channel?
+  subscriptions ChannelSubscription[]
+  emails        UserEmail[]
+  sessions      Session[]
+  tokens        UserOpenIdToken[]
+  blockTargets  UserBlock[]           @relation("Blocker")
+  blockedBy     UserBlock[]           @relation("BlockedBy")
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+  roleId        String
+}
+
+// The `blocker` is the person doing the block, and the `target` is the person
+// getting blocked. In other words, the `target` is blocked by the `blocker`.
+model UserBlock {
+  id        Int         @id @default(autoincrement())
+  blocker   UserAccount @relation("Blocker", fields: [blockerId], references: [id])
+  blockerId String
+  target    UserAccount @relation("BlockedBy", fields: [targetId], references: [id])
+  targetId  String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
 }
 
 model UserEmail {
@@ -63,4 +102,13 @@ model UserOpenIdToken {
   accountId     String?
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
+}
+
+model UserRole {
+  id          String        @id
+  name        String
+  description String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  users       UserAccount[]
 }
