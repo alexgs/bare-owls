@@ -6,55 +6,28 @@
 import { ApolloServer } from 'apollo-server-micro';
 import { DateTimeResolver } from 'graphql-scalars';
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  asNexusMethod,
-  makeSchema,
-  nonNull,
-  nullable,
-  objectType,
-  stringArg,
-} from 'nexus';
+import { asNexusMethod, makeSchema } from 'nexus';
 import path from 'path';
 
-import prisma from 'server-lib/prisma';
+import * as types from './types';
 
 export const GQLDate = asNexusMethod(DateTimeResolver, 'date');
 
-const UserAccount = objectType({
-  name: 'UserAccount',
-  definition(t) {
-    t.string('id');
-    t.string('username');
-  },
-});
-
-const Query = objectType({
-  name: 'Query',
-  definition(t) {
-    t.list.field('users', {
-      type: 'UserAccount',
-      resolve: () => {
-        return prisma.userAccount.findMany();
-      },
-    });
-  },
-});
-
 export const schema = makeSchema({
-  types: [Query, UserAccount],
+  types,
   outputs: {
     typegen: path.join(process.cwd(), 'pages/api/graphql/nexus-typegen.ts'),
     schema: path.join(process.cwd(), 'pages/api/graphql/schema.graphql'),
   },
 });
 
+const apolloServer = new ApolloServer({ schema });
+
 export const config = {
   api: {
     bodyParser: false,
   },
 };
-
-const apolloServer = new ApolloServer({ schema });
 
 const startServer = apolloServer.start();
 
