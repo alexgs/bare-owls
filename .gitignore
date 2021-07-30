@@ -32,8 +32,9 @@
 
 # --- PROJECT ---
 
-# This file contains secrets, so keep it out of the repo
+# These files may contain secrets, so keep them out of the repo
 **/.npmrc
+webapp/prisma/seed-data/*.ts
 
 # artifacts and dependencies
 **/dist
