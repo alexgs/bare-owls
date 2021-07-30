@@ -9,7 +9,7 @@ import * as env from 'env-var';
 import ms from 'ms';
 import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
-import { IdTokenClaims, Issuer } from 'openid-client';
+import { Client, IdTokenClaims, Issuer } from 'openid-client';
 
 import { seconds } from 'lib';
 import { prisma } from 'server-lib';
@@ -24,6 +24,13 @@ interface ClaimsHandlerOutput {
 
 type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
 
+interface IronPassword {
+  id: string;
+  secret: string;
+}
+
+type IronPasswords = Array<IronPassword>;
+
 interface SealPassword {
   id: string;
   secret: string;
@@ -35,7 +42,10 @@ const COOKIE_NONCE_TTL = env.get('COOKIE_NONCE_TTL').required().asString();
 const COOKIE_SESSION_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
 const DOMAIN = env.get('AUTH0_DOMAIN').required().asString();
 const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
-const IRON_PASSWORDS = env.get('IRON_PASSWORDS').required().asJsonArray();
+const IRON_PASSWORDS = env
+  .get('IRON_PASSWORDS')
+  .required()
+  .asJsonArray() as IronPasswords;
 const IRON_SEAL_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
 
 export const CALLBACK_URL = `${BASE_URL}/api/callback`;
@@ -135,12 +145,12 @@ async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
 async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
   const accounts = await prisma.userAccount.findMany({
     where: {
-      token: {
+      tokens: {
         some: { sub: claims.sub },
       },
     },
     include: {
-      email: {
+      emails: {
         orderBy: { createdAt: 'asc' },
         take: 1,
       },
@@ -161,7 +171,7 @@ async function login(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
     user: {
       id: account.id,
       name: account.displayName ?? account.username,
-      email: account.email[0].original,
+      email: account.emails[0].original,
     },
   };
 }
@@ -174,6 +184,7 @@ async function register(claims: IdTokenClaims): Promise<ClaimsHandlerOutput> {
       id: nanoid(),
       displayName: claims.name,
       username: `new-user-${nanoid()}`,
+      roleId: 'FAN',
     },
   });
   const email = await prisma.userEmail.create({
@@ -239,7 +250,7 @@ export async function extractOpenIdToken(
   return tokens.claims();
 }
 
-export async function getOidcClient() {
+export async function getOidcClient(): Promise<Client> {
   const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
   return new issuer.Client({
     client_id: CLIENT_ID,

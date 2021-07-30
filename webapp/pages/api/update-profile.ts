@@ -64,7 +64,7 @@ async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {
   await prisma.userAccount.update({
     data: {
       displayName: value.name,
-      email: {
+      emails: {
         // TODO This query assumes there's only one email address, which may not always be true
         updateMany: {
           where: {},
@@ -74,7 +74,7 @@ async function handleFormPost(req: NextApiRequest): Promise<HandlerOutput> {
           },
         },
       },
-      session: {
+      sessions: {
         updateMany: {
           where: {},
           data: {
