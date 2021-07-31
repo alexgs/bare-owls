@@ -22,14 +22,6 @@ const App = ({ Component, pageProps }: AppProps): React.ReactNode => {
   return (
     <>
       <Head>
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/normalize.css/normalize.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
-        />
         <title>Bare Owls</title>
       </Head>
       <Grommet theme={theme} full>
