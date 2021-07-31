@@ -20,10 +20,12 @@
     "lint": "next lint",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
+    "seed": "npx prisma db seed --preview-feature",
     "start": "next start -p $WEBAPP_PORT",
     "studio": "npx prisma studio",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\""
   },
   "dependencies": {
     "@hapi/iron": "^6.0.0",
