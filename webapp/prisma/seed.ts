@@ -3,9 +3,17 @@
  * the Open Software License version 3.0.
  */
 
-import { PrismaClient, UserAccount, UserRole } from '@prisma/client';
+import {
+  PrismaClient,
+  UserAccount,
+  UserEmail,
+  UserRole,
+  UserOpenIdToken,
+} from '@prisma/client';
 
 import userAccounts from './seed-data/user-accounts';
+import userEmails from './seed-data/user-emails';
+import userOpenIdTokens from './seed-data/user-openid-tokens';
 import userRoles from './seed-data/user-roles';
 
 const prisma = new PrismaClient();
@@ -23,6 +31,18 @@ async function upsertUserAccounts(): Promise<Array<UserAccount>> {
   );
 }
 
+async function upsertUserEmails(): Promise<Array<UserEmail>> {
+  return Promise.all(
+    userEmails.map((data) => {
+      return prisma.userEmail.upsert({
+        where: { original: data.original },
+        create: data,
+        update: data,
+      });
+    }),
+  );
+}
+
 async function upsertUserRoles(): Promise<Array<UserRole>> {
   const keys = Object.keys(userRoles);
   return Promise.all(
@@ -36,12 +56,32 @@ async function upsertUserRoles(): Promise<Array<UserRole>> {
   );
 }
 
+async function upsertUserOpenIdTokens(): Promise<Array<UserOpenIdToken>> {
+  const keys = Object.keys(userOpenIdTokens);
+  return Promise.all(
+    keys.map((key) =>
+      prisma.userOpenIdToken.upsert({
+        where: { id: key },
+        create: userOpenIdTokens[key],
+        update: userOpenIdTokens[key],
+      }),
+    ),
+  );
+}
+
 async function seed(): Promise<void> {
+  // User data needs to be seeded in this order: (1) roles; (2) accounts; (3) tokens; (4) emails
   const roles = await upsertUserRoles();
   console.log(`\n>> Upserted ${roles.length} user roles.`);
 
   const users = await upsertUserAccounts();
   console.log(`>> Upserted ${users.length} user accounts.`);
+
+  const tokens = await upsertUserOpenIdTokens();
+  console.log(`>> Upserted ${tokens.length} OpenID tokens.`);
+
+  const emails = await upsertUserEmails();
+  console.log(`>> Upserted ${emails.length} email addresses.`);
 }
 
 seed()
