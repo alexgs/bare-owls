@@ -99,6 +99,7 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 export interface NexusGenFieldTypes {
   Query: { // field return type
     emails: Array<NexusGenRootTypes['UserEmail'] | null> | null; // [UserEmail]
+    session: NexusGenRootTypes['Session'] | null; // Session
     users: Array<NexusGenRootTypes['UserAccount'] | null> | null; // [UserAccount]
   }
   Session: { // field return type
@@ -114,8 +115,9 @@ export interface NexusGenFieldTypes {
   UserAccount: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     displayName: string | null; // String
-    email: NexusGenRootTypes['UserEmail'][]; // [UserEmail!]!
+    emails: NexusGenRootTypes['UserEmail'][]; // [UserEmail!]!
     id: string; // String!
+    role: NexusGenRootTypes['UserRole']; // UserRole!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
     username: string; // String!
   }
@@ -141,6 +143,7 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     emails: 'UserEmail'
+    session: 'Session'
     users: 'UserAccount'
   }
   Session: { // field return type name
@@ -156,8 +159,9 @@ export interface NexusGenFieldTypeNames {
   UserAccount: { // field return type name
     createdAt: 'DateTime'
     displayName: 'String'
-    email: 'UserEmail'
+    emails: 'UserEmail'
     id: 'String'
+    role: 'UserRole'
     updatedAt: 'DateTime'
     username: 'String'
   }
@@ -181,6 +185,11 @@ export interface NexusGenFieldTypeNames {
 }
 
 export interface NexusGenArgTypes {
+  Query: {
+    session: { // args
+      sessionId: string; // String!
+    }
+  }
 }
 
 export interface NexusGenAbstractTypeMembers {

@@ -3,7 +3,10 @@
  * the Open Software License version 3.0.
  */
 
-import { UserAccount as PrismaUser } from '@prisma/client';
+import {
+  UserAccount as PrismaUser,
+  UserRole as PrismaRole,
+} from '@prisma/client';
 import { objectType } from 'nexus';
 
 import { prisma } from 'server-lib';
@@ -18,7 +21,14 @@ export const UserAccount = objectType({
     t.string('id');
     t.string('username');
     t.nullable.string('displayName');
-    t.list.field('email', {
+    t.field('role', {
+      type: 'UserRole',
+      resolve: (source) =>
+        prisma.userAccount
+          .findUnique({ where: { id: source.id } })
+          .role() as Promise<PrismaRole>,
+    });
+    t.list.field('emails', {
       type: 'UserEmail',
       resolve: (parent) =>
         prisma.userEmail.findMany({ where: { accountId: parent.id } }),

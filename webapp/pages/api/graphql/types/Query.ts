@@ -3,7 +3,7 @@
  * the Open Software License version 3.0.
  */
 
-import { objectType } from 'nexus';
+import { nonNull, objectType } from 'nexus';
 
 import prisma from 'server-lib/prisma';
 
@@ -20,6 +20,13 @@ export const Query = objectType({
       type: 'UserAccount',
       resolve: () => {
         return prisma.userAccount.findMany();
+      },
+    });
+    t.nullable.field('session', {
+      type: 'Session',
+      args: { sessionId: nonNull('String') },
+      resolve: (_root, args) => {
+        return prisma.session.findFirst({ where: { id: args.sessionId } });
       },
     });
   },

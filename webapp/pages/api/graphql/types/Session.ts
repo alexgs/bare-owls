@@ -23,7 +23,7 @@ export const Session = objectType({
     t.field('account', {
       type: 'UserAccount',
       resolve: (source) =>
-        prisma.userEmail
+        prisma.session
           .findUnique({ where: { id: source.id } })
           .account() as Promise<PrismaUser>,
     });
