@@ -5,3 +5,4 @@
 
 export { AppBar } from './AppBar';
 export { NavBar } from './NavBar';
+export { Protect } from './Protect';
