@@ -3,15 +3,29 @@
  * the Open Software License version 3.0.
  */
 
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserAccount, UserRole } from '@prisma/client';
 
+import userAccounts from './seed-data/user-accounts';
 import userRoles from './seed-data/user-roles';
 
 const prisma = new PrismaClient();
 
-async function seed(): Promise<void> {
+async function upsertUserAccounts(): Promise<Array<UserAccount>> {
+  const keys = Object.keys(userAccounts);
+  return Promise.all(
+    keys.map((key) =>
+      prisma.userAccount.upsert({
+        where: { id: userAccounts[key].id },
+        create: userAccounts[key],
+        update: userAccounts[key],
+      }),
+    ),
+  );
+}
+
+async function upsertUserRoles(): Promise<Array<UserRole>> {
   const keys = Object.keys(userRoles);
-  const roles = await Promise.all(
+  return Promise.all(
     keys.map((key) =>
       prisma.userRole.upsert({
         where: { id: key },
@@ -20,7 +34,14 @@ async function seed(): Promise<void> {
       }),
     ),
   );
-  console.log(`>> Upserted ${roles.length} roles.`);
+}
+
+async function seed(): Promise<void> {
+  const roles = await upsertUserRoles();
+  console.log(`\n>> Upserted ${roles.length} user roles.`);
+
+  const users = await upsertUserAccounts();
+  console.log(`>> Upserted ${users.length} user accounts.`);
 }
 
 seed()
