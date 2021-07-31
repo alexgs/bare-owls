@@ -11,6 +11,10 @@ declare global {
      * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
      */
     date<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // "DateTime";
+    /**
+     * The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+     */
+    json<FieldName extends string>(fieldName: FieldName, opts?: core.CommonInputFieldConfig<TypeName, FieldName>): void // "JSON";
   }
 }
 declare global {
@@ -19,6 +23,10 @@ declare global {
      * A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
      */
     date<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "DateTime";
+    /**
+     * The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+     */
+    json<FieldName extends string>(fieldName: FieldName, ...opts: core.ScalarOutSpread<TypeName, FieldName>): void // "JSON";
   }
 }
 
@@ -40,10 +48,20 @@ export interface NexusGenScalars {
   Boolean: boolean
   ID: string
   DateTime: any
+  JSON: any
 }
 
 export interface NexusGenObjects {
   Query: {};
+  Session: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    data?: NexusGenScalars['JSON'] | null; // JSON
+    displayName: string; // String!
+    email: string; // String!
+    expires: NexusGenScalars['DateTime']; // DateTime!
+    id: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+  }
   UserAccount: { // root type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     displayName?: string | null; // String
@@ -58,6 +76,13 @@ export interface NexusGenObjects {
     simplified: string; // String!
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
     verified: boolean; // Boolean!
+  }
+  UserRole: { // root type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    description: string; // String!
+    id: string; // String!
+    name: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
   }
 }
 
@@ -76,6 +101,16 @@ export interface NexusGenFieldTypes {
     emails: Array<NexusGenRootTypes['UserEmail'] | null> | null; // [UserEmail]
     users: Array<NexusGenRootTypes['UserAccount'] | null> | null; // [UserAccount]
   }
+  Session: { // field return type
+    account: NexusGenRootTypes['UserAccount']; // UserAccount!
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    data: NexusGenScalars['JSON'] | null; // JSON
+    displayName: string; // String!
+    email: string; // String!
+    expires: NexusGenScalars['DateTime']; // DateTime!
+    id: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+  }
   UserAccount: { // field return type
     createdAt: NexusGenScalars['DateTime']; // DateTime!
     displayName: string | null; // String
@@ -93,12 +128,30 @@ export interface NexusGenFieldTypes {
     updatedAt: NexusGenScalars['DateTime']; // DateTime!
     verified: boolean; // Boolean!
   }
+  UserRole: { // field return type
+    createdAt: NexusGenScalars['DateTime']; // DateTime!
+    description: string; // String!
+    id: string; // String!
+    name: string; // String!
+    updatedAt: NexusGenScalars['DateTime']; // DateTime!
+    users: NexusGenRootTypes['UserAccount'][]; // [UserAccount!]!
+  }
 }
 
 export interface NexusGenFieldTypeNames {
   Query: { // field return type name
     emails: 'UserEmail'
     users: 'UserAccount'
+  }
+  Session: { // field return type name
+    account: 'UserAccount'
+    createdAt: 'DateTime'
+    data: 'JSON'
+    displayName: 'String'
+    email: 'String'
+    expires: 'DateTime'
+    id: 'String'
+    updatedAt: 'DateTime'
   }
   UserAccount: { // field return type name
     createdAt: 'DateTime'
@@ -116,6 +169,14 @@ export interface NexusGenFieldTypeNames {
     simplified: 'String'
     updatedAt: 'DateTime'
     verified: 'Boolean'
+  }
+  UserRole: { // field return type name
+    createdAt: 'DateTime'
+    description: 'String'
+    id: 'String'
+    name: 'String'
+    updatedAt: 'DateTime'
+    users: 'UserAccount'
   }
 }
 

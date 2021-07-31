@@ -42,11 +42,30 @@ export const UserEmail = objectType({
       type: 'UserAccount',
       resolve: (source) =>
         prisma.userEmail
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
           .findUnique({ where: { id: source.id } })
           .account() as Promise<PrismaUser>,
     });
     t.boolean('verified');
+    t.date('createdAt');
+    t.date('updatedAt');
+  },
+});
+
+export const UserRole = objectType({
+  name: 'UserRole',
+  nonNullDefaults: {
+    input: true,
+    output: true,
+  },
+  definition(t) {
+    t.string('id');
+    t.string('name');
+    t.string('description');
+    t.list.field('users', {
+      type: 'UserAccount',
+      resolve: (parent) =>
+        prisma.userAccount.findMany({ where: { roleId: parent.id } }),
+    });
     t.date('createdAt');
     t.date('updatedAt');
   },
