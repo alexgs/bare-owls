@@ -3,34 +3,16 @@
  * the Open Software License version 3.0.
  */
 
-import { Box, Button } from 'grommet';
-import { useRouter } from 'next/router';
+import { Box } from 'grommet';
 import * as React from 'react';
 
-import { NavBar } from 'components';
-import { LOGIN_PATH, useSession } from 'lib';
-import db from 'server-lib/prisma';
+import { NavBar, RequireLogin } from 'components';
+import { useSession } from 'lib';
 
-function Content() {
-  const router = useRouter();
-  const { isError, isLoading, session } = useSession();
-
-  if (isError) {
-    return <div>Error!</div>;
-  }
-
-  if (isLoading) {
-    return null;
-  }
-
-  if (session) {
-    return <div>Hello {session.user?.name}</div>;
-  }
-
-  return (
-    <Button label="Login" onClick={() => router.push(LOGIN_PATH)} primary />
-  );
-}
+const Content: React.FC = () => {
+  const session = useSession();
+  return <div>Hello {session.user?.name}</div>;
+};
 
 const HomePage: React.FC = () => {
   return (
@@ -38,16 +20,13 @@ const HomePage: React.FC = () => {
       <NavBar />
       <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
         <Box flex align="start" direction="column" justify="start" pad="medium">
-          <Content />
+          <RequireLogin>
+            <Content />
+          </RequireLogin>
         </Box>
       </Box>
     </>
   );
-};
-
-export const getServerSideProps = async () => {
-  const posts = await db.userAccount.count();
-  return { props: { posts } };
 };
 
 export default HomePage;

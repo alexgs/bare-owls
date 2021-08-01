@@ -72,14 +72,14 @@ export const COOKIE_OPTIONS: CookieOptionsSet = {
     httpOnly: true,
     expires: new Date(0),
     path: '/',
-    sameSite: 'strict', // This should match SESSION_SET.sameSite
+    sameSite: process.env.NODE_ENV === 'development' ? 'none' : 'strict', // This should match SESSION_SET.sameSite
     secure: true,
   },
   SESSION_SET: {
     httpOnly: true,
     maxAge: seconds(COOKIE_SESSION_TTL),
     path: '/',
-    sameSite: 'strict', // This might need to be "lax"
+    sameSite: process.env.NODE_ENV === 'development' ? 'none' : 'strict', // This might need to be "lax"
     secure: true,
   },
 };

@@ -3,10 +3,13 @@
  * the Open Software License version 3.0.
  */
 
+import { ApolloProvider } from '@apollo/client';
 import { Grommet } from 'grommet';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import * as React from 'react';
+
+import { apollo } from 'lib';
 
 const theme = {
   global: {
@@ -22,18 +25,12 @@ const App = ({ Component, pageProps }: AppProps): React.ReactNode => {
   return (
     <>
       <Head>
-        <link
-          rel="stylesheet"
-          href="https://unpkg.com/normalize.css/normalize.css"
-        />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
-        />
         <title>Bare Owls</title>
       </Head>
       <Grommet theme={theme} full>
-        <Component {...pageProps} />
+        <ApolloProvider client={apollo}>
+          <Component {...pageProps} />
+        </ApolloProvider>
       </Grommet>
     </>
   );
