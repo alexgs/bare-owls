@@ -5,6 +5,13 @@
 
 import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
+// We need to load a Fetch polyfill on the server when we run the `npm run gen:nexus` script
+if (typeof window === 'undefined') {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  require('cross-fetch/polyfill');
+}
+
 const GRAPHQL_PATH = '/api/graphql';
 
 const link = createHttpLink({
