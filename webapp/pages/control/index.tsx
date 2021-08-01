@@ -3,38 +3,33 @@
  * the Open Software License version 3.0.
  */
 
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  useQuery,
-  gql,
-} from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Box } from 'grommet';
 import * as React from 'react';
 
 import { NavBar, Protect } from 'components';
-import { apollo } from 'lib';
 import { Session } from 'types';
+
+const usernamesQuery = gql`
+  query GetUsernames {
+    users {
+      username
+    }
+  }
+`;
 
 interface Props {}
 
 const ControlIndex: React.FC<Props> = (props: Props) => {
-  React.useEffect(() => {
-    // const client = ...
+  const { data, loading, error } = useQuery(usernamesQuery);
 
-    void apollo
-      .query({
-        query: gql`
-          query GetUsernames {
-            users {
-              username
-            }
-          }
-        `,
-      })
-      .then((result) => console.log(result));
-  }, []);
+  if (error) {
+    console.error(error);
+  }
+
+  if (data) {
+    console.log(data);
+  }
 
   return (
     <>
