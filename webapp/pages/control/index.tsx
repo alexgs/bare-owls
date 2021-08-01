@@ -7,9 +7,8 @@ import { gql, useQuery } from '@apollo/client';
 import { Box } from 'grommet';
 import * as React from 'react';
 
-import { NavBar, Protect, RequireLogin } from 'components';
+import { NavBar, RequireLogin } from 'components';
 import { useSessionNew } from 'lib';
-import { Session } from 'types';
 
 const usernamesQuery = gql`
   query GetUsernames {
