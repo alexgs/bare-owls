@@ -18,10 +18,14 @@ const usernamesQuery = gql`
   }
 `;
 
+interface QueryResult {
+  users: Array<{username: string}>;
+}
+
 interface Props {}
 
 const ControlIndex: React.FC<Props> = (props: Props) => {
-  const { data, loading, error } = useQuery(usernamesQuery);
+  const { data, loading, error } = useQuery<QueryResult>(usernamesQuery);
 
   if (error) {
     console.error(error);
