@@ -185,11 +185,6 @@ export interface NexusGenFieldTypeNames {
 }
 
 export interface NexusGenArgTypes {
-  Query: {
-    session: { // args
-      sessionId: string; // String!
-    }
-  }
 }
 
 export interface NexusGenAbstractTypeMembers {

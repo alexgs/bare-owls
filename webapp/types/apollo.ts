@@ -3,6 +3,8 @@
  * the Open Software License version 3.0.
  */
 
-export * from './apollo';
-export * from './auth';
-export * from './json';
+import { Session } from './auth';
+
+export interface ApolloContext {
+  session: Session | null;
+}

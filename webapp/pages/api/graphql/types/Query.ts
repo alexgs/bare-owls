@@ -3,9 +3,10 @@
  * the Open Software License version 3.0.
  */
 
-import { nonNull, objectType } from 'nexus';
+import { objectType } from 'nexus';
 
 import prisma from 'server-lib/prisma';
+import { ApolloContext } from 'types';
 
 export const Query = objectType({
   name: 'Query',
@@ -24,9 +25,11 @@ export const Query = objectType({
     });
     t.nullable.field('session', {
       type: 'Session',
-      args: { sessionId: nonNull('String') },
-      resolve: (_root, args) => {
-        return prisma.session.findFirst({ where: { id: args.sessionId } });
+      resolve: (_root, _args, context: ApolloContext) => {
+        if (context.session) {
+          return prisma.session.findFirst({ where: { id: context.session.id } });
+        }
+        return null;
       },
     });
   },

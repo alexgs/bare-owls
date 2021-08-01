@@ -3,9 +3,17 @@
  * the Open Software License version 3.0.
  */
 
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
+
+const GRAPHQL_PATH = '/api/graphql';
+
+const link = createHttpLink({
+  credentials: 'same-origin',
+  uri: GRAPHQL_PATH,
+});
 
 export const apollo = new ApolloClient({
-  uri: '/api/graphql',
+  link,
   cache: new InMemoryCache(),
+  uri: GRAPHQL_PATH,
 });
