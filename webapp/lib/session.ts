@@ -55,7 +55,7 @@ interface SessionLoaderOutput {
   session: Session | null;
 }
 
-export function useSessionNew(): Session {
+export function useSession(): Session {
   const { data } = useQuery<QueryResult>(query);
   if (!data) {
     throw new Error('Session not loaded.');

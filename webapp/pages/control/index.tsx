@@ -8,7 +8,7 @@ import { Box } from 'grommet';
 import * as React from 'react';
 
 import { NavBar, RequireLogin } from 'components';
-import { useSessionNew } from 'lib';
+import { useSession } from 'lib';
 
 const usernamesQuery = gql`
   query GetUsernames {
@@ -25,7 +25,7 @@ interface QueryResult {
 interface Props {}
 
 const Content: React.FC = () => {
-  const session = useSessionNew();
+  const session = useSession();
   return <div>Session ID: {session.id}</div>
 }
 

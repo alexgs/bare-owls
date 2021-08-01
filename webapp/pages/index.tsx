@@ -7,10 +7,10 @@ import { Box } from 'grommet';
 import * as React from 'react';
 
 import { NavBar, RequireLogin } from 'components';
-import { useSessionNew } from 'lib';
+import { useSession } from 'lib';
 
 const Content: React.FC = () => {
-  const session = useSessionNew();
+  const session = useSession();
   return <div>Hello {session.user?.name}</div>;
 };
 
