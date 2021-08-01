@@ -7,4 +7,3 @@ export * from './apollo-client';
 export * from './constants';
 export * from './seconds';
 export * from './session';
-export * from './use-session-loader';
