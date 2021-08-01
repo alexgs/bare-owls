@@ -4,33 +4,54 @@
  */
 
 import { gql, useQuery } from '@apollo/client';
-import { Box } from 'grommet';
+import { Box, DataTable, Text } from 'grommet';
 import * as React from 'react';
 
 import { NavBar, RequireLogin } from 'components';
-import { useSession } from 'lib';
 
-const usernamesQuery = gql`
-  query GetUsernames {
+const query = gql`
+  query ListUsers {
     users {
+      displayName
+      id
+      role {
+        id
+        name
+      }
       username
     }
   }
 `;
 
 interface QueryResult {
-  users: Array<{username: string}>;
+  users: Array<{
+    displayName: string;
+    id: string;
+    role: {
+      id: string;
+      name: string;
+    };
+    username: string;
+  }>;
 }
 
-interface Props {}
+const columns = [
+  {
+    property: 'username',
+    header: <Text>Username</Text>,
+  },
+  {
+    property: 'displayName',
+    header: <Text>Display name</Text>,
+  },
+  {
+    property: 'role.name',
+    header: <Text>Role</Text>,
+  },
+];
 
 const Content: React.FC = () => {
-  const session = useSession();
-  return <div>Session ID: {session.id}</div>
-}
-
-const ControlIndex: React.FC<Props> = (props: Props) => {
-  const { data, loading, error } = useQuery<QueryResult>(usernamesQuery);
+  const { data, loading, error } = useQuery<QueryResult>(query);
 
   if (error) {
     console.error(error);
@@ -40,6 +61,14 @@ const ControlIndex: React.FC<Props> = (props: Props) => {
     console.log(data);
   }
 
+  return (
+    <Box align={'center'}>
+      <DataTable columns={columns} data={data?.users} />
+    </Box>
+  );
+};
+
+const ControlIndex: React.FC = () => {
   return (
     <>
       <NavBar />

@@ -20,7 +20,7 @@ export const Query = objectType({
     t.list.field('users', {
       type: 'UserAccount',
       resolve: () => {
-        return prisma.userAccount.findMany();
+        return prisma.userAccount.findMany({ orderBy: { username: 'asc' } });
       },
     });
     t.nullable.field('session', {
