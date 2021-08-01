@@ -7,7 +7,8 @@ import { gql, useQuery } from '@apollo/client';
 import { Box } from 'grommet';
 import * as React from 'react';
 
-import { NavBar, Protect } from 'components';
+import { NavBar, Protect, RequireLogin } from 'components';
+import { useSessionNew } from 'lib';
 import { Session } from 'types';
 
 const usernamesQuery = gql`
@@ -23,6 +24,11 @@ interface QueryResult {
 }
 
 interface Props {}
+
+const Content: React.FC = () => {
+  const session = useSessionNew();
+  return <div>Session ID: {session.id}</div>
+}
 
 const ControlIndex: React.FC<Props> = (props: Props) => {
   const { data, loading, error } = useQuery<QueryResult>(usernamesQuery);
@@ -40,7 +46,9 @@ const ControlIndex: React.FC<Props> = (props: Props) => {
       <NavBar />
       <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
         <Box flex align="start" direction="column" justify="start" pad="medium">
-          <Protect>{(session: Session) => <div>Hello control</div>}</Protect>
+          <RequireLogin>
+            <Content />
+          </RequireLogin>
         </Box>
       </Box>
     </>

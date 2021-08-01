@@ -6,3 +6,4 @@
 export { AppBar } from './AppBar';
 export { NavBar } from './NavBar';
 export { Protect } from './Protect';
+export { RequireLogin } from './RequireLogin';

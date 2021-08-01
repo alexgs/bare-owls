@@ -18,4 +18,6 @@ export interface UserData {
   email: string;
   id: string;
   name: string;
+  roleId?: string; // TODO Make required
+  username?: string; // TODO Make required
 }
