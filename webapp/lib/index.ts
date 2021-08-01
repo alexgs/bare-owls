@@ -5,6 +5,6 @@
 
 export * from './apollo-client';
 export * from './constants';
-export * from './use-session';
-export * from './use-session-loader';
 export * from './seconds';
+export * from './session';
+export * from './use-session-loader';
