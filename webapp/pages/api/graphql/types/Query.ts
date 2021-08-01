@@ -6,6 +6,7 @@
 import { objectType } from 'nexus';
 
 import prisma from 'server-lib/prisma';
+import { ApolloContext } from 'types';
 
 export const Query = objectType({
   name: 'Query',
@@ -20,6 +21,15 @@ export const Query = objectType({
       type: 'UserAccount',
       resolve: () => {
         return prisma.userAccount.findMany();
+      },
+    });
+    t.nullable.field('session', {
+      type: 'Session',
+      resolve: (_root, _args, context: ApolloContext) => {
+        if (context.session) {
+          return prisma.session.findFirst({ where: { id: context.session.id } });
+        }
+        return null;
       },
     });
   },

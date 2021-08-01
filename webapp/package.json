@@ -28,11 +28,13 @@
     "ts-node": "ts-node --compiler-options \"{\\\"module\\\":\\\"commonjs\\\"}\""
   },
   "dependencies": {
+    "@apollo/client": "^3.4.1",
     "@hapi/iron": "^6.0.0",
     "@prisma/client": "^2.25.0",
     "@types/react": "^17.0.11",
     "apollo-server-micro": "^3.1.1",
     "cookie": "^0.4.1",
+    "deepmerge": "^4.2.2",
     "env-var": "^7.0.1",
     "formik": "^2.2.9",
     "graphql": "^15.5.1",
@@ -49,7 +51,6 @@
     "query-string": "^7.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "swr": "^0.5.6",
     "typescript": "^4.3.4",
     "yup": "^0.32.9"
   },

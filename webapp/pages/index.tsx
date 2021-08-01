@@ -6,9 +6,13 @@
 import { Box } from 'grommet';
 import * as React from 'react';
 
-import { NavBar, Protect } from 'components';
-import db from 'server-lib/prisma';
-import { Session } from 'types';
+import { NavBar, RequireLogin } from 'components';
+import { useSession } from 'lib';
+
+const Content: React.FC = () => {
+  const session = useSession();
+  return <div>Hello {session.user?.name}</div>;
+};
 
 const HomePage: React.FC = () => {
   return (
@@ -16,18 +20,13 @@ const HomePage: React.FC = () => {
       <NavBar />
       <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
         <Box flex align="start" direction="column" justify="start" pad="medium">
-          <Protect>
-            {(session: Session) => <div>Hello {session.user?.name}</div>}
-          </Protect>
+          <RequireLogin>
+            <Content />
+          </RequireLogin>
         </Box>
       </Box>
     </>
   );
-};
-
-export const getServerSideProps = async () => {
-  const posts = await db.userAccount.count();
-  return { props: { posts } };
 };
 
 export default HomePage;

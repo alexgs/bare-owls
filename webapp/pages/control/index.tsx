@@ -3,24 +3,51 @@
  * the Open Software License version 3.0.
  */
 
+import { gql, useQuery } from '@apollo/client';
 import { Box } from 'grommet';
 import * as React from 'react';
 
-import { NavBar, Protect } from 'components';
-import { Session } from 'types';
+import { NavBar, RequireLogin } from 'components';
+import { useSession } from 'lib';
 
-interface Props {
+const usernamesQuery = gql`
+  query GetUsernames {
+    users {
+      username
+    }
+  }
+`;
+
+interface QueryResult {
+  users: Array<{username: string}>;
+}
+
+interface Props {}
+
+const Content: React.FC = () => {
+  const session = useSession();
+  return <div>Session ID: {session.id}</div>
 }
 
 const ControlIndex: React.FC<Props> = (props: Props) => {
+  const { data, loading, error } = useQuery<QueryResult>(usernamesQuery);
+
+  if (error) {
+    console.error(error);
+  }
+
+  if (data) {
+    console.log(data);
+  }
+
   return (
     <>
       <NavBar />
       <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
         <Box flex align="start" direction="column" justify="start" pad="medium">
-          <Protect>
-            {(session: Session) => <div>Hello control</div>}
-          </Protect>
+          <RequireLogin>
+            <Content />
+          </RequireLogin>
         </Box>
       </Box>
     </>

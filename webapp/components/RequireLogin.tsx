@@ -7,16 +7,15 @@ import { Box, Button, Text } from 'grommet';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 
-import { LOGIN_PATH, useSession } from 'lib';
-import { Session as SessionType } from 'types';
+import { LOGIN_PATH, useSessionLoader } from 'lib';
 
 interface Props {
-  children: (session: SessionType) => JSX.Element;
+  children: React.ReactElement;
 }
 
-export const Protect: React.FC<Props> = (props: Props) => {
+export const RequireLogin: React.FC<Props> = (props: Props) => {
   const router = useRouter();
-  const { isError, isLoading, session } = useSession();
+  const { isError, isLoading, session } = useSessionLoader();
 
   if (isError) {
     return <div>Error!</div>;
@@ -27,7 +26,7 @@ export const Protect: React.FC<Props> = (props: Props) => {
   }
 
   if (session) {
-    return props.children(session);
+    return props.children;
   }
 
   return (
