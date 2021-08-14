@@ -1,29 +1,27 @@
 version: '3'
 
 vars:
-  SERVER_SERVICE_NAME: webapp
-  SERVER_WORKING_DIR: ./webapp
+  WEBAPP_SERVICE_NAME: webapp
+  WEBAPP_WORKING_DIR: ./webapp
 
-  SERVER_VERSION:
-    sh: jq -r .version {{.SERVER_WORKING_DIR}}/package.json
+  WEBAPP_VERSION:
+    sh: jq -r .version {{.WEBAPP_WORKING_DIR}}/package.json
 
 tasks:
-  node:
-    cmds:
-      - docker exec -it {{.SERVER_SERVICE_NAME}} zsh
-    desc: Open a shell for running node & npm commands in the {{.SERVER_SERVICE_NAME|title}} container
-
   version:major:
+    dir: "{{.WEBAPP_WORKING_DIR}}"
     cmds:
       - "{{.NPM}} version major"
     desc: Increment major version number
 
   version:minor:
+    dir: "{{.WEBAPP_WORKING_DIR}}"
     cmds:
       - "{{.NPM}} version minor"
     desc: Increment minor version number
 
   version:patch:
+    dir: "{{.WEBAPP_WORKING_DIR}}"
     cmds:
       - "{{.NPM}} version patch"
     desc: Increment patch version number
@@ -32,7 +30,7 @@ tasks:
 
   show-version:
     cmds:
-      - echo {{.SERVER_VERSION}}
+      - echo {{.WEBAPP_VERSION}}
     silent: true
 
   # --- PRIVATE COMMANDS ---

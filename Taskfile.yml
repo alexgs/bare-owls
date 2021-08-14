@@ -8,7 +8,7 @@ dotenv: ['.env']
 
 vars:
   COMPOSE: docker-compose
-  NPM: "PATH=$TASKFILE_NPM_PATH npm"
+  NPM: npm
 
 tasks:
   config:
