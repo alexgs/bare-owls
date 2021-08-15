@@ -5,15 +5,8 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getSession } from 'server-lib';
-
-async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  const session = await getSession(req);
-  if (session) {
-    return res.json(session);
-  }
-
-  res.status(403).json({ message: 'Forbidden' });
+function handler(req: NextApiRequest, res: NextApiResponse): void {
+  return res.json({ displayName: 'Alex' });
 }
 
 export default handler;

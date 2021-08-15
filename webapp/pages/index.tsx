@@ -18,14 +18,22 @@ interface Data {
 }
 
 const Content: React.FC = () => {
-  const data: Data = {
-    // payload: {
-    //   displayName: 'Alex',
-    // },
-    // status: 200,
-    status: 409,
-  }
+  const [data, setData] = React.useState<Data>({ status: 0 });
   const router = useRouter();
+
+  React.useEffect(() => {
+    async function worker() {
+      const response = await fetch('/api/session', { credentials: 'include' });
+      const incomingData: Data = {
+        status: response.status,
+      }
+      if (response.ok) {
+        incomingData.payload = await response.json() as { displayName: string };
+      }
+      setData(incomingData);
+    }
+    void worker();
+  }, []);
 
   let session = null;
   if (data) {
