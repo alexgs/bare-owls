@@ -4,6 +4,7 @@
  */
 
 import { Box, Button } from 'grommet';
+import { signIn, signOut, useSession } from 'next-auth/client';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 
@@ -18,36 +19,23 @@ interface Data {
 }
 
 const Content: React.FC = () => {
-  const [data, setData] = React.useState<Data>({ status: 0 });
-  const router = useRouter();
+  const [session, loading] = useSession();
 
-  React.useEffect(() => {
-    async function worker() {
-      const response = await fetch('/api/session', { credentials: 'include' });
-      const incomingData: Data = {
-        status: response.status,
-      }
-      if (response.ok) {
-        incomingData.payload = await response.json() as { displayName: string };
-      }
-      setData(incomingData);
-    }
-    void worker();
-  }, []);
-
-  let session = null;
-  if (data) {
-    session = data.status === 200 ? data.payload : null;
+  if (!session) {
+    return <Button label="Login" onClick={() => signIn()} primary />;
   }
 
   if (session) {
-    return <div>Hello {session.displayName}</div>;
+    return (
+      <>
+        <div>Hello {session.displayName}</div>
+        <Button label="Login" onClick={() => signOut()} primary />
+      </>
+    );
   }
 
-  return (
-    <Button label="Login" onClick={() => router.push(LOGIN_PATH)} primary />
-  );
-}
+  return null;
+};
 
 const HomePage: React.FC = () => {
   return (

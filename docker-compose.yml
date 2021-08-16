@@ -34,8 +34,8 @@ services:
       SEARCH_TYPE: database
     depends_on:
       - database
-#    labels:
-#      - "traefik.enable=false"
+  #  labels:
+  #    - "traefik.enable=false"
 
   # https://github.com/Tecnativa/docker-socket-proxy
   soxy:
@@ -85,18 +85,24 @@ services:
     networks:
       - owl-network
     environment:
-      - AUTH0_CLIENT_ID
-      - AUTH0_CLIENT_SECRET
-      - AUTH0_DOMAIN
-      - COOKIE_NONCE_TTL
-      - COOKIE_SESSION_TTL
-      - DATABASE_URL
-      - IRON_CURRENT_PWD
-      - IRON_PASSWORDS
-      - IRON_SEAL_TTL
-      - SESSION_TTL
-      - WEBAPP_BASE_URL
-      - WEBAPP_PORT
+      AUTH0_CLIENT_ID: ${AUTH0_CLIENT_ID}
+      AUTH0_CLIENT_SECRET: ${AUTH0_CLIENT_SECRET}
+      AUTH0_DOMAIN: ${AUTH0_DOMAIN}
+      COOKIE_NONCE_TTL: ${COOKIE_NONCE_TTL}
+      COOKIE_SESSION_TTL: ${COOKIE_SESSION_TTL}
+      DATABASE_URL: ${DATABASE_URL}
+      FUSIONAUTH_CLIENT_ID: ${FUSIONAUTH_CLIENT_ID}
+      FUSIONAUTH_CLIENT_SECRET: ${FUSIONAUTH_CLIENT_SECRET}
+      FUSIONAUTH_DOMAIN: ${FUSIONAUTH_DOMAIN}
+      IRON_CURRENT_PWD: ${IRON_CURRENT_PWD}
+      IRON_PASSWORDS: ${IRON_PASSWORDS}
+      IRON_SEAL_TTL: ${IRON_SEAL_TTL}
+      NEXTAUTH_URL: ${WEBAPP_NEXTAUTH_URL}
+      # NEXTAUTH_URL_INTERNAL: ${WEBAPP_FUSIONAUTH_URL}
+      SESSION_TTL: ${SESSION_TTL}
+      WEBAPP_BASE_URL: ${WEBAPP_BASE_URL}
+      WEBAPP_FUSIONAUTH_HOST: ${WEBAPP_FUSIONAUTH_HOST}
+      WEBAPP_PORT: ${WEBAPP_PORT}
     command: npm run dev
     labels:
       - "traefik.http.routers.webapp.rule=PathPrefix(`/`)"
