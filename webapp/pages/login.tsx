@@ -3,13 +3,10 @@
  * the Open Software License version 3.0.
  */
 
-import * as cookie from 'cookie';
 import { Anchor, Box } from 'grommet';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { generators } from 'openid-client';
+import { GetServerSidePropsResult } from 'next';
+import * as qs from 'query-string';
 import * as React from 'react';
-
-import { COOKIE, COOKIE_OPTIONS, getOidcClient } from 'server-lib';
 
 const showLink = false; // Useful for debugging
 
@@ -28,24 +25,15 @@ const Login: React.FC<Props> = (props: Props) => {
   return <div>Login Page</div>;
 };
 
-export async function getServerSideProps(
-  context: GetServerSidePropsContext,
-): Promise<GetServerSidePropsResult<unknown>> {
-  const nonce = generators.nonce();
+export function getServerSideProps(): GetServerSidePropsResult<unknown> {
+  const AUTH_BASE_URL = 'http://localhost:9011';
+  const query = qs.stringify({
+    client_id: '2323677f-62b9-467f-8cd6-931169f237f9',
+    redirect_uri: 'https://localhost.owlbear.tech/callback',
+    response_type: 'code',
+  })
+  const url = `${AUTH_BASE_URL}/oauth2/authorize?${query}`;
 
-  const client = await getOidcClient();
-  const url = client.authorizationUrl({
-    nonce,
-    response_mode: 'form_post',
-    scope: 'openid email profile',
-  });
-
-  const nonceCookie = cookie.serialize(
-    COOKIE.NONCE,
-    nonce,
-    COOKIE_OPTIONS.NONCE_SET,
-  );
-  context.res.setHeader('set-cookie', nonceCookie);
   if (showLink) {
     return { props: { url } };
   }
