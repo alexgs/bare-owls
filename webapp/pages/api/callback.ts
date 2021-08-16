@@ -16,12 +16,7 @@ import {
 } from 'server-lib';
 
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  const nonceCookie = cookie.serialize(
-    COOKIE.NONCE,
-    '',
-    COOKIE_OPTIONS.NONCE_RM,
-  );
-  const cookies = [nonceCookie];
+  const cookies = [];
   let path = '/';
 
   if (req.method === 'POST') {

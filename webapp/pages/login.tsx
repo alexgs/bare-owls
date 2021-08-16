@@ -29,7 +29,9 @@ export function getServerSideProps(): GetServerSidePropsResult<unknown> {
   const AUTH_BASE_URL = 'http://localhost:9011';
   const query = qs.stringify({
     client_id: '2323677f-62b9-467f-8cd6-931169f237f9',
-    redirect_uri: 'https://localhost.owlbear.tech/callback',
+    code_challenge: '',
+    code_challenge_method: 'S256',
+    redirect_uri: 'https://localhost.owlbear.tech/api/callback',
     response_type: 'code',
   })
   const url = `${AUTH_BASE_URL}/oauth2/authorize?${query}`;
