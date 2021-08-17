@@ -1,4 +1,6 @@
 tls:
   certificates:
-    - certFile: /etc/traefik/localhost.crt
-      keyFile: /etc/traefik/localhost.key
+    - certFile: /etc/traefik/auth-owlbear-tech.crt
+      keyFile: /etc/traefik/auth-owlbear-tech.key
+    - certFile: /etc/traefik/localhost-owlbear-tech.crt
+      keyFile: /etc/traefik/localhost-owlbear-tech.key

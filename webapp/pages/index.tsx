@@ -3,15 +3,38 @@
  * the Open Software License version 3.0.
  */
 
-import { Box } from 'grommet';
+import { Box, Button } from 'grommet';
+import { signIn, signOut, useSession } from 'next-auth/client';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 
-import { NavBar, RequireLogin } from 'components';
-import { useSession } from 'lib';
+import { NavBar } from 'components';
+import { LOGIN_PATH } from 'lib';
+
+interface Data {
+  payload?: {
+    displayName: string;
+  };
+  status: number;
+}
 
 const Content: React.FC = () => {
-  const session = useSession();
-  return <div>Hello {session.user?.name}</div>;
+  const [session, loading] = useSession();
+
+  if (!session) {
+    return <Button label="Login" onClick={() => signIn()} primary />;
+  }
+
+  if (session) {
+    return (
+      <>
+        <div>Hello {session.displayName}</div>
+        <Button label="Login" onClick={() => signOut()} primary />
+      </>
+    );
+  }
+
+  return null;
 };
 
 const HomePage: React.FC = () => {
@@ -20,9 +43,7 @@ const HomePage: React.FC = () => {
       <NavBar />
       <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
         <Box flex align="start" direction="column" justify="start" pad="medium">
-          <RequireLogin>
-            <Content />
-          </RequireLogin>
+          <Content />
         </Box>
       </Box>
     </>

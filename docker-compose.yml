@@ -23,19 +23,21 @@ services:
     networks:
       - owl-network
     environment:
-      DATABASE_URL: jdbc:postgresql://database:5432/fusionauth
-      DATABASE_ROOT_USERNAME: ${DBADMIN_USER}
-      DATABASE_ROOT_PASSWORD: ${DBADMIN_PASSWORD}
-      DATABASE_USERNAME: ${DATABASE_USER}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      FUSIONAUTH_APP_MEMORY: ${FUSIONAUTH_APP_MEMORY}
-      FUSIONAUTH_APP_RUNTIME_MODE: development
-      FUSIONAUTH_APP_URL: http://localhost:9011
-      SEARCH_TYPE: database
+      - DATABASE_URL=jdbc:postgresql://database:5432/fusionauth
+      - DATABASE_ROOT_USERNAME=${DBADMIN_USER}
+      - DATABASE_ROOT_PASSWORD=${DBADMIN_PASSWORD}
+      - DATABASE_USERNAME=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - FUSIONAUTH_APP_MEMORY
+      - FUSIONAUTH_APP_RUNTIME_MODE=development
+      - FUSIONAUTH_APP_URL=http://${FUSIONAUTH_HOST_EXTERNAL}
+      - SEARCH_TYPE=database
     depends_on:
       - database
-#    labels:
-#      - "traefik.enable=false"
+    labels:
+      - "traefik.http.routers.auth.rule=Host(`auth.owlbear.tech`) && PathPrefix(`/`)"
+      - "traefik.http.routers.auth.tls=true"
+      - "traefik.http.services.auth.loadbalancer.server.port=9011"
 
   # https://github.com/Tecnativa/docker-socket-proxy
   soxy:
@@ -91,9 +93,14 @@ services:
       - COOKIE_NONCE_TTL
       - COOKIE_SESSION_TTL
       - DATABASE_URL
+      - FUSIONAUTH_CLIENT_ID
+      - FUSIONAUTH_CLIENT_SECRET
+      - FUSIONAUTH_HOST_EXTERNAL
+      - FUSIONAUTH_HOST_INTERNAL
       - IRON_CURRENT_PWD
       - IRON_PASSWORDS
       - IRON_SEAL_TTL
+      - NEXTAUTH_URL=${WEBAPP_NEXTAUTH_URL}
       - SESSION_TTL
       - WEBAPP_BASE_URL
       - WEBAPP_PORT

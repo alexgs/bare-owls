@@ -15,13 +15,11 @@ import {
   handleOidcResponse,
 } from 'server-lib';
 
+// TODO Update this file (or maybe just the callback functions?)
+// TODO Pass tokens only in cookies
+
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  const nonceCookie = cookie.serialize(
-    COOKIE.NONCE,
-    '',
-    COOKIE_OPTIONS.NONCE_RM,
-  );
-  const cookies = [nonceCookie];
+  const cookies = [];
   let path = '/';
 
   if (req.method === 'POST') {
