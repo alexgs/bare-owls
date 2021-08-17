@@ -34,8 +34,10 @@ services:
       - SEARCH_TYPE=database
     depends_on:
       - database
-  #  labels:
-  #    - "traefik.enable=false"
+    labels:
+      - "traefik.http.routers.auth.rule=Host(`auth.owlbear.tech`) && PathPrefix(`/`)"
+      - "traefik.http.routers.auth.tls=true"
+      - "traefik.http.services.auth.loadbalancer.server.port=9011"
 
   # https://github.com/Tecnativa/docker-socket-proxy
   soxy:

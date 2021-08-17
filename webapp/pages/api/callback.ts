@@ -15,6 +15,9 @@ import {
   handleOidcResponse,
 } from 'server-lib';
 
+// TODO Update this file (or maybe just the callback functions?)
+// TODO Pass tokens only in cookies
+
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
   const cookies = [];
   let path = '/';
