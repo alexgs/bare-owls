@@ -9,6 +9,7 @@ import * as env from 'env-var';
 import ms from 'ms';
 import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
+import normalizeUrl from 'normalize-url';
 import { Client, IdTokenClaims, Issuer } from 'openid-client';
 
 import { seconds } from 'lib';
@@ -36,11 +37,15 @@ interface SealPassword {
   secret: string;
 }
 
+const AUTH_HOST_INTERNAL = env.get('AUTH_HOST_INTERNAL').required().asString();
+const AUTH_PATH_DISCOVERY = env
+  .get('AUTH_PATH_DISCOVERY')
+  .required()
+  .asString();
 const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
-const CLIENT_ID = env.get('AUTH0_CLIENT_ID').required().asString();
+const CLIENT_ID = env.get('AUTH_CLIENT_ID').required().asString();
 const COOKIE_NONCE_TTL = env.get('COOKIE_NONCE_TTL').required().asString();
 const COOKIE_SESSION_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
-const DOMAIN = env.get('AUTH0_DOMAIN').required().asString();
 const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
 const IRON_PASSWORDS = env
   .get('IRON_PASSWORDS')
@@ -251,7 +256,10 @@ export async function extractOpenIdToken(
 }
 
 export async function getOidcClient(): Promise<Client> {
-  const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
+  const discoveryUrl = normalizeUrl(
+    `${AUTH_HOST_INTERNAL}/${AUTH_PATH_DISCOVERY}`,
+  );
+  const issuer = await Issuer.discover(discoveryUrl);
   return new issuer.Client({
     client_id: CLIENT_ID,
     redirect_uris: [CALLBACK_URL],

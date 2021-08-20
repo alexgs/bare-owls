@@ -3,38 +3,13 @@
  * the Open Software License version 3.0.
  */
 
-import { Box, Button } from 'grommet';
-import { signIn, signOut, useSession } from 'next-auth/client';
-import { useRouter } from 'next/router';
+import { Box } from 'grommet';
 import * as React from 'react';
 
 import { NavBar } from 'components';
-import { LOGIN_PATH } from 'lib';
-
-interface Data {
-  payload?: {
-    displayName: string;
-  };
-  status: number;
-}
 
 const Content: React.FC = () => {
-  const [session, loading] = useSession();
-
-  if (!session) {
-    return <Button label="Login" onClick={() => signIn()} primary />;
-  }
-
-  if (session) {
-    return (
-      <>
-        <div>Hello {session.displayName}</div>
-        <Button label="Login" onClick={() => signOut()} primary />
-      </>
-    );
-  }
-
-  return null;
+  return <div>Hello world</div>;
 };
 
 const HomePage: React.FC = () => {

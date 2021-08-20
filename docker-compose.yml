@@ -30,7 +30,7 @@ services:
       - DATABASE_PASSWORD=${DATABASE_PASSWORD}
       - FUSIONAUTH_APP_MEMORY
       - FUSIONAUTH_APP_RUNTIME_MODE=development
-      - FUSIONAUTH_APP_URL=http://${FUSIONAUTH_HOST_EXTERNAL}
+      - FUSIONAUTH_APP_URL=${AUTH_HOST_EXTERNAL}
       - SEARCH_TYPE=database
     depends_on:
       - database
@@ -87,20 +87,17 @@ services:
     networks:
       - owl-network
     environment:
-      - AUTH0_CLIENT_ID
-      - AUTH0_CLIENT_SECRET
-      - AUTH0_DOMAIN
+      - AUTH_CLIENT_ID
+      - AUTH_CLIENT_SECRET
+      - AUTH_HOST_EXTERNAL
+      - AUTH_HOST_INTERNAL
+      - AUTH_PATH_DISCOVERY
       - COOKIE_NONCE_TTL
       - COOKIE_SESSION_TTL
       - DATABASE_URL
-      - FUSIONAUTH_CLIENT_ID
-      - FUSIONAUTH_CLIENT_SECRET
-      - FUSIONAUTH_HOST_EXTERNAL
-      - FUSIONAUTH_HOST_INTERNAL
       - IRON_CURRENT_PWD
       - IRON_PASSWORDS
       - IRON_SEAL_TTL
-      - NEXTAUTH_URL=${WEBAPP_NEXTAUTH_URL}
       - SESSION_TTL
       - WEBAPP_BASE_URL
       - WEBAPP_PORT
