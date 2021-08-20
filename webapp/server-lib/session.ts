@@ -7,7 +7,7 @@ import Iron from '@hapi/iron';
 import * as env from 'env-var';
 import ms from 'ms';
 import { nanoid } from 'nanoid';
-import { NextApiRequestCookies} from 'next/dist/server/api-utils';
+import { NextApiRequestCookies } from 'next/dist/server/api-utils';
 
 import { COOKIE, IRON_OPTIONS, IRON_UNSEAL, prisma } from 'server-lib';
 import { JsonObject, JsonValue, Session, SessionId, UserData } from 'types';

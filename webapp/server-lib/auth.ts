@@ -37,6 +37,7 @@ interface SealPassword {
   secret: string;
 }
 
+const AUTH_HOST_EXTERNAL = env.get('AUTH_HOST_EXTERNAL').required().asString();
 const AUTH_HOST_INTERNAL = env.get('AUTH_HOST_INTERNAL').required().asString();
 const AUTH_PATH_DISCOVERY = env
   .get('AUTH_PATH_DISCOVERY')
@@ -44,6 +45,7 @@ const AUTH_PATH_DISCOVERY = env
   .asString();
 const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
 const CLIENT_ID = env.get('AUTH_CLIENT_ID').required().asString();
+const CLIENT_SECRET = env.get('AUTH_CLIENT_SECRET').required().asString();
 const COOKIE_NONCE_TTL = env.get('COOKIE_NONCE_TTL').required().asString();
 const COOKIE_SESSION_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
 const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
@@ -262,8 +264,9 @@ export async function getOidcClient(): Promise<Client> {
   const issuer = await Issuer.discover(discoveryUrl);
   return new issuer.Client({
     client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
     redirect_uris: [CALLBACK_URL],
-    response_types: ['id_token token'],
+    response_types: ['code'],
   });
 }
 
