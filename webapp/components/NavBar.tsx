@@ -8,7 +8,7 @@ import { Login, Logout } from 'grommet-icons';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 
-import { LOGIN_PATH, LOGOUT_PATH, useSessionLoader } from 'lib';
+import { LOGIN_PATH, LOGOUT_PATH } from 'lib';
 
 import { AppBar } from './AppBar';
 

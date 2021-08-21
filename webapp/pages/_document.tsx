@@ -3,12 +3,12 @@
  * the Open Software License version 3.0.
  */
 
-// noinspection HtmlRequiredTitleElement
-/* eslint-disable @next/next/google-font-display */
 
 import Document, { Html, Head, Main, NextScript } from 'next/document'
 import * as React from 'react';
 
+/* eslint-disable @next/next/google-font-display */
+// noinspection HtmlRequiredTitleElement
 class OwlDocument extends Document {
   render() {
     return (
