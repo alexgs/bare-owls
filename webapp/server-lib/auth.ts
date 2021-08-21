@@ -5,13 +5,11 @@
 
 import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
-import normalizeUrl from 'normalize-url';
 import { Client, IdTokenClaims, Issuer } from 'openid-client';
+import urlJoin from 'url-join';
 
 import { Config, getConfig, prisma } from 'server-lib';
 import { JsonObject, UserData } from 'types';
-
-import { startSession } from './session';
 
 interface ClaimsHandlerOutput {
   user: UserData;
@@ -129,19 +127,19 @@ async function storeOpenIdToken(
 
 // --- PUBLIC FUNCTIONS ---
 
-export async function extractOpenIdToken(
-  req: NextApiRequest,
-): Promise<IdTokenClaims> {
-  const nonce = req.cookies[COOKIE.NONCE];
-  if (!nonce) {
-    throw new Error('Unable to load nonce from cookie');
-  }
-
-  const client = await getOidcClient();
-  const params = client.callbackParams(req);
-  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
-  return tokens.claims();
-}
+// export async function extractOpenIdToken(
+//   req: NextApiRequest,
+// ): Promise<IdTokenClaims> {
+//   const nonce = req.cookies[COOKIE.NONCE];
+//   if (!nonce) {
+//     throw new Error('Unable to load nonce from cookie');
+//   }
+//
+//   const client = await getOidcClient();
+//   const params = client.callbackParams(req);
+//   const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+//   return tokens.claims();
+// }
 
 export async function getOidcClient(): Promise<Client> {
   const config = getConfig();
@@ -152,9 +150,7 @@ export async function getOidcClient(): Promise<Client> {
     CLIENT_ID,
     CLIENT_SECRET,
   } = config;
-  const discoveryUrl = normalizeUrl(
-    `${AUTH_ORIGIN_INTERNAL}/${AUTH_PATH_DISCOVERY}`,
-  );
+  const discoveryUrl = urlJoin(AUTH_ORIGIN_INTERNAL, AUTH_PATH_DISCOVERY);
   const issuer = await Issuer.discover(discoveryUrl);
   return new issuer.Client({
     client_id: CLIENT_ID,
@@ -169,26 +165,26 @@ interface ResponseHandlerOutput {
   sessionId: string;
 }
 
-export async function handleOidcResponse(
-  req: NextApiRequest,
-): Promise<ResponseHandlerOutput> {
-  const nonce = req.cookies[COOKIE.NONCE];
-  if (!nonce) {
-    throw new Error('Unable to load nonce from cookie');
-  }
-
-  const client = await getOidcClient();
-  const params = client.callbackParams(req);
-  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
-  const claims = tokens.claims();
-
-  const isRegisteredSubject = await isRegistered(claims);
-  const { user, data } = isRegisteredSubject
-    ? await login(claims)
-    : await register(claims);
-  const sessionId = await startSession(user, data);
-  return {
-    sessionId,
-    registerNewUser: !isRegisteredSubject,
-  };
-}
+// export async function handleOidcResponse(
+//   req: NextApiRequest,
+// ): Promise<ResponseHandlerOutput> {
+//   const nonce = req.cookies[COOKIE.NONCE];
+//   if (!nonce) {
+//     throw new Error('Unable to load nonce from cookie');
+//   }
+//
+//   const client = await getOidcClient();
+//   const params = client.callbackParams(req);
+//   const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+//   const claims = tokens.claims();
+//
+//   const isRegisteredSubject = await isRegistered(claims);
+//   const { user, data } = isRegisteredSubject
+//     ? await login(claims)
+//     : await register(claims);
+//   const sessionId = await startSession(user, data);
+//   return {
+//     sessionId,
+//     registerNewUser: !isRegisteredSubject,
+//   };
+// }

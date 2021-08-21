@@ -77,6 +77,7 @@ function formatUnsealPasswords(passwords: IronPasswords) {
 // The `env.get` functions were failing in a misleading way when they were in a
 //   module's global context, which lead to a lot of wasted time. >:-(
 export function getConfig(): Config {
+  // Hidden vars -- only used for computing other values
   const COOKIE_VERIFY_TTL = env.get('COOKIE_VERIFY_TTL').required().asString();
   const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
   const IRON_PASSWORDS = env
@@ -85,38 +86,26 @@ export function getConfig(): Config {
     .asJsonArray() as IronPasswords;
   const IRON_SEAL_TTL = env.get('IRON_SEAL_TTL').required().asString();
 
-  // There's probably a good way to do typing in here, but I don't know what it
-  //   is right now, and I don't want to figure it out at the moment (2021-08-
-  //   20). I'm leaving this here as a possible future starting point
-  // const output: BaseConfig = {
-  //   AUTH_HOST_EXTERNAL: '',
-  //   IRON_PASSWORDS: [],
-  //   COOKIE: {},
-  //   IRON_SEAL: {
-  //     id: '',
-  //     secret: '',
-  //   }
-  // };
-
-  const output: Partial<BaseConfig> = {};
-  output.AUTH_ORIGIN_EXTERNAL = env
+  // Direct vars -- go right into the output without modification
+  const AUTH_ORIGIN_EXTERNAL = env
     .get('AUTH_ORIGIN_EXTERNAL')
     .required()
     .asString();
-  output.AUTH_ORIGIN_INTERNAL = env
+  const AUTH_ORIGIN_INTERNAL = env
     .get('AUTH_ORIGIN_INTERNAL')
     .required()
     .asString();
-  output.AUTH_PATH_DISCOVERY = env
+  const AUTH_PATH_DISCOVERY = env
     .get('AUTH_PATH_DISCOVERY')
     .required()
     .asString();
-  output.BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
-  output.CLIENT_ID = env.get('AUTH_CLIENT_ID').required().asString();
-  output.CLIENT_SECRET = env.get('AUTH_CLIENT_SECRET').required().asString();
+  const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
+  const CLIENT_ID = env.get('AUTH_CLIENT_ID').required().asString();
+  const CLIENT_SECRET = env.get('AUTH_CLIENT_SECRET').required().asString();
 
-  output.CALLBACK_URL = `${output.BASE_URL}/api/callback`;
-  output.COOKIE = {
+  // Computed vars
+  const CALLBACK_URL = `${BASE_URL}/api/callback`;
+  const COOKIE: CookieOptionsSet = {
     VERIFY: {
       NAME: 'iron-owl',
       RM: {
@@ -136,7 +125,7 @@ export function getConfig(): Config {
     },
   };
   // noinspection SpellCheckingInspection
-  output.IRON_OPTIONS = {
+  const IRON_OPTIONS: SealOptions = {
     // Same as the default options except for `ttl`
     encryption: {
       saltBits: 256,
@@ -154,8 +143,20 @@ export function getConfig(): Config {
     timestampSkewSec: 60,
     localtimeOffsetMsec: 0,
   };
-  output.IRON_SEAL = formatSealPassword(IRON_PASSWORDS, IRON_CURRENT_PWD);
-  output.IRON_UNSEAL = formatUnsealPasswords(IRON_PASSWORDS);
+  const IRON_SEAL = formatSealPassword(IRON_PASSWORDS, IRON_CURRENT_PWD);
+  const IRON_UNSEAL = formatUnsealPasswords(IRON_PASSWORDS);
 
-  return output as Config;
+  return {
+    AUTH_ORIGIN_EXTERNAL,
+    AUTH_ORIGIN_INTERNAL,
+    AUTH_PATH_DISCOVERY,
+    BASE_URL,
+    CALLBACK_URL,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    COOKIE,
+    IRON_OPTIONS,
+    IRON_SEAL,
+    IRON_UNSEAL,
+  };
 }
