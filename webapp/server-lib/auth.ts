@@ -141,8 +141,7 @@ async function storeOpenIdToken(
 //   return tokens.claims();
 // }
 
-export async function getOidcClient(): Promise<Client> {
-  const config = getConfig();
+export async function getOidcClient(config: Config): Promise<Client> {
   const {
     AUTH_ORIGIN_INTERNAL,
     AUTH_PATH_DISCOVERY,
