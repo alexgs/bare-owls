@@ -3,17 +3,12 @@
  * the Open Software License version 3.0.
  */
 
-import { SealOptions } from '@hapi/iron';
-import * as cookie from 'cookie';
-import * as env from 'env-var';
-import ms from 'ms';
 import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
 import normalizeUrl from 'normalize-url';
 import { Client, IdTokenClaims, Issuer } from 'openid-client';
 
-import { seconds } from 'lib';
-import { prisma } from 'server-lib';
+import { Config, prisma } from 'server-lib';
 import { JsonObject, UserData } from 'types';
 
 import { startSession } from './session';
@@ -23,116 +18,7 @@ interface ClaimsHandlerOutput {
   data?: JsonObject;
 }
 
-type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
-
-interface IronPassword {
-  id: string;
-  secret: string;
-}
-
-type IronPasswords = Array<IronPassword>;
-
-interface SealPassword {
-  id: string;
-  secret: string;
-}
-
-const AUTH_HOST_EXTERNAL = env.get('AUTH_HOST_EXTERNAL').required().asString();
-const AUTH_HOST_INTERNAL = env.get('AUTH_HOST_INTERNAL').required().asString();
-const AUTH_PATH_DISCOVERY = env
-  .get('AUTH_PATH_DISCOVERY')
-  .required()
-  .asString();
-const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
-const CLIENT_ID = env.get('AUTH_CLIENT_ID').required().asString();
-const CLIENT_SECRET = env.get('AUTH_CLIENT_SECRET').required().asString();
-const COOKIE_NONCE_TTL = env.get('COOKIE_NONCE_TTL').required().asString();
-const COOKIE_SESSION_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
-const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
-const IRON_PASSWORDS = env
-  .get('IRON_PASSWORDS')
-  .required()
-  .asJsonArray() as IronPasswords;
-const IRON_SEAL_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
-
-export const CALLBACK_URL = `${BASE_URL}/api/callback`;
-export const COOKIE = {
-  SESSION: 'iron-owl',
-  NONCE: 'bare-owls-nonce',
-};
-export const COOKIE_OPTIONS: CookieOptionsSet = {
-  NONCE_RM: {
-    httpOnly: true,
-    expires: new Date(0),
-    path: '/',
-    sameSite: 'none', // This should match NONCE_SET.sameSite
-    secure: true,
-  },
-  NONCE_SET: {
-    httpOnly: true,
-    maxAge: seconds(COOKIE_NONCE_TTL),
-    path: '/',
-    sameSite: 'none',
-    secure: true,
-  },
-  SESSION_RM: {
-    httpOnly: true,
-    expires: new Date(0),
-    path: '/',
-    sameSite: process.env.NODE_ENV === 'development' ? 'none' : 'strict', // This should match SESSION_SET.sameSite
-    secure: true,
-  },
-  SESSION_SET: {
-    httpOnly: true,
-    maxAge: seconds(COOKIE_SESSION_TTL),
-    path: '/',
-    sameSite: process.env.NODE_ENV === 'development' ? 'none' : 'strict', // This might need to be "lax"
-    secure: true,
-  },
-};
-// noinspection SpellCheckingInspection
-export const IRON_OPTIONS: SealOptions = {
-  // Same as the default options except for `ttl`
-  encryption: {
-    saltBits: 256,
-    algorithm: 'aes-256-cbc',
-    iterations: 1,
-    minPasswordlength: 32,
-  },
-  integrity: {
-    saltBits: 256,
-    algorithm: 'sha256',
-    iterations: 1,
-    minPasswordlength: 32,
-  },
-  ttl: ms(IRON_SEAL_TTL),
-  timestampSkewSec: 60,
-  localtimeOffsetMsec: 0,
-};
-export const IRON_SEAL = formatSealPassword();
-export const IRON_UNSEAL = formatUnsealPasswords();
-
 // --- INTERNAL FUNCTIONS ---
-
-/** @internal */
-function formatSealPassword(): SealPassword {
-  const output = IRON_PASSWORDS.find((value) => value.id === IRON_CURRENT_PWD);
-  if (!output) {
-    throw new Error(
-      'No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.',
-    );
-  }
-  return output;
-}
-
-/** @internal */
-function formatUnsealPasswords() {
-  const output: Record<string, string> = {};
-  IRON_PASSWORDS.forEach((value: SealPassword) => {
-    output[value.id] = value.secret;
-  });
-  return output;
-}
 
 /** @internal */
 async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
@@ -257,7 +143,9 @@ export async function extractOpenIdToken(
   return tokens.claims();
 }
 
-export async function getOidcClient(): Promise<Client> {
+export async function getOidcClient(config: Config): Promise<Client> {
+  const { AUTH_HOST_INTERNAL, AUTH_PATH_DISCOVERY, CALLBACK_URL, CLIENT_ID, CLIENT_SECRET } = config;
+
   const discoveryUrl = normalizeUrl(
     `${AUTH_HOST_INTERNAL}/${AUTH_PATH_DISCOVERY}`,
   );

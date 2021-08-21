@@ -6,11 +6,10 @@
 import { Anchor, Box } from 'grommet';
 import { GetServerSidePropsResult } from 'next';
 import { generators } from 'openid-client';
-import * as qs from 'query-string';
 import * as React from 'react';
 
 import { NavBar } from 'components';
-import { getOidcClient } from 'server-lib';
+import { getConfig, getOidcClient } from 'server-lib';
 
 const showLink = true; // Useful for debugging
 
@@ -39,7 +38,8 @@ export async function getServerSideProps(): Promise<
   const codeVerifier = generators.codeVerifier();
   const codeChallenge = generators.codeChallenge(codeVerifier);
 
-  const client = await getOidcClient();
+  const config = getConfig();
+  const client = await getOidcClient(config);
   const url1 = client.authorizationUrl({
     scope: 'openid',
     // resource: 'https://my.api.example.com/resource/32178',
