@@ -8,7 +8,7 @@ import { NextApiRequest } from 'next';
 import normalizeUrl from 'normalize-url';
 import { Client, IdTokenClaims, Issuer } from 'openid-client';
 
-import { Config, prisma } from 'server-lib';
+import { Config, getConfig, prisma } from 'server-lib';
 import { JsonObject, UserData } from 'types';
 
 import { startSession } from './session';
@@ -143,11 +143,17 @@ export async function extractOpenIdToken(
   return tokens.claims();
 }
 
-export async function getOidcClient(config: Config): Promise<Client> {
-  const { AUTH_HOST_INTERNAL, AUTH_PATH_DISCOVERY, CALLBACK_URL, CLIENT_ID, CLIENT_SECRET } = config;
-
+export async function getOidcClient(): Promise<Client> {
+  const config = getConfig();
+  const {
+    AUTH_ORIGIN_INTERNAL,
+    AUTH_PATH_DISCOVERY,
+    CALLBACK_URL,
+    CLIENT_ID,
+    CLIENT_SECRET,
+  } = config;
   const discoveryUrl = normalizeUrl(
-    `${AUTH_HOST_INTERNAL}/${AUTH_PATH_DISCOVERY}`,
+    `${AUTH_ORIGIN_INTERNAL}/${AUTH_PATH_DISCOVERY}`,
   );
   const issuer = await Issuer.discover(discoveryUrl);
   return new issuer.Client({

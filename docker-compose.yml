@@ -18,8 +18,6 @@ services:
     image: fusionauth/fusionauth-app:latest
     container_name: fusionauth
     restart: unless-stopped
-    ports:
-      - "9011:9011"
     networks:
       - owl-network
     environment:
@@ -89,16 +87,14 @@ services:
     environment:
       - AUTH_CLIENT_ID
       - AUTH_CLIENT_SECRET
-      - AUTH_HOST_EXTERNAL
-      - AUTH_HOST_INTERNAL
+      - AUTH_ORIGIN_EXTERNAL
+      - AUTH_ORIGIN_INTERNAL
       - AUTH_PATH_DISCOVERY
-      - COOKIE_NONCE_TTL
-      - COOKIE_SESSION_TTL
+      - COOKIE_VERIFY_TTL
       - DATABASE_URL
       - IRON_CURRENT_PWD
       - IRON_PASSWORDS
       - IRON_SEAL_TTL
-      - SESSION_TTL
       - WEBAPP_BASE_URL
       - WEBAPP_PORT
     command: npm run dev

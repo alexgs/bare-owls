@@ -38,8 +38,7 @@ export async function getServerSideProps(): Promise<
   const codeVerifier = generators.codeVerifier();
   const codeChallenge = generators.codeChallenge(codeVerifier);
 
-  const config = getConfig();
-  const client = await getOidcClient(config);
+  const client = await getOidcClient();
   const url1 = client.authorizationUrl({
     scope: 'openid',
     // resource: 'https://my.api.example.com/resource/32178',
