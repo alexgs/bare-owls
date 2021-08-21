@@ -8,9 +8,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { makeSchema } from 'nexus';
 import path from 'path';
 
-import { getSession } from 'server-lib';
-import { ApolloContext } from 'types';
-
 import * as types from './types';
 
 interface ServerContext {
@@ -28,10 +25,10 @@ export const schema = makeSchema({
 
 const apolloServer = new ApolloServer({
   schema,
-  context: async ({ req }: ServerContext): Promise<ApolloContext> => {
-    const session = await getSession(req);
-    return { session };
-  },
+  // context: async ({ req }: ServerContext): Promise<ApolloContext> => {
+  //   const session = await getSession(req);
+  //   return { session };
+  // },
 });
 
 export const config = {

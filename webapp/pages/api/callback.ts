@@ -7,39 +7,39 @@ import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-import {
-  COOKIE,
-  COOKIE_OPTIONS,
-  IRON_OPTIONS,
-  IRON_SEAL,
-  handleOidcResponse,
-} from 'server-lib';
+// import {
+//   COOKIE,
+//   COOKIE_OPTIONS,
+//   IRON_OPTIONS,
+//   IRON_SEAL,
+//   handleOidcResponse,
+// } from 'server-lib';
 
 // TODO Update this file (or maybe just the callback functions?)
 // TODO Pass tokens only in cookies
 
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  const cookies = [];
-  let path = '/';
-
-  if (req.method === 'POST') {
-    const { registerNewUser, sessionId } = await handleOidcResponse(req);
-    const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
-    const sessionCookie = cookie.serialize(
-      COOKIE.SESSION,
-      sealedId,
-      COOKIE_OPTIONS.SESSION_SET,
-    );
-    cookies.push(sessionCookie);
-
-    if (registerNewUser) {
-      path = `/callback?newUser=true`;
-    } else {
-      path = `/callback`;
-    }
-  }
-  res.setHeader('set-cookie', cookies);
-  res.redirect(302, path);
+  // const cookies = [];
+  // let path = '/';
+  //
+  // if (req.method === 'POST') {
+  //   const { registerNewUser, sessionId } = await handleOidcResponse(req);
+  //   const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
+  //   const sessionCookie = cookie.serialize(
+  //     COOKIE.SESSION,
+  //     sealedId,
+  //     COOKIE_OPTIONS.SESSION_SET,
+  //   );
+  //   cookies.push(sessionCookie);
+  //
+  //   if (registerNewUser) {
+  //     path = `/callback?newUser=true`;
+  //   } else {
+  //     path = `/callback`;
+  //   }
+  // }
+  // res.setHeader('set-cookie', cookies);
+  // res.redirect(302, path);
 }
 
 export default handler;
