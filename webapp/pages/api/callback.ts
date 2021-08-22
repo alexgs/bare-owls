@@ -6,40 +6,52 @@
 import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import * as querystring from 'query-string';
 
-// import {
-//   COOKIE,
-//   COOKIE_OPTIONS,
-//   IRON_OPTIONS,
-//   IRON_SEAL,
-//   handleOidcResponse,
-// } from 'server-lib';
+import { getConfig, getOidcClient } from 'server-lib';
 
-// TODO Update this file (or maybe just the callback functions?)
-// TODO Pass tokens only in cookies
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<void> {
+  const cookies: string[] = [];
+  let path = '/';
+  let payload: Record<string, unknown> = { method: 'not GET' };
 
-async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  // const cookies = [];
-  // let path = '/';
-  //
-  // if (req.method === 'POST') {
-  //   const { registerNewUser, sessionId } = await handleOidcResponse(req);
-  //   const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
-  //   const sessionCookie = cookie.serialize(
-  //     COOKIE.SESSION,
-  //     sealedId,
-  //     COOKIE_OPTIONS.SESSION_SET,
-  //   );
-  //   cookies.push(sessionCookie);
-  //
-  //   if (registerNewUser) {
-  //     path = `/callback?newUser=true`;
-  //   } else {
-  //     path = `/callback`;
-  //   }
-  // }
-  // res.setHeader('set-cookie', cookies);
+  if (req.method === 'GET') {
+    const config = getConfig();
+    const { CALLBACK_URL, COOKIE, IRON_UNSEAL, IRON_OPTIONS } = config;
+
+    const verifyCookie = req.cookies[COOKIE.VERIFY.NAME];
+    if (!verifyCookie) {
+      const query = querystring.stringify({ error: 'LOGIN_FAILED' });
+      path = `${path}?${query}`;
+      payload = { cookie: 'not found' };
+    } else {
+      const coverVerifier = (await Iron.unseal(
+        verifyCookie,
+        IRON_UNSEAL,
+        IRON_OPTIONS,
+      )) as string;
+
+      const client = await getOidcClient(config);
+      const params = client.callbackParams(req);
+      const tokens = await client.oauthCallback(CALLBACK_URL, params, {
+        code_verifier: coverVerifier,
+      });
+      const accessToken = tokens.access_token;
+      const refreshToken = tokens.refresh_token;
+      payload = {
+        accessToken,
+        params,
+        refreshToken,
+        test: 'value',
+      };
+    }
+  }
+  res.setHeader('set-cookie', cookies);
   // res.redirect(302, path);
+  res.json(payload);
 }
 
 export default handler;

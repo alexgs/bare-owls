@@ -42,7 +42,7 @@ export async function getServerSideProps(
   const config = getConfig();
   const client = await getOidcClient(config);
   const url1 = client.authorizationUrl({
-    scope: 'openid',
+    scope: 'openid offline_access',
     // resource: 'https://my.api.example.com/resource/32178',
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
