@@ -3,13 +3,10 @@
  * the Open Software License version 3.0.
  */
 
-import { ApolloProvider } from '@apollo/client';
 import { Grommet } from 'grommet';
 import { AppProps } from 'next/app';
 import Head from 'next/head';
 import * as React from 'react';
-
-import { apollo } from 'lib';
 
 const theme = {
   global: {
@@ -28,9 +25,7 @@ const App = ({ Component, pageProps }: AppProps): React.ReactNode => {
         <title>Bare Owls</title>
       </Head>
       <Grommet theme={theme} full>
-        <ApolloProvider client={apollo}>
-          <Component {...pageProps} />
-        </ApolloProvider>
+        <Component {...pageProps} />
       </Grommet>
     </>
   );

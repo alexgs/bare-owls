@@ -8,33 +8,33 @@ import { Login, Logout } from 'grommet-icons';
 import { useRouter } from 'next/router';
 import * as React from 'react';
 
-import { LOGIN_PATH, LOGOUT_PATH, useSessionLoader } from 'lib';
+import { LOGIN_PATH, LOGOUT_PATH } from 'lib';
 
 import { AppBar } from './AppBar';
 
 function LogInOutButton() {
   const router = useRouter();
-  const { isError, isLoading, session } = useSessionLoader();
+  // const { isError, isLoading, session } = useSessionLoader();
 
-  if (isError) {
-    console.error('Error loading session.');
-    return null;
-  }
-
-  if (isLoading) {
-    return null;
-  }
-
-  if (session) {
-    return (
-      <Button
-        icon={<Logout />}
-        onClick={() => {
-          void router.push(LOGOUT_PATH);
-        }}
-      />
-    );
-  }
+  // if (isError) {
+  //   console.error('Error loading session.');
+  //   return null;
+  // }
+  //
+  // if (isLoading) {
+  //   return null;
+  // }
+  //
+  // if (session) {
+  //   return (
+  //     <Button
+  //       icon={<Logout />}
+  //       onClick={() => {
+  //         void router.push(LOGOUT_PATH);
+  //       }}
+  //     />
+  //   );
+  // }
 
   return (
     <Button

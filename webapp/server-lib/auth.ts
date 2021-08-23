@@ -3,129 +3,20 @@
  * the Open Software License version 3.0.
  */
 
-import { SealOptions } from '@hapi/iron';
-import * as cookie from 'cookie';
-import * as env from 'env-var';
-import ms from 'ms';
 import { nanoid } from 'nanoid';
 import { NextApiRequest } from 'next';
 import { Client, IdTokenClaims, Issuer } from 'openid-client';
+import urlJoin from 'url-join';
 
-import { seconds } from 'lib';
-import { prisma } from 'server-lib';
+import { Config, getConfig, prisma } from 'server-lib';
 import { JsonObject, UserData } from 'types';
-
-import { startSession } from './session';
 
 interface ClaimsHandlerOutput {
   user: UserData;
   data?: JsonObject;
 }
 
-type CookieOptionsSet = Record<string, cookie.CookieSerializeOptions>;
-
-interface IronPassword {
-  id: string;
-  secret: string;
-}
-
-type IronPasswords = Array<IronPassword>;
-
-interface SealPassword {
-  id: string;
-  secret: string;
-}
-
-const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
-const CLIENT_ID = env.get('AUTH0_CLIENT_ID').required().asString();
-const COOKIE_NONCE_TTL = env.get('COOKIE_NONCE_TTL').required().asString();
-const COOKIE_SESSION_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
-const DOMAIN = env.get('AUTH0_DOMAIN').required().asString();
-const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
-const IRON_PASSWORDS = env
-  .get('IRON_PASSWORDS')
-  .required()
-  .asJsonArray() as IronPasswords;
-const IRON_SEAL_TTL = env.get('COOKIE_SESSION_TTL').required().asString();
-
-export const CALLBACK_URL = `${BASE_URL}/api/callback`;
-export const COOKIE = {
-  SESSION: 'iron-owl',
-  NONCE: 'bare-owls-nonce',
-};
-export const COOKIE_OPTIONS: CookieOptionsSet = {
-  NONCE_RM: {
-    httpOnly: true,
-    expires: new Date(0),
-    path: '/',
-    sameSite: 'none', // This should match NONCE_SET.sameSite
-    secure: true,
-  },
-  NONCE_SET: {
-    httpOnly: true,
-    maxAge: seconds(COOKIE_NONCE_TTL),
-    path: '/',
-    sameSite: 'none',
-    secure: true,
-  },
-  SESSION_RM: {
-    httpOnly: true,
-    expires: new Date(0),
-    path: '/',
-    sameSite: process.env.NODE_ENV === 'development' ? 'none' : 'strict', // This should match SESSION_SET.sameSite
-    secure: true,
-  },
-  SESSION_SET: {
-    httpOnly: true,
-    maxAge: seconds(COOKIE_SESSION_TTL),
-    path: '/',
-    sameSite: process.env.NODE_ENV === 'development' ? 'none' : 'strict', // This might need to be "lax"
-    secure: true,
-  },
-};
-// noinspection SpellCheckingInspection
-export const IRON_OPTIONS: SealOptions = {
-  // Same as the default options except for `ttl`
-  encryption: {
-    saltBits: 256,
-    algorithm: 'aes-256-cbc',
-    iterations: 1,
-    minPasswordlength: 32,
-  },
-  integrity: {
-    saltBits: 256,
-    algorithm: 'sha256',
-    iterations: 1,
-    minPasswordlength: 32,
-  },
-  ttl: ms(IRON_SEAL_TTL),
-  timestampSkewSec: 60,
-  localtimeOffsetMsec: 0,
-};
-export const IRON_SEAL = formatSealPassword();
-export const IRON_UNSEAL = formatUnsealPasswords();
-
 // --- INTERNAL FUNCTIONS ---
-
-/** @internal */
-function formatSealPassword(): SealPassword {
-  const output = IRON_PASSWORDS.find((value) => value.id === IRON_CURRENT_PWD);
-  if (!output) {
-    throw new Error(
-      'No record matching value of IRON_CURRENT_PWD found in IRON_PASSWORDS.',
-    );
-  }
-  return output;
-}
-
-/** @internal */
-function formatUnsealPasswords() {
-  const output: Record<string, string> = {};
-  IRON_PASSWORDS.forEach((value: SealPassword) => {
-    output[value.id] = value.secret;
-  });
-  return output;
-}
 
 /** @internal */
 async function isRegistered(claims: IdTokenClaims): Promise<boolean> {
@@ -236,26 +127,35 @@ async function storeOpenIdToken(
 
 // --- PUBLIC FUNCTIONS ---
 
-export async function extractOpenIdToken(
-  req: NextApiRequest,
-): Promise<IdTokenClaims> {
-  const nonce = req.cookies[COOKIE.NONCE];
-  if (!nonce) {
-    throw new Error('Unable to load nonce from cookie');
-  }
+// export async function extractOpenIdToken(
+//   req: NextApiRequest,
+// ): Promise<IdTokenClaims> {
+//   const nonce = req.cookies[COOKIE.NONCE];
+//   if (!nonce) {
+//     throw new Error('Unable to load nonce from cookie');
+//   }
+//
+//   const client = await getOidcClient();
+//   const params = client.callbackParams(req);
+//   const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+//   return tokens.claims();
+// }
 
-  const client = await getOidcClient();
-  const params = client.callbackParams(req);
-  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
-  return tokens.claims();
-}
-
-export async function getOidcClient(): Promise<Client> {
-  const issuer = await Issuer.discover(`https://${DOMAIN}/authorize`);
+export async function getOidcClient(config: Config): Promise<Client> {
+  const {
+    AUTH_ORIGIN_INTERNAL,
+    AUTH_PATH_DISCOVERY,
+    CALLBACK_URL,
+    CLIENT_ID,
+    CLIENT_SECRET,
+  } = config;
+  const discoveryUrl = urlJoin(AUTH_ORIGIN_INTERNAL, AUTH_PATH_DISCOVERY);
+  const issuer = await Issuer.discover(discoveryUrl);
   return new issuer.Client({
     client_id: CLIENT_ID,
+    client_secret: CLIENT_SECRET,
     redirect_uris: [CALLBACK_URL],
-    response_types: ['id_token token'],
+    response_types: ['code'],
   });
 }
 
@@ -264,26 +164,26 @@ interface ResponseHandlerOutput {
   sessionId: string;
 }
 
-export async function handleOidcResponse(
-  req: NextApiRequest,
-): Promise<ResponseHandlerOutput> {
-  const nonce = req.cookies[COOKIE.NONCE];
-  if (!nonce) {
-    throw new Error('Unable to load nonce from cookie');
-  }
-
-  const client = await getOidcClient();
-  const params = client.callbackParams(req);
-  const tokens = await client.callback(CALLBACK_URL, params, { nonce });
-  const claims = tokens.claims();
-
-  const isRegisteredSubject = await isRegistered(claims);
-  const { user, data } = isRegisteredSubject
-    ? await login(claims)
-    : await register(claims);
-  const sessionId = await startSession(user, data);
-  return {
-    sessionId,
-    registerNewUser: !isRegisteredSubject,
-  };
-}
+// export async function handleOidcResponse(
+//   req: NextApiRequest,
+// ): Promise<ResponseHandlerOutput> {
+//   const nonce = req.cookies[COOKIE.NONCE];
+//   if (!nonce) {
+//     throw new Error('Unable to load nonce from cookie');
+//   }
+//
+//   const client = await getOidcClient();
+//   const params = client.callbackParams(req);
+//   const tokens = await client.callback(CALLBACK_URL, params, { nonce });
+//   const claims = tokens.claims();
+//
+//   const isRegisteredSubject = await isRegistered(claims);
+//   const { user, data } = isRegisteredSubject
+//     ? await login(claims)
+//     : await register(claims);
+//   const sessionId = await startSession(user, data);
+//   return {
+//     sessionId,
+//     registerNewUser: !isRegisteredSubject,
+//   };
+// }

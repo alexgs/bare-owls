@@ -6,36 +6,63 @@
 import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import * as querystring from 'query-string';
 
-import {
-  COOKIE,
-  COOKIE_OPTIONS,
-  IRON_OPTIONS,
-  IRON_SEAL,
-  handleOidcResponse,
-} from 'server-lib';
+import { getConfig, getOidcClient } from 'server-lib';
 
-// TODO Update this file (or maybe just the callback functions?)
-// TODO Pass tokens only in cookies
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<void> {
+  const config = getConfig();
+  const { CALLBACK_URL, COOKIE, IRON_UNSEAL, IRON_OPTIONS } = config;
 
-async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  const cookies = [];
+  const verifierCookie = cookie.serialize(
+    COOKIE.VERIFY.NAME,
+    '',
+    COOKIE.VERIFY.RM,
+  );
+  const cookies = [verifierCookie];
   let path = '/';
 
-  if (req.method === 'POST') {
-    const { registerNewUser, sessionId } = await handleOidcResponse(req);
-    const sealedId = await Iron.seal(sessionId, IRON_SEAL, IRON_OPTIONS);
-    const sessionCookie = cookie.serialize(
-      COOKIE.SESSION,
-      sealedId,
-      COOKIE_OPTIONS.SESSION_SET,
-    );
-    cookies.push(sessionCookie);
-
-    if (registerNewUser) {
-      path = `/callback?newUser=true`;
+  if (req.method === 'GET') {
+    const verifyCookie = req.cookies[COOKIE.VERIFY.NAME];
+    if (!verifyCookie) {
+      const query = querystring.stringify({ error: 'LOGIN_FAILED' });
+      path = `${path}?${query}`;
     } else {
-      path = `/callback`;
+      const codeVerifier = (await Iron.unseal(
+        verifyCookie,
+        IRON_UNSEAL,
+        IRON_OPTIONS,
+      )) as string;
+
+      const client = await getOidcClient(config);
+      const params = client.callbackParams(req);
+      const tokens = await client.oauthCallback(CALLBACK_URL, params, {
+        code_verifier: codeVerifier,
+      });
+      const accessToken = tokens.access_token;
+      const refreshToken = tokens.refresh_token;
+
+      if (accessToken && refreshToken) {
+        const accessTokenCookie = cookie.serialize(
+          COOKIE.ACCESS_TOKEN.NAME,
+          accessToken,
+          COOKIE.ACCESS_TOKEN.SET,
+        );
+        cookies.push(accessTokenCookie);
+
+        const refreshTokenCookie = cookie.serialize(
+          COOKIE.REFRESH_TOKEN.NAME,
+          refreshToken,
+          COOKIE.REFRESH_TOKEN.SET,
+        );
+        cookies.push(refreshTokenCookie);
+      } else {
+        const query = querystring.stringify({ error: 'LOGIN_FAILED' });
+        path = `${path}?${query}`;
+      }
     }
   }
   res.setHeader('set-cookie', cookies);
