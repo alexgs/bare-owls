@@ -78,6 +78,8 @@ function formatUnsealPasswords(passwords: IronPasswords) {
 //   module's global context, which lead to a lot of wasted time. >:-(
 export function getConfig(): Config {
   // Hidden vars -- only used for computing other values
+  const COOKIE_ACCESS_TOKEN_TTL = env.get('COOKIE_ACCESS_TOKEN_TTL').required().asString();
+  const COOKIE_REFRESH_TOKEN_TTL = env.get('COOKIE_REFRESH_TOKEN_TTL').required().asString();
   const COOKIE_VERIFY_TTL = env.get('COOKIE_VERIFY_TTL').required().asString();
   const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
   const IRON_PASSWORDS = env
@@ -106,6 +108,40 @@ export function getConfig(): Config {
   // Computed vars
   const CALLBACK_URL = `${BASE_URL}/api/callback`;
   const COOKIE: CookieOptionsSet = {
+    ACCESS_TOKEN: {
+      NAME: 'access-token',
+      RM: {
+        httpOnly: true,
+        expires: new Date(0),
+        path: '/',
+        sameSite: 'none', // This should match ACCESS_TOKEN.SET.sameSite
+        secure: true,
+      },
+      SET: {
+        httpOnly: true,
+        maxAge: seconds(COOKIE_ACCESS_TOKEN_TTL),
+        path: '/',
+        sameSite: 'none', // This should match ACCESS_TOKEN.RM.sameSite
+        secure: true,
+      },
+    },
+    REFRESH_TOKEN: {
+      NAME: 'refresh-token',
+      RM: {
+        httpOnly: true,
+        expires: new Date(0),
+        path: '/',
+        sameSite: 'none', // This should match REFRESH_TOKEN.SET.sameSite
+        secure: true,
+      },
+      SET: {
+        httpOnly: true,
+        maxAge: seconds(COOKIE_REFRESH_TOKEN_TTL),
+        path: '/',
+        sameSite: 'none', // This should match REFRESH_TOKEN.RM.sameSite
+        secure: true,
+      },
+    },
     VERIFY: {
       NAME: 'iron-owl',
       RM: {
