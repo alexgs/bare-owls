@@ -5,4 +5,5 @@
 
 export * from './auth';
 export * from './config';
+export { pkce } from './pkce';
 export { default as prisma } from './prisma';
