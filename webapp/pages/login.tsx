@@ -54,6 +54,7 @@ export async function getServerSideProps(
     code_challenge_method: 'S256',
     redirect_uri: CALLBACK_URL,
     response_type: 'code',
+    scope: 'openid offline_access',
   });
   const url = `${AUTH_ORIGIN_EXTERNAL}/oauth2/authorize?${query}`;
 
