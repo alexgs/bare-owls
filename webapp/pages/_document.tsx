@@ -3,8 +3,7 @@
  * the Open Software License version 3.0.
  */
 
-
-import Document, { Html, Head, Main, NextScript } from 'next/document'
+import Document, { Html, Head, Main, NextScript } from 'next/document';
 import * as React from 'react';
 
 /* eslint-disable @next/next/google-font-display */
@@ -28,8 +27,8 @@ class OwlDocument extends Document {
           <NextScript />
         </body>
       </Html>
-    )
+    );
   }
 }
 
-export default OwlDocument
+export default OwlDocument;

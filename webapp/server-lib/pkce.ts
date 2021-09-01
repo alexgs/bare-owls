@@ -37,4 +37,4 @@ function generateVerifier(): string {
 export const pkce = {
   generateChallenge,
   generateVerifier,
-}
+};

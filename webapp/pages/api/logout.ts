@@ -7,7 +7,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { prisma } from 'server-lib';
 
-async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
+async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse,
+): Promise<void> {
   if (req.method === 'POST') {
     const { sessionId } = req.body as { sessionId?: string };
     if (!sessionId) {
