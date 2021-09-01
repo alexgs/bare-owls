@@ -3,19 +3,27 @@
  * the Open Software License version 3.0.
  */
 
+import FusionAuthClient from '@fusionauth/typescript-client';
 import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as querystring from 'query-string';
 
-import { getConfig, getOidcClient } from 'server-lib';
+import { getConfig } from 'server-lib';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<void> {
-  const config = getConfig();
-  const { CALLBACK_URL, COOKIE, IRON_UNSEAL, IRON_OPTIONS } = config;
+  const {
+    AUTH_ORIGIN_INTERNAL,
+    CALLBACK_URL,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    COOKIE,
+    IRON_OPTIONS,
+    IRON_UNSEAL,
+  } = getConfig();
 
   const verifierCookie = cookie.serialize(
     COOKIE.VERIFY.NAME,
@@ -37,11 +45,19 @@ async function handler(
         IRON_OPTIONS,
       )) as string;
 
-      const client = await getOidcClient(config);
-      const params = client.callbackParams(req);
-      const tokens = await client.oauthCallback(CALLBACK_URL, params, {
-        code_verifier: codeVerifier,
-      });
+      const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
+      const response = await client.exchangeOAuthCodeForAccessTokenUsingPKCE(
+        req.query.code as string,
+        CLIENT_ID,
+        CLIENT_SECRET,
+        CALLBACK_URL,
+        codeVerifier,
+      );
+
+      if (response.statusCode !== 200) {
+        throw response.exception;
+      }
+      const tokens = response.response;
       const accessToken = tokens.access_token;
       const refreshToken = tokens.refresh_token;
 

@@ -7,13 +7,13 @@ import Iron from '@hapi/iron';
 import * as cookie from 'cookie';
 import { Anchor, Box } from 'grommet';
 import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import { generators } from 'openid-client';
+import * as querystring from 'query-string';
 import * as React from 'react';
 
 import { NavBar } from 'components';
-import { getConfig, getOidcClient } from 'server-lib';
+import { getConfig, pkce } from 'server-lib';
 
-const showLink = true; // Useful for debugging
+const showLink = false; // Useful for debugging
 
 interface Props {
   url?: string;
@@ -36,24 +36,28 @@ const Login: React.FC<Props> = (props: Props) => {
 export async function getServerSideProps(
   context: GetServerSidePropsContext,
 ): Promise<GetServerSidePropsResult<unknown>> {
-  const codeVerifier = generators.codeVerifier();
-  const codeChallenge = generators.codeChallenge(codeVerifier);
+  const codeVerifier = pkce.generateVerifier();
+  const codeChallenge = pkce.generateChallenge(codeVerifier);
 
-  const config = getConfig();
-  const client = await getOidcClient(config);
-  const url1 = client.authorizationUrl({
-    scope: 'openid offline_access',
-    // resource: 'https://my.api.example.com/resource/32178',
+  const {
+    AUTH_ORIGIN_EXTERNAL,
+    CALLBACK_URL,
+    CLIENT_ID,
+    COOKIE,
+    IRON_OPTIONS,
+    IRON_SEAL,
+  } = getConfig();
+
+  const query = querystring.stringify({
+    client_id: CLIENT_ID,
     code_challenge: codeChallenge,
     code_challenge_method: 'S256',
+    redirect_uri: CALLBACK_URL,
+    response_type: 'code',
+    scope: 'openid offline_access',
   });
-  const url2 = new URL(url1);
-  url2.hostname = 'auth.owlbear.tech';
-  url2.port = '';
-  url2.protocol = 'https:';
-  const url3 = url2.toString();
+  const url = `${AUTH_ORIGIN_EXTERNAL}/oauth2/authorize?${query}`;
 
-  const { COOKIE, IRON_OPTIONS, IRON_SEAL } = config;
   const sealedVerifier = await Iron.seal(codeVerifier, IRON_SEAL, IRON_OPTIONS);
   const verifierCookie = cookie.serialize(
     COOKIE.VERIFY.NAME,
@@ -61,12 +65,13 @@ export async function getServerSideProps(
     COOKIE.VERIFY.SET,
   );
   context.res.setHeader('set-cookie', verifierCookie);
+
   if (showLink) {
-    return { props: { url: url3 } };
+    return { props: { url } };
   }
   return {
     redirect: {
-      destination: url3,
+      destination: url,
       statusCode: 302,
     },
   };

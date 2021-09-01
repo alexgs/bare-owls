@@ -78,8 +78,14 @@ function formatUnsealPasswords(passwords: IronPasswords) {
 //   module's global context, which lead to a lot of wasted time. >:-(
 export function getConfig(): Config {
   // Hidden vars -- only used for computing other values
-  const COOKIE_ACCESS_TOKEN_TTL = env.get('COOKIE_ACCESS_TOKEN_TTL').required().asString();
-  const COOKIE_REFRESH_TOKEN_TTL = env.get('COOKIE_REFRESH_TOKEN_TTL').required().asString();
+  const COOKIE_ACCESS_TOKEN_TTL = env
+    .get('COOKIE_ACCESS_TOKEN_TTL')
+    .required()
+    .asString();
+  const COOKIE_REFRESH_TOKEN_TTL = env
+    .get('COOKIE_REFRESH_TOKEN_TTL')
+    .required()
+    .asString();
   const COOKIE_VERIFY_TTL = env.get('COOKIE_VERIFY_TTL').required().asString();
   const IRON_CURRENT_PWD = env.get('IRON_CURRENT_PWD').required().asString();
   const IRON_PASSWORDS = env

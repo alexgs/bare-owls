@@ -3,6 +3,6 @@
  * the Open Software License version 3.0.
  */
 
-export * from './auth';
 export * from './config';
+export { pkce } from './pkce';
 export { default as prisma } from './prisma';
