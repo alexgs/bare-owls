@@ -13,7 +13,7 @@ import * as React from 'react';
 import { NavBar } from 'components';
 import { getConfig, pkce } from 'server-lib';
 
-const showLink = true; // Useful for debugging
+const showLink = false; // Useful for debugging
 
 interface Props {
   url?: string;
