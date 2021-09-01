@@ -3,13 +3,11 @@
  * the Open Software License version 3.0.
  */
 
+import FusionAuthClient from '@fusionauth/typescript-client';
 import * as cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getConfig, getOidcClient } from 'server-lib';
-
-// TODO Update this file (or maybe just the callback functions?)
-// TODO Pass tokens only in cookies
+import { getConfig } from 'server-lib';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isExpired(token: string): boolean {
@@ -17,32 +15,43 @@ function isExpired(token: string): boolean {
   return false;
 }
 
+// TODO Configure JWT signing (https://fusionauth.io/docs/v1/tech/tutorials/json-web-tokens/)
+
 async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
-  const config = getConfig();
-  const { COOKIE } = config;
+  const {
+    AUTH_ORIGIN_INTERNAL,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    COOKIE,
+  } = getConfig();
   const cookies: string[] = [];
 
-  const accessToken = req.cookies[COOKIE.ACCESS_TOKEN.NAME];
-  const refreshToken = req.cookies[COOKIE.REFRESH_TOKEN.NAME];
+  let accessToken: string | undefined = req.cookies[COOKIE.ACCESS_TOKEN.NAME];
+  let refreshToken: string | undefined = req.cookies[COOKIE.REFRESH_TOKEN.NAME];
   if (!refreshToken) {
     // TODO Redirect to login page
   } else if (!accessToken || isExpired(accessToken)) {
-    const client = await getOidcClient(config);
-    const tokens = await client.refresh(refreshToken);
-    const newAccessToken = tokens.access_token;
-    const newRefreshToken = tokens.refresh_token;
+    const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
+    const response = await client.exchangeRefreshTokenForAccessToken(refreshToken, CLIENT_ID, CLIENT_SECRET, '', '');
 
-    if (newAccessToken && newRefreshToken) {
+    if (response.statusCode !== 200) {
+      throw response.exception;
+    }
+    const tokens = response.response;
+    accessToken = tokens.access_token;
+    refreshToken = tokens.refresh_token;
+
+    if (accessToken && refreshToken) {
       const accessTokenCookie = cookie.serialize(
         COOKIE.ACCESS_TOKEN.NAME,
-        newAccessToken,
+        accessToken,
         COOKIE.ACCESS_TOKEN.SET,
       );
       cookies.push(accessTokenCookie);
 
       const refreshTokenCookie = cookie.serialize(
         COOKIE.REFRESH_TOKEN.NAME,
-        newRefreshToken,
+        refreshToken,
         COOKIE.REFRESH_TOKEN.SET,
       );
       cookies.push(refreshTokenCookie);
