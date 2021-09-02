@@ -8,6 +8,7 @@ import * as cookie from 'cookie';
 import {isBefore} from 'date-fns';
 import { NextApiRequest, NextApiResponse } from 'next';
 
+import { LOGIN_PATH } from 'lib';
 import { getConfig } from 'server-lib';
 
 interface FusionAuthClaims {
@@ -62,7 +63,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void>
   let accessToken: string | undefined = req.cookies[COOKIE.ACCESS_TOKEN.NAME];
   let refreshToken: string | undefined = req.cookies[COOKIE.REFRESH_TOKEN.NAME];
   if (!refreshToken) {
-    // TODO Redirect to login page
+    res.redirect(302, LOGIN_PATH);
+    return;
   } else if (!accessToken || isExpired(accessToken)) {
     const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
     const response = await client.exchangeRefreshTokenForAccessToken(refreshToken, CLIENT_ID, CLIENT_SECRET, '', '');
