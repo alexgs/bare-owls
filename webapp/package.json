@@ -30,6 +30,7 @@
     "@hapi/iron": "^6.0.0",
     "@prisma/client": "^2.25.0",
     "cookie": "^0.4.1",
+    "date-fns": "^2.23.0",
     "deepmerge": "^4.2.2",
     "env-var": "^7.0.1",
     "formik": "^2.2.9",
