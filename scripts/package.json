@@ -1,0 +1,43 @@
+{
+  "name": "scripts",
+  "version": "0.1.0",
+  "description": "Utility scripts for \"Bare Owls\"",
+  "author": {
+    "email": "alex.nebula99@gmail.com",
+    "name": "Alex Gates-Shannon"
+  },
+  "engines": {
+    "node": "^14.16.0"
+  },
+  "license": "OSL-3.0",
+  "private": true,
+  "scripts": {
+    "check": "npx tsc --noEmit",
+    "database-backup": "ts-node src/database-backup.ts",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "date-fns": "^2.23.0",
+    "dotenv": "^10.0.0",
+    "env-var": "^7.0.1",
+    "shelljs": "^0.8.4",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^14.17.14",
+    "@types/shelljs": "^0.8.9",
+    "@typescript-eslint/eslint-plugin": "^4.30.0",
+    "@typescript-eslint/parser": "^4.30.0",
+    "eslint": "^7.32.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "prettier": "^2.3.2"
+  },
+  "volta": {
+    "node": "14.17.5",
+    "npm": "7.20.6"
+  }
+}

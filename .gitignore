@@ -34,6 +34,7 @@
 
 # These files may contain secrets, so keep them out of the repo
 **/.npmrc
+**/.pgpass
 webapp/prisma/seed-data/*.json
 webapp/prisma/seed-data/*.ts
 
@@ -42,6 +43,7 @@ webapp/prisma/seed-data/*.ts
 **/generated
 **/node_modules
 host/**/*.log
+host/**/*.sql
 
 # misc
 .DS_Store
