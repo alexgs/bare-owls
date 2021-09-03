@@ -1,10 +1,13 @@
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-var-requires
-require('dotenv').config({ path: '../.env' });
-
 import chalk from 'chalk';
+import { format } from 'date-fns';
 import * as env from 'env-var';
 import path from 'path';
 import shell from 'shelljs';
+
+const PROJECT_ROOT = path.resolve(__dirname, '../..');
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-var-requires
+require('dotenv').config({ path: path.join(PROJECT_ROOT, '.env') });
 
 interface ComposeProjectData {
   Name: string;
@@ -12,8 +15,6 @@ interface ComposeProjectData {
 }
 
 type ComposeProjectList = ComposeProjectData[];
-
-const PROJECT_ROOT = path.resolve(__dirname, '../..');
 
 const DB = {
   NAMES: [env.get('DATABASE_NAME').required().asString(), 'fusionauth'],
@@ -30,6 +31,17 @@ const TEXT = {
   INFO: chalk.cyan('-- Info    --'),
   WARNING: chalk.keyword('orange').bold('<< Warning >>'),
 };
+
+function getBackupFilename(databaseName: string): string {
+  let database = databaseName;
+  if (database !== 'fusionauth') {
+    database = database.split('_').slice(0, -1).join('-');
+  }
+  const now = new Date();
+  const date = format(now, 'yyyy-MM-dd');
+  const time = format(now, 'kk-mm-ss');
+  return `${database}_${date}_${time}.sql`;
+}
 
 // eslint-disable-next-line @typescript-eslint/require-await
 async function main() {
@@ -78,11 +90,14 @@ async function main() {
 
   shell.mkdir('-p', PATHS.BACKUP_DIR);
   DB.NAMES.forEach((database) => {
+    const filename = getBackupFilename(database);
     const backup =
-      `PGPASSFILE=${PATHS.PGPASS} pg_dump --host=localhost ` +
-      `-p ${DB.PORT} -U ${DB.USER} -w ` +
-      `${database} > ${path.join(PATHS.BACKUP_DIR, `${database}.sql`)}`;
+      `PGPASSFILE=${PATHS.PGPASS} pg_dump --host=localhost -p ${DB.PORT} ` +
+      `-U ${DB.USER} -w ${database} > ${path.join(PATHS.BACKUP_DIR, filename)}`;
     shell.exec(backup);
+    // In the future, we could compress and encrypt the backup files. See
+    //   [this article][1] for discussion and an example.
+    // [1]: https://fusionauth.io/learn/expert-advice/security/guide-to-user-data-security/#3112-backups
   });
 
   console.log(TEXT.INFO, 'Backup complete');
