@@ -6,4 +6,6 @@ Generally, internal documentation should be stored as close to its subject matte
 
 - Creating and managing [self-signed certificates](certificates.md)
 - Configuring and starting the [database server](database.md)
+- [Design decisions](design-decisions.md) about the product
 - [Documentation and references](references.md) elsewhere on the interwebs
+- [Old task IDs](old-task-ids.md) mapped to new IDs
