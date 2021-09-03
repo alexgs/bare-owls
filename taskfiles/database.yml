@@ -3,8 +3,15 @@ version: '3'
 vars:
   DATABASE_INIT_NAME: postgres-init-container
   DATABASE_SERVICE_NAME: database
+  SCRIPTS_WORKING_DIR: ./scripts
 
 tasks:
+  backup:
+    dir: "{{.SCRIPTS_WORKING_DIR}}"
+    cmds:
+      - "{{.NPM}} run database-backup"
+    desc: Backup application databases to SQL files
+
   psql:
     cmds:
       - "psql -h localhost -p $DATABASE_PORT -U $DATABASE_USER -d $DATABASE_NAME"
