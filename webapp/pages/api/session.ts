@@ -58,6 +58,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void>
     CLIENT_SECRET,
     COOKIE,
   } = getConfig();
+  const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
   const cookies: string[] = [];
 
   let accessToken: string | undefined = req.cookies[COOKIE.ACCESS_TOKEN.NAME];
@@ -66,9 +67,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void>
     res.redirect(302, LOGIN_PATH);
     return;
   } else if (!accessToken || isExpired(accessToken)) {
-    const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
     const response = await client.exchangeRefreshTokenForAccessToken(refreshToken, CLIENT_ID, CLIENT_SECRET, '', '');
-
     if (response.statusCode !== 200) {
       throw response.exception;
     }
@@ -92,13 +91,13 @@ async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void>
       cookies.push(refreshTokenCookie);
     }
   } else {
-    // TODO Verify the token signature
-    // TODO Check for token revocation
+    const response = await client.validateJWT(accessToken);
+    if (response.statusCode !== 200) {
+      throw response.exception;
+    }
   }
 
-  // TODO Get the claims
   const claims = getClaims(accessToken);
-
   res.setHeader('set-cookie', cookies);
   res.json({ claims });
 }
