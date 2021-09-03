@@ -3,6 +3,7 @@ require('dotenv').config({ path: '../.env' });
 
 import chalk from 'chalk';
 import * as env from 'env-var';
+import path from 'path';
 import shell from 'shelljs';
 
 interface ComposeProjectData {
@@ -12,15 +13,18 @@ interface ComposeProjectData {
 
 type ComposeProjectList = ComposeProjectData[];
 
+const PROJECT_ROOT = path.resolve(__dirname, '../..');
+
 const DB = {
-  NAME: env.get('DATABASE_NAME').required().asString(),
-  PASSWORD: env.get('DATABASE_PASSWORD').required().asString(),
+  NAMES: [env.get('DATABASE_NAME').required().asString(), 'fusionauth'],
   PORT: env.get('DATABASE_PORT').required().asPortNumber(),
-  URL: '',
   USER: env.get('DATABASE_USER').required().asString(),
 };
-DB.URL = `postgresql://${DB.USER}:${DB.PASSWORD}@localhost:${DB.PORT}/${DB.NAME}`;
-const REQUIRED_COMMANDS = ['docker-compose', 'psql'];
+const PATHS = {
+  BACKUP_DIR: path.resolve(PROJECT_ROOT, 'host/database/backup'),
+  PGPASS: path.resolve(PROJECT_ROOT, '.pgpass'),
+};
+const REQUIRED_COMMANDS = ['docker-compose', 'pg_dump'];
 const TEXT = {
   ERROR: chalk.bgWhiteBright.red.bold(' >> ERROR << '),
   INFO: chalk.cyan('-- Info    --'),
@@ -46,6 +50,15 @@ async function main() {
     shell.exit(2);
   }
 
+  // For details on PG password file, see https://www.postgresql.org/docs/current/libpq-pgpass.html
+  if (!shell.test('-e', PATHS.PGPASS)) {
+    console.log(
+      TEXT.ERROR,
+      `The password file ${PATHS.PGPASS} is missing. Exiting.`,
+    );
+    shell.exit(4);
+  }
+
   const composeProjectsJson = shell.exec('docker-compose ls --format json', {
     silent: true,
   });
@@ -63,7 +76,16 @@ async function main() {
     shell.exit(0);
   }
 
-  console.log('Hello database backups!');
+  shell.mkdir('-p', PATHS.BACKUP_DIR);
+  DB.NAMES.forEach((database) => {
+    const backup =
+      `PGPASSFILE=${PATHS.PGPASS} pg_dump --host=localhost ` +
+      `-p ${DB.PORT} -U ${DB.USER} -w ` +
+      `${database} > ${path.join(PATHS.BACKUP_DIR, `${database}.sql`)}`;
+    shell.exec(backup);
+  });
+
+  console.log(TEXT.INFO, 'Backup complete');
 }
 
 main()
