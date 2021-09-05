@@ -16,8 +16,8 @@ Reference: See "Creating Tokens > Signature Algorithms" subsection of the [Build
 
 ### Future
 
-When using client-accessible JWTs to access a CDN, we will need to use a public/private key to sign and verify claims. One option is to change the signing key for the whole application in FusionAuth.
+We will need to use separate applications in FusionAuth: one for the "core" application and one for the CDN. There is one main reason: FusionAuth uses the application ID for the "audience" claim in the JWT.
 
-However, I think it will make more sense to have separate applications within FusionAuth. The main application can use the default tenant settings (although it may make life easier to set them directly on the application). The CDN application will use custom settings.
+This configuration will also give us more control over the JWT claims and signing keys. The core application can use the default tenant settings (although it may make life easier to set them directly on the application). The CDN application will use custom settings.
 
 I don't like how the OpenID-connect compatible HMAC signing key uses the client secret. I guess there's not much point in having two secrets (one for OAuth and another for HMAC) because anyone who can access one can access the other. There may be implications for changing or rotating the client secret and the HMAC secret. I'm not sure if there's a good reason to change this or not. I'm not concerned about complying with the OIDC standard, so that is not a consideration.
