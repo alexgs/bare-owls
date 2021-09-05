@@ -5,7 +5,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getAccessToken, getClaims } from 'server-lib';
+import { getAccessToken, getSession } from 'server-lib';
 
 async function handler(
   req: NextApiRequest,
@@ -13,8 +13,8 @@ async function handler(
 ): Promise<void> {
   const accessToken = await getAccessToken(req, res);
   if (accessToken) {
-    const claims = getClaims(accessToken);
-    res.json({ claims });
+    const session = await getSession(accessToken);
+    res.json({ session });
   }
 }
 

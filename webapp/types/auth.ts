@@ -3,8 +3,6 @@
  * the Open Software License version 3.0.
  */
 
-import { JsonObject } from './json';
-
 export interface FusionAuthClaims {
   aud: string;
   authenticationType: string;
@@ -18,18 +16,11 @@ export interface FusionAuthClaims {
 }
 
 export interface Session {
-  data?: JsonObject;
-  expires: Date;
-  id: SessionId;
-  user: UserData;
-}
-
-export type SessionId = string;
-
-export interface UserData {
+  firstName: string;
+  lastName?: string;
+  displayName: string;
+  username: string
   email: string;
-  id: string;
-  name: string;
-  roleId?: string; // TODO Make required
-  username?: string; // TODO Make required
+  emailVerified: boolean;
+  userId: string;
 }

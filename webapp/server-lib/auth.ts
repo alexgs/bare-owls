@@ -10,7 +10,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 
 import { LOGIN_PATH } from 'lib';
 import { COOKIE_HEADER, getConfig } from 'server-lib';
-import { FusionAuthClaims } from 'types';
+import { FusionAuthClaims, Session } from 'types';
 
 // --- PRIVATE FUNCTIONS ---
 
@@ -99,4 +99,30 @@ export function getClaims(jwt?: string): FusionAuthClaims {
   const base64Claims = jwt.split('.')[1];
   const claimsJson = Buffer.from(base64Claims, 'base64').toString();
   return JSON.parse(claimsJson) as FusionAuthClaims;
+}
+
+export async function getSession(jwt: string): Promise<Session> {
+  const { AUTH_ORIGIN_INTERNAL, CLIENT_ID } = getConfig();
+  const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
+  const response = await client.retrieveUserInfoFromAccessToken(jwt);
+  if (response.statusCode !== 200) {
+    throw response.exception;
+  }
+
+  console.log(`>> --- <<\n${JSON.stringify(response.response)}\n>> --- <<`);
+  const user = response.response.user;
+  if (!user) {
+    throw new Error('User is empty.');
+  }
+
+  // TODO Use Joi (or the Formik-compatible one) to validate these fields
+  return {
+    email: user.email ?? 'fake',
+    displayName: user.fullName ?? user.username ?? 'fake',
+    emailVerified: !!user.verified,
+    firstName: user.firstName ?? user.username ?? 'fake',
+    lastName: user.lastName,
+    userId: user.id ?? 'fake',
+    username: user.username ?? 'fake',
+  };
 }
