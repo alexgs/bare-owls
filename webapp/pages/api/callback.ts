@@ -9,7 +9,7 @@ import * as cookie from 'cookie';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import * as querystring from 'query-string';
 
-import { getConfig } from 'server-lib';
+import { COOKIE_HEADER, getConfig } from 'server-lib';
 
 async function handler(
   req: NextApiRequest,
@@ -81,7 +81,7 @@ async function handler(
       }
     }
   }
-  res.setHeader('set-cookie', cookies);
+  res.setHeader(COOKIE_HEADER, cookies);
   res.redirect(302, path);
 }
 

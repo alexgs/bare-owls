@@ -4,10 +4,12 @@
 
 Callback handler for OAuth flow.
 
-## `/api/logout`
+## `/api/claims`
 
-Currently (2021-09-05) broken.
+Returns the claims of the current ID token as a JSON object.
 
 ## `/api/session`
 
-Returns the claims of the current ID token as a JSON object.
+Returns session data (which is currently based on the response from [FusionAuth's `/oauth2/userinfo` endpoint][1]).
+
+[1]: https://fusionauth.io/docs/v1/tech/oauth/endpoints/#introspect
