@@ -5,6 +5,18 @@
 
 import { JsonObject } from './json';
 
+export interface FusionAuthClaims {
+  aud: string;
+  authenticationType: string;
+  email: string;
+  email_verified: boolean;
+  exp: number;
+  iat: number;
+  iss: string;
+  jti: string;
+  sub: string;
+}
+
 export interface Session {
   data?: JsonObject;
   expires: Date;
