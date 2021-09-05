@@ -17,6 +17,10 @@ Handy links for documentation, articles, and other materials used in this projec
 - [HTTP Status Codes][11]
 - JWTs
   - [Building a Secure Signed JWT][16]
+  - Public and private claims and namespaces
+    - Auth0: [Add custom claims to a token][26]
+    - Auth0: [Create namespaced custom claims][25]
+    - SO: [What is difference between private and public claims?][24]
   - Verifying claims
     1. How to [verify JWT claims][12] with FusionAuth Java library
     2. API docs for verifying JWT claims with [Jose JavaScript module][13]
@@ -54,3 +58,6 @@ Handy links for documentation, articles, and other materials used in this projec
 [21]: https://swr.vercel.app/docs/getting-started
 [22]: https://taskfile.dev/#/
 [23]: https://docs.volta.sh/reference/
+[24]: https://stackoverflow.com/questions/49215866/what-is-difference-between-private-and-public-claims-on-jwt
+[25]: https://auth0.com/docs/security/tokens/json-web-tokens/create-namespaced-custom-claims
+[26]: https://auth0.com/docs/configure/apis/scopes/sample-use-cases-scopes-and-claims#add-custom-claims-to-a-token
