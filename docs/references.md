@@ -17,6 +17,7 @@ Handy links for documentation, articles, and other materials used in this projec
 - [HTTP Status Codes][11]
 - JWTs
   - [Building a Secure Signed JWT][16]
+  - [JWT Debugger][27] from Auth0
   - Public and private claims and namespaces
     - Auth0: [Add custom claims to a token][26]
     - Auth0: [Create namespaced custom claims][25]
@@ -61,3 +62,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [24]: https://stackoverflow.com/questions/49215866/what-is-difference-between-private-and-public-claims-on-jwt
 [25]: https://auth0.com/docs/security/tokens/json-web-tokens/create-namespaced-custom-claims
 [26]: https://auth0.com/docs/configure/apis/scopes/sample-use-cases-scopes-and-claims#add-custom-claims-to-a-token
+[27]: https://jwt.io/#debugger-io

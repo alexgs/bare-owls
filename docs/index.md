@@ -4,8 +4,9 @@ Generally, internal documentation should be stored as close to its subject matte
 
 ## Available Documentation
 
-- Creating and managing [self-signed certificates](certificates.md)
-- Configuring and starting the [database server](database.md)
+- Configuring and starting the [database server](database-server.md)
 - [Design decisions](design-decisions.md) about the product
-- [Documentation and references](references.md) elsewhere on the interwebs
 - [Old task IDs](old-task-ids.md) mapped to new IDs
+- [REST API endpoints](rest-api-endpoints.md)
+- [References and documentation](references.md) elsewhere on the interwebs
+- Creating and managing [self-signed certificates](self-signed-certificates.md)

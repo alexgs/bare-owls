@@ -8,6 +8,8 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import * as React from 'react';
 
+import { SessionProvider } from 'components';
+
 const theme = {
   global: {
     font: {
@@ -24,9 +26,11 @@ const App = ({ Component, pageProps }: AppProps): React.ReactNode => {
       <Head>
         <title>Bare Owls</title>
       </Head>
-      <Grommet theme={theme} full>
-        <Component {...pageProps} />
-      </Grommet>
+      <SessionProvider>
+        <Grommet theme={theme} full>
+          <Component {...pageProps} />
+        </Grommet>
+      </SessionProvider>
     </>
   );
 };

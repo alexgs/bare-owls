@@ -11,7 +11,7 @@ import * as querystring from 'query-string';
 import * as React from 'react';
 
 import { NavBar } from 'components';
-import { getConfig, pkce } from 'server-lib';
+import { COOKIE_HEADER, getConfig, pkce } from 'server-lib';
 
 const showLink = false; // Useful for debugging
 
@@ -64,7 +64,7 @@ export async function getServerSideProps(
     sealedVerifier,
     COOKIE.VERIFY.SET,
   );
-  context.res.setHeader('set-cookie', verifierCookie);
+  context.res.setHeader(COOKIE_HEADER, verifierCookie);
 
   if (showLink) {
     return { props: { url } };

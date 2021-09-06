@@ -5,7 +5,7 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { HTTP_CODE, STATUS, getAccessToken, getSession } from 'server-lib';
+import { HTTP_CODE, STATUS, getAccessToken, getClaims } from 'server-lib';
 
 async function handler(
   req: NextApiRequest,
@@ -13,8 +13,8 @@ async function handler(
 ): Promise<void> {
   const result = await getAccessToken(req, res);
   if (result.status === STATUS.OK) {
-    const session = await getSession(result.token);
-    res.json({ session });
+    const claims = getClaims(result.token);
+    res.json({ claims });
   } else if (
     result.status === STATUS.ERROR.ACCESS_TOKEN.INVALID_JWT ||
     result.status === STATUS.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN
