@@ -5,16 +5,23 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { getAccessToken, getSession } from 'server-lib';
+import { HTTP_CODE, STATUS, getAccessToken, getSession } from 'server-lib';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<void> {
-  const accessToken = await getAccessToken(req, res);
-  if (accessToken) {
-    const session = await getSession(accessToken);
+  const result = await getAccessToken(req, res);
+  if (result.status === STATUS.OK) {
+    const session = await getSession(result.token);
     res.json({ session });
+  } else if (
+    result.status === STATUS.ERROR.ACCESS_TOKEN.INVALID_JWT ||
+    result.status === STATUS.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN
+  ) {
+    res.status(HTTP_CODE.UNAUTHORIZED).end();
+  } else {
+    res.status(HTTP_CODE.SERVER_ERROR).json({ ...result });
   }
 }
 
