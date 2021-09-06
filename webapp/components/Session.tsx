@@ -4,8 +4,15 @@
  */
 
 import * as React from 'react';
+import useSWR from 'swr';
+import { Fetcher } from 'swr/dist/types';
 
 import { Session } from 'types';
+
+interface Data {
+  payload: NullableSession;
+  status: number;
+}
 
 type NullableSession = Session | null;
 
@@ -19,22 +26,38 @@ interface SessionProviderProps {
 
 const SessionContext = React.createContext<NullableSession>(null);
 
+const fetcher: Fetcher<Data> = async (path: string) => {
+  const response = await fetch(path);
+  if (response.status === 200) {
+    const payload = await response.json() as { session: Session };
+    return {
+      payload: payload.session,
+      status: response.status,
+    };
+  }
+  return {
+    payload: null,
+    status: response.status,
+  };
+};
+
 // This pattern was adapted from NextAuth v3.29.0
 // https://github.com/nextauthjs/next-auth/blob/ead715219a5d7a6e882a6ba27fa56b03954d062d/src/client/index.js
 export function SessionProvider(
   props: SessionProviderProps,
 ): SessionProviderElement {
   const { children } = props;
-  const session: NullableSession = null;
-  // const session: NullableSession = {
-  //   displayName: 'Fake',
-  //   username: 'fake00',
-  //   userId: '10101010101',
-  //   lastName: 'McFakerson',
-  //   firstName: 'Fakey',
-  //   emailVerified: false,
-  //   email: 'fakey@mcfakeperson.com',
-  // };
+
+  let session: NullableSession = null;
+  const { data, error } = useSWR<Data, Error>('/api/session', fetcher);
+  if (data) {
+    session = data.status === 200 ? data.payload : null;
+  } else {
+    session = null;
+  }
+  if (error) {
+    console.error(`SWR Error: ${error.message}`);
+  }
 
   return React.createElement(
     SessionContext.Provider,
