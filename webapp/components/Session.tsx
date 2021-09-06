@@ -3,6 +3,7 @@
  * the Open Software License version 3.0.
  */
 
+import ms from 'ms';
 import * as React from 'react';
 import useSWR from 'swr';
 import { Fetcher } from 'swr/dist/types';
@@ -29,7 +30,7 @@ const SessionContext = React.createContext<NullableSession>(null);
 const fetcher: Fetcher<Data> = async (path: string) => {
   const response = await fetch(path);
   if (response.status === 200) {
-    const payload = await response.json() as { session: Session };
+    const payload = (await response.json()) as { session: Session };
     return {
       payload: payload.session,
       status: response.status,
@@ -49,7 +50,8 @@ export function SessionProvider(
   const { children } = props;
 
   let session: NullableSession = null;
-  const { data, error } = useSWR<Data, Error>('/api/session', fetcher);
+  const options = { refreshInterval: ms('2s') };
+  const { data, error } = useSWR<Data, Error>('/api/session', fetcher, options);
   if (data) {
     session = data.status === 200 ? data.payload : null;
   } else {

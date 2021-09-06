@@ -28,3 +28,11 @@ The Next.js examples include a [middleware][2] pattern. [The documentation][3], 
 
 [2]: https://github.com/vercel/next.js/tree/canary/examples/api-routes-middleware
 [3]: https://nextjs.org/docs/api-routes/api-middlewares#extending-the-reqres-objects-with-typescript
+
+
+## Session Provider
+
+The pattern I used for the `SessionProvider` (see [Session.tsx][4]) looks more like the normal React Context pattern than the [SWR pattern][5]. I previously used the SWR pattern and found it more cumbersome than the Context pattern. It's more a matter of taste at this stage, and this is easier. :shrug: It can always be revisited in the future if there's a need.
+
+[4]: /webapp/components/Session.tsx
+[5]: https://swr.vercel.app/docs/getting-started#example

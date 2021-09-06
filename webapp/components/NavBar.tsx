@@ -11,30 +11,22 @@ import * as React from 'react';
 import { LOGIN_PATH, LOGOUT_PATH } from 'lib';
 
 import { AppBar } from './AppBar';
+import { useSession } from './Session';
 
 function LogInOutButton() {
   const router = useRouter();
-  // const { isError, isLoading, session } = useSessionLoader();
+  const session = useSession();
 
-  // if (isError) {
-  //   console.error('Error loading session.');
-  //   return null;
-  // }
-  //
-  // if (isLoading) {
-  //   return null;
-  // }
-  //
-  // if (session) {
-  //   return (
-  //     <Button
-  //       icon={<Logout />}
-  //       onClick={() => {
-  //         void router.push(LOGOUT_PATH);
-  //       }}
-  //     />
-  //   );
-  // }
+  if (session) {
+    return (
+      <Button
+        icon={<Logout />}
+        onClick={() => {
+          void router.push(LOGOUT_PATH);
+        }}
+      />
+    );
+  }
 
   return (
     <Button
