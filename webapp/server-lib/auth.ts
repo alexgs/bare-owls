@@ -6,11 +6,13 @@
 import FusionAuthClient from '@fusionauth/typescript-client';
 import * as cookie from 'cookie';
 import { isAfter } from 'date-fns';
+import got from 'got';
 import { NextApiRequest, NextApiResponse } from 'next';
+import join from 'url-join';
 
 import { LOGIN_PATH } from 'lib';
 import { COOKIE_HEADER, getConfig } from 'server-lib';
-import { FusionAuthClaims, Session } from 'types';
+import { FusionAuthClaims, Session, UserinfoResponse } from 'types';
 
 // --- PRIVATE FUNCTIONS ---
 
@@ -102,27 +104,30 @@ export function getClaims(jwt?: string): FusionAuthClaims {
 }
 
 export async function getSession(jwt: string): Promise<Session> {
-  const { AUTH_ORIGIN_INTERNAL, CLIENT_ID } = getConfig();
-  const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
-  const response = await client.retrieveUserInfoFromAccessToken(jwt);
+  const { AUTH_ORIGIN_INTERNAL } = getConfig();
+  const userinfoEndpoint = join(AUTH_ORIGIN_INTERNAL, '/oauth2/userinfo')
+  const response = await got.get(userinfoEndpoint, {
+    headers: {
+      Authorization: `Bearer ${jwt}`,
+    },
+    responseType: 'json',
+    throwHttpErrors: false
+  });
   if (response.statusCode !== 200) {
-    throw response.exception;
+    throw new Error(`${response.statusCode} ${response.statusMessage ?? ''}`);
   }
 
-  console.log(`>> --- <<\n${JSON.stringify(response.response)}\n>> --- <<`);
-  const user = response.response.user;
-  if (!user) {
-    throw new Error('User is empty.');
-  }
+  // TODO Use Joi (or the Formik-compatible one) to validate these fields and perform the type-cast
+  const user = response.body as UserinfoResponse;
+  console.log(`>> --- <<\n${JSON.stringify(user)}\n>> --- <<`);
 
-  // TODO Use Joi (or the Formik-compatible one) to validate these fields
   return {
-    email: user.email ?? 'fake',
-    displayName: user.fullName ?? user.username ?? 'fake',
-    emailVerified: !!user.verified,
-    firstName: user.firstName ?? user.username ?? 'fake',
-    lastName: user.lastName,
-    userId: user.id ?? 'fake',
-    username: user.username ?? 'fake',
+    email: user.email,
+    displayName: user.given_name ?? user.preferred_username,
+    emailVerified: user.email_verified,
+    firstName: user.given_name,
+    lastName: user.family_name,
+    userId: user.sub,
+    username: user.preferred_username,
   };
 }

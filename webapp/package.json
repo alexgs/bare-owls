@@ -34,6 +34,7 @@
     "deepmerge": "^4.2.2",
     "env-var": "^7.0.1",
     "formik": "^2.2.9",
+    "got": "^11.8.2",
     "grommet": "^2.17.3",
     "grommet-icons": "^4.6.0",
     "lodash-es": "^4.17.21",
@@ -72,12 +73,10 @@
     "jest": "^27.0.6",
     "jest-mock-extended": "^1.0.18",
     "prettier": "2.3.x",
-    "prisma": "2.25.x",
-    "ts-node": "^10.1.0",
-    "tsconfig-paths": "^3.10.1"
+    "prisma": "2.25.x"
   },
   "volta": {
     "node": "14.17.5",
-    "npm": "7.20.6"
+    "npm": "7.22.0"
   }
 }
