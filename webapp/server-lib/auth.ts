@@ -10,8 +10,7 @@ import got from 'got';
 import { NextApiRequest, NextApiResponse } from 'next';
 import join from 'url-join';
 
-import { LOGIN_PATH } from 'lib';
-import { COOKIE_HEADER, getConfig } from 'server-lib';
+import { COOKIE_HEADER, STATUS, getConfig } from 'server-lib';
 import { FusionAuthClaims, Session, UserinfoResponse } from 'types';
 
 // --- PRIVATE FUNCTIONS ---
@@ -24,10 +23,27 @@ function isExpired(jwt: string): boolean {
 
 // --- PUBLIC FUNCTIONS ---
 
+interface AccessTokenOk {
+  status: typeof STATUS.OK;
+  token: string;
+}
+
+interface AccessTokenError {
+  status:
+    | typeof STATUS.ERROR.ACCESS_TOKEN.EXCHANGE_REFRESH_ERROR
+    | typeof STATUS.ERROR.ACCESS_TOKEN.INVALID_JWT
+    | typeof STATUS.ERROR.ACCESS_TOKEN.NOT_RECEIVED
+    | typeof STATUS.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN
+    | typeof STATUS.ERROR.UNKNOWN;
+  message?: string;
+}
+
+type AccessTokenResult = AccessTokenError | AccessTokenOk;
+
 export async function getAccessToken(
   req: NextApiRequest,
   res: NextApiResponse,
-): Promise<string | null> {
+): Promise<AccessTokenResult> {
   const { AUTH_ORIGIN_INTERNAL, CLIENT_ID, CLIENT_SECRET, COOKIE } =
     getConfig();
   const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
@@ -36,8 +52,7 @@ export async function getAccessToken(
   let accessToken: string | undefined = req.cookies[COOKIE.ACCESS_TOKEN.NAME];
   let refreshToken: string | undefined = req.cookies[COOKIE.REFRESH_TOKEN.NAME];
   if (!refreshToken) {
-    res.redirect(302, LOGIN_PATH);
-    return null;
+    return { status: STATUS.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN };
   } else if (!accessToken || isExpired(accessToken)) {
     const response = await client.exchangeRefreshTokenForAccessToken(
       refreshToken,
@@ -47,7 +62,13 @@ export async function getAccessToken(
       '',
     );
     if (response.statusCode !== 200) {
-      throw response.exception;
+      return {
+        message: JSON.stringify({
+          statusCode: response.statusCode,
+          body: response.exception.message,
+        }),
+        status: STATUS.ERROR.ACCESS_TOKEN.EXCHANGE_REFRESH_ERROR,
+      };
     }
     const tokens = response.response;
     accessToken = tokens.access_token;
@@ -68,19 +89,21 @@ export async function getAccessToken(
       );
       cookies.push(refreshTokenCookie);
     } else {
-      res.status(500).json({ message: 'Unable to retrieve tokens.' });
-      return null;
+      return { status: STATUS.ERROR.ACCESS_TOKEN.NOT_RECEIVED };
     }
   } else {
     const response = await client.validateJWT(accessToken);
     if (response.statusCode !== 200) {
-      throw response.exception;
+      return { status: STATUS.ERROR.ACCESS_TOKEN.INVALID_JWT };
     }
   }
   if (cookies.length > 0) {
     res.setHeader(COOKIE_HEADER, cookies);
   }
-  return accessToken;
+  return {
+    status: STATUS.OK,
+    token: accessToken,
+  };
 }
 
 export function getClaims(jwt?: string): FusionAuthClaims {
@@ -105,13 +128,13 @@ export function getClaims(jwt?: string): FusionAuthClaims {
 
 export async function getSession(jwt: string): Promise<Session> {
   const { AUTH_ORIGIN_INTERNAL } = getConfig();
-  const userinfoEndpoint = join(AUTH_ORIGIN_INTERNAL, '/oauth2/userinfo')
+  const userinfoEndpoint = join(AUTH_ORIGIN_INTERNAL, '/oauth2/userinfo');
   const response = await got.get(userinfoEndpoint, {
     headers: {
       Authorization: `Bearer ${jwt}`,
     },
     responseType: 'json',
-    throwHttpErrors: false
+    throwHttpErrors: false,
   });
   if (response.statusCode !== 200) {
     throw new Error(`${response.statusCode} ${response.statusMessage ?? ''}`);
