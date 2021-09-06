@@ -8,6 +8,9 @@ import { AppProps } from 'next/app';
 import Head from 'next/head';
 import * as React from 'react';
 
+import { SessionProvider } from 'components';
+import { Session } from 'types';
+
 const theme = {
   global: {
     font: {
@@ -18,15 +21,27 @@ const theme = {
   },
 };
 
+const session: Session = {
+  displayName: 'Fake',
+  username: 'fake00',
+  userId: '10101010101',
+  lastName: 'McFakerson',
+  firstName: 'Fakey',
+  emailVerified: false,
+  email: 'fakey@mcfakeperson.com',
+};
+
 const App = ({ Component, pageProps }: AppProps): React.ReactNode => {
   return (
     <>
       <Head>
         <title>Bare Owls</title>
       </Head>
-      <Grommet theme={theme} full>
-        <Component {...pageProps} />
-      </Grommet>
+      <SessionProvider.Provider value={session}>
+        <Grommet theme={theme} full>
+          <Component {...pageProps} />
+        </Grommet>
+      </SessionProvider.Provider>
     </>
   );
 };

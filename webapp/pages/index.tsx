@@ -7,7 +7,7 @@ import { Box } from 'grommet';
 import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import * as React from 'react';
 
-import { NavBar } from 'components';
+import { NavBar, useSession } from 'components';
 import { STATUS, getAccessToken, getSession } from 'server-lib';
 import { Session } from 'types';
 
@@ -22,13 +22,14 @@ const Content: React.FC<Props> = (props: Props) => {
   return <div>Hello world</div>;
 };
 
-const HomePage: React.FC<Props> = (props: Props) => {
+const HomePage: React.FC = () => {
+  const session = useSession();
   return (
     <>
       <NavBar />
       <Box direction="row" flex overflow={{ horizontal: 'hidden' }}>
         <Box flex align="start" direction="column" justify="start" pad="medium">
-          <Content session={props.session} />
+          <Content session={session} />
         </Box>
       </Box>
     </>
