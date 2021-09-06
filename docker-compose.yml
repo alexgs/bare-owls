@@ -37,6 +37,24 @@ services:
       - "traefik.http.routers.auth.tls=true"
       - "traefik.http.services.auth.loadbalancer.server.port=9011"
 
+  hasura:
+    image: hasura/graphql-engine:v2.0.7
+    container_name: hasura
+    restart: unless-stopped
+    ports:
+      - "${HASURA_CONSOLE_PORT}:8080"
+    networks:
+      - owl-network
+    environment:
+      - DATABASE_URL
+      - HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_ADMIN_SECRET}
+      - HASURA_GRAPHQL_DEV_MODE=true
+      - HASURA_GRAPHQL_ENABLED_LOG_TYPES=startup, http-log, webhook-log, websocket-log, query-log
+      - HASURA_GRAPHQL_ENABLE_CONSOLE=true
+      - HASURA_GRAPHQL_METADATA_DATABASE_URL=${HASURA_METADATA_DB}
+    depends_on:
+      - database
+
   # https://github.com/Tecnativa/docker-socket-proxy
   soxy:
     image: tecnativa/docker-socket-proxy
@@ -100,6 +118,8 @@ services:
       - WEBAPP_BASE_URL
       - WEBAPP_PORT
     command: npm run dev
+    depends_on:
+      - database
     labels:
       - "traefik.http.routers.webapp.rule=PathPrefix(`/`)"
       - "traefik.http.routers.webapp.tls=true"
