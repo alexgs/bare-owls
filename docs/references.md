@@ -3,7 +3,9 @@
 Handy links for documentation, articles, and other materials used in this project.
 
 - [`date-fns` documentation][1]
-- [FusionAuth docs][2]
+- FusionAuth
+  - [FusionAuth docs][2]
+  - [Login and authentication workflows][29]
 - GraphQL
   - [Full stack app][3] (with Next.js (React), Apollo Client, Apollo Server and Nexus)
   - [Next.js API example][4] (in the Next.js repo)
@@ -65,3 +67,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [26]: https://auth0.com/docs/configure/apis/scopes/sample-use-cases-scopes-and-claims#add-custom-claims-to-a-token
 [27]: https://jwt.io/#debugger-io
 [28]: https://hasura.io/docs/latest/graphql/core/index.html
+[29]: https://fusionauth.io/learn/expert-advice/authentication/login-authentication-workflows/

@@ -17,7 +17,11 @@ interface ComposeProjectData {
 type ComposeProjectList = ComposeProjectData[];
 
 const DB = {
-  NAMES: [env.get('DATABASE_NAME').required().asString(), 'fusionauth'],
+  NAMES: [
+    env.get('DATABASE_NAME').required().asString(),
+    'fusionauth',
+    'hasura',
+  ],
   PORT: env.get('DATABASE_PORT').required().asPortNumber(),
   USER: env.get('DATABASE_USER').required().asString(),
 };
@@ -34,7 +38,7 @@ const TEXT = {
 
 function getBackupFilename(databaseName: string): string {
   let database = databaseName;
-  if (database !== 'fusionauth') {
+  if (database.startsWith('db_')) {
     database = database.split('_').slice(0, -1).join('-');
   }
   const now = new Date();
