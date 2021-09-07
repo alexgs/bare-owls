@@ -37,6 +37,11 @@ Handy links for documentation, articles, and other materials used in this projec
 - [Prisma documentation][20]
 - [SWR docs][21]
 - [Task][22] (aka "Taskfile" or "Gotask")
+- UUID-related packages
+  - [nanoid][30]
+  - [short-uuid][33]
+  - [uuid-apikey][32]
+  - [uuid][31]
 - [Volta reference][23]
 
 [1]: https://date-fns.org/docs/Getting-Started
@@ -68,3 +73,7 @@ Handy links for documentation, articles, and other materials used in this projec
 [27]: https://jwt.io/#debugger-io
 [28]: https://hasura.io/docs/latest/graphql/core/index.html
 [29]: https://fusionauth.io/learn/expert-advice/authentication/login-authentication-workflows/
+[30]: https://www.npmjs.com/package/nanoid
+[31]: https://www.npmjs.com/package/uuid
+[32]: https://www.npmjs.com/package/uuid-apikey
+[33]: https://www.npmjs.com/package/short-uuid
