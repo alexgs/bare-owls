@@ -28,7 +28,7 @@
   "dependencies": {
     "@fusionauth/typescript-client": "^1.29.1",
     "@hapi/iron": "^6.0.0",
-    "@prisma/client": "^2.25.0",
+    "@prisma/client": "2.30.x",
     "cookie": "^0.4.1",
     "date-fns": "^2.23.0",
     "deepmerge": "^4.2.2",
@@ -74,7 +74,7 @@
     "jest": "^27.0.6",
     "jest-mock-extended": "^1.0.18",
     "prettier": "2.3.x",
-    "prisma": "2.25.x"
+    "prisma": "2.30.x"
   },
   "volta": {
     "node": "14.17.5",

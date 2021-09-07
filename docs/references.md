@@ -15,6 +15,7 @@ Handy links for documentation, articles, and other materials used in this projec
   - [Icons][9]
   - [Storybook][10]
 - [HTTP Status Codes][11]
+- [Hasura][28] docs
 - JWTs
   - [Building a Secure Signed JWT][16]
   - [JWT Debugger][27] from Auth0
@@ -63,3 +64,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [25]: https://auth0.com/docs/security/tokens/json-web-tokens/create-namespaced-custom-claims
 [26]: https://auth0.com/docs/configure/apis/scopes/sample-use-cases-scopes-and-claims#add-custom-claims-to-a-token
 [27]: https://jwt.io/#debugger-io
+[28]: https://hasura.io/docs/latest/graphql/core/index.html
