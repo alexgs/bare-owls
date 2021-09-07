@@ -8,15 +8,15 @@ datasource db {
 
 generator client {
   previewFeatures = ["namedConstraints"]
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
 }
 
 model Channel {
-  id          String                @id
+  id          String                @id @default(uuid()) @db.Uuid
   name        String                @unique
   title       String
   owner       UserAccount           @relation(fields: [ownerId], references: [id])
-  ownerId     String
+  ownerId     String                @db.Uuid
   subscribers ChannelSubscription[]
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
@@ -25,42 +25,26 @@ model Channel {
 model ChannelSubscription {
   id        Int         @id @default(autoincrement())
   channel   Channel     @relation(fields: [channelId], references: [id])
-  channelId String
+  channelId String      @db.Uuid
   user      UserAccount @relation(fields: [userId], references: [id])
-  userId    String
+  userId    String      @db.Uuid
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
 
-model Session {
-  id          String      @id
-  displayName String
-  data        Json?
-  email       String
-  expires     DateTime
-  account     UserAccount @relation(fields: [accountId], references: [id])
-  accountId   String
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  @@index(fields: [accountId], name: "Session.accountId_index")
-}
-
 model UserAccount {
-  id            String                @id
+  id            String                @id @default(uuid()) @db.Uuid
   username      String                @unique
   displayName   String?
   role          UserRole              @relation(fields: [roleId], references: [id])
   channel       Channel?
   subscriptions ChannelSubscription[]
   emails        UserEmail[]
-  sessions      Session[]
-  tokens        UserOpenIdToken[]
   blockTargets  UserBlock[]           @relation("Blocker")
   blockedBy     UserBlock[]           @relation("BlockedBy")
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @updatedAt
-  roleId        String
+  roleId        String                @db.Uuid
 }
 
 // The `blocker` is the person doing the block, and the `target` is the person
@@ -68,9 +52,9 @@ model UserAccount {
 model UserBlock {
   id        Int         @id @default(autoincrement())
   blocker   UserAccount @relation("Blocker", fields: [blockerId], references: [id])
-  blockerId String
+  blockerId String      @db.Uuid
   target    UserAccount @relation("BlockedBy", fields: [targetId], references: [id])
-  targetId  String
+  targetId  String      @db.Uuid
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
 }
@@ -80,7 +64,7 @@ model UserEmail {
   original   String      @unique
   simplified String
   account    UserAccount @relation(fields: [accountId], references: [id])
-  accountId  String
+  accountId  String      @db.Uuid
   verified   Boolean     @default(false)
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
@@ -88,25 +72,8 @@ model UserEmail {
   @@index(fields: [simplified], name: "UserEmail.simplified_index")
 }
 
-model UserOpenIdToken {
-  id            String       @id
-  sub           String       @unique
-  iss           String
-  aud           String
-  exp           DateTime
-  iat           DateTime
-  email         String?
-  emailVerified Boolean      @default(false)
-  name          String?
-  nickname      String?
-  account       UserAccount? @relation(fields: [accountId], references: [id])
-  accountId     String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-}
-
 model UserRole {
-  id          String        @id
+  id          String        @id @default(uuid()) @db.Uuid
   name        String
   description String
   createdAt   DateTime      @default(now())
