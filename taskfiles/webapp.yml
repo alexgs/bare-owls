@@ -8,6 +8,11 @@ vars:
     sh: jq -r .version {{.WEBAPP_WORKING_DIR}}/package.json
 
 tasks:
+  shell:
+    cmds:
+      - docker exec -it {{.WEBAPP_SERVICE_NAME}} zsh
+    desc: Open a shell for running commands in the {{.WEBAPP_SERVICE_NAME|title}} container
+
   version:major:
     dir: "{{.WEBAPP_WORKING_DIR}}"
     cmds:
