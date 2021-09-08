@@ -15,7 +15,7 @@ Prerequisites
   - [Doppler][3]
   - [Task][1]
 
-After you have the prereq's installed, you can start the application with `task up` and end it with `task down`.
+I find it convenient to alias Doppler and Task, like this: `alias task='doppler run -- task'` (single quotes required). Once you are good to go, you can start the application with `task up` and end it with `task down`.
 
 [1]: https://taskfile.dev/
 [3]: https://www.doppler.com/
