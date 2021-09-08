@@ -3,14 +3,14 @@ services:
     image: postgres:13-alpine
     container_name: database
     restart: unless-stopped
+    networks:
+      - owl-network
     ports:
       - "${DATABASE_PORT}:5432"
     volumes:
       - "${DATABASE_HOST_DIRECTORY}:/var/lib/postgresql/data"
       - ./host/database:/host
     working_dir: /host
-    networks:
-      - owl-network
     labels:
       - "traefik.enable=false"
 
@@ -20,6 +20,8 @@ services:
     restart: unless-stopped
     networks:
       - owl-network
+    ports:
+      - "${FUSIONAUTH_PORT}:9011"
     environment:
       - DATABASE_URL=jdbc:postgresql://database:5432/fusionauth
       - DATABASE_ROOT_USERNAME=${DBADMIN_USER}
