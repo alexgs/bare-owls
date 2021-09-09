@@ -3,6 +3,9 @@
 Handy links for documentation, articles, and other materials used in this project.
 
 - [`date-fns` documentation][1]
+- Doppler
+  - ["Bare Owls" project][34]
+  - [Documentation][35]
 - FusionAuth
   - [FusionAuth docs][2]
   - [Login and authentication workflows][29]
@@ -37,6 +40,7 @@ Handy links for documentation, articles, and other materials used in this projec
 - [Prisma documentation][20]
 - [SWR docs][21]
 - [Task][22] (aka "Taskfile" or "Gotask")
+- [Traefik][36]
 - UUID-related packages
   - [nanoid][30]
   - [short-uuid][33]
@@ -77,3 +81,6 @@ Handy links for documentation, articles, and other materials used in this projec
 [31]: https://www.npmjs.com/package/uuid
 [32]: https://www.npmjs.com/package/uuid-apikey
 [33]: https://www.npmjs.com/package/short-uuid
+[34]: https://dashboard.doppler.com/workplace/98a6b3ff79724119c892/projects/bare-owls
+[35]: https://docs.doppler.com/docs
+[36]: https://doc.traefik.io/traefik/

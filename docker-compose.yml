@@ -56,6 +56,11 @@ services:
       - HASURA_GRAPHQL_METADATA_DATABASE_URL=${HASURA_METADATA_DB}
     depends_on:
       - database
+    labels:
+      - "traefik.http.middlewares.hasura-path.replacepath.path=/v1/graphql"
+      - "traefik.http.routers.hasura.middlewares=hasura-path"
+      - "traefik.http.routers.hasura.rule=Path(`/api/graphql`)"
+      - "traefik.http.routers.hasura.tls=true"
 
   # https://github.com/Tecnativa/docker-socket-proxy
   soxy:
