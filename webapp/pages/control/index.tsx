@@ -10,10 +10,10 @@ import * as React from 'react';
 import { NavBar } from 'components';
 
 interface QueryResult {
-  users: UserRecord[];
+  users: UserRecordBase[];
 }
 
-interface UserRecord {
+interface UserRecordBase {
   displayName: string;
   id: string;
   role: {
@@ -21,6 +21,10 @@ interface UserRecord {
     name: string;
   };
   username: string;
+}
+
+interface UserRecord extends UserRecordBase {
+  linkStatus: 'loading'|'linked'|'unlinked';
 }
 
 type UserDb = Record<string, UserRecord>;
@@ -37,6 +41,10 @@ const columns = [
   {
     property: 'role.displayName',
     header: <Text>Role</Text>,
+  },
+  {
+    property: 'linkStatus',
+    header: <Text>Link</Text>,
   },
 ];
 
@@ -61,7 +69,10 @@ function structureData(data?: QueryResult): UserDb {
   }
 
   data.users.reduce((output, user) => {
-    output[user.id] = user;
+    output[user.id] = {
+      linkStatus: 'loading',
+      ...user
+    };
     return output;
   }, output);
   return output;
