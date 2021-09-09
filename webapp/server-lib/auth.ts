@@ -140,9 +140,9 @@ export async function getSession(jwt: string): Promise<Session> {
     throw new Error(`${response.statusCode} ${response.statusMessage ?? ''}`);
   }
 
-  // TODO Use Joi (or the Formik-compatible one) to validate these fields and perform the type-cast
+  // TODO Use Yup to validate these fields and perform the type-cast
   const user = response.body as UserinfoResponse;
-  console.log(`>> --- <<\n${JSON.stringify(user)}\n>> --- <<`);
+  // console.log(`>> --- <<\n${JSON.stringify(user)}\n>> --- <<`);
 
   return {
     email: user.email,

@@ -9,31 +9,21 @@ import * as React from 'react';
 
 import { NavBar } from 'components';
 
-const query = gql`
-  query ListUsers {
-    users {
-      displayName
-      id
-      role {
-        id
-        name
-      }
-      username
-    }
-  }
-`;
-
 interface QueryResult {
-  users: Array<{
-    displayName: string;
-    id: string;
-    role: {
-      id: string;
-      name: string;
-    };
-    username: string;
-  }>;
+  users: UserRecord[];
 }
+
+interface UserRecord {
+  displayName: string;
+  id: string;
+  role: {
+    displayName: string;
+    name: string;
+  };
+  username: string;
+}
+
+type UserDb = Record<string, UserRecord>;
 
 const columns = [
   {
@@ -45,25 +35,58 @@ const columns = [
     header: <Text>Display name</Text>,
   },
   {
-    property: 'role.name',
+    property: 'role.displayName',
     header: <Text>Role</Text>,
   },
 ];
 
+const query = gql`
+  query ListUsers {
+    users {
+      displayName
+      id
+      role {
+        displayName
+        name
+      }
+      username
+    }
+  }
+`;
+
+function structureData(data?: QueryResult): UserDb {
+  const output: UserDb = {};
+  if (!data) {
+    return output;
+  }
+
+  data.users.reduce((output, user) => {
+    output[user.id] = user;
+    return output;
+  }, output);
+  return output;
+}
+
 const Content: React.FC = () => {
   const { data, error } = useQuery<QueryResult>(query);
 
-  if (error) {
-    console.error(error);
-  }
+  const [userDb, setUserDb] = React.useState<UserDb>({});
 
-  if (data) {
-    console.log(data);
-  }
+  React.useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+
+    if (data) {
+      console.log(data);
+    }
+
+    setUserDb(structureData(data));
+  }, [data, error]);
 
   return (
     <Box align={'center'}>
-      <DataTable columns={columns} data={data?.users} />
+      <DataTable columns={columns} data={Object.values(userDb)} />
     </Box>
   );
 };
