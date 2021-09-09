@@ -6,6 +6,7 @@ Generally, internal documentation should be stored as close to its subject matte
 
 - Configuring and starting the [database server](database-server.md)
 - [Design decisions](design-decisions.md) about the product
+- [GraphQL](graphql.md)
 - How to [manually link accounts](manually-link-accounts.md) between the core application and the auth system
 - [Old task IDs](old-task-ids.md) mapped to new IDs
 - [REST API endpoints](rest-api-endpoints.md)

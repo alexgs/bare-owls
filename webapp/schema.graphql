@@ -1,0 +1,2997 @@
+schema {
+  query: query_root
+  mutation: mutation_root
+  subscription: subscription_root
+}
+
+"""whether this query should be cached (Hasura Cloud only)"""
+directive @cached(
+  """measured in seconds"""
+  ttl: Int! = 60
+
+  """refresh the cache entry"""
+  refresh: Boolean! = false
+) on QUERY
+
+"""
+Boolean expression to compare columns of type "Boolean". All fields are combined with logical 'AND'.
+"""
+input Boolean_comparison_exp {
+  _eq: Boolean
+  _gt: Boolean
+  _gte: Boolean
+  _in: [Boolean!]
+  _is_null: Boolean
+  _lt: Boolean
+  _lte: Boolean
+  _neq: Boolean
+  _nin: [Boolean!]
+}
+
+"""
+Boolean expression to compare columns of type "Int". All fields are combined with logical 'AND'.
+"""
+input Int_comparison_exp {
+  _eq: Int
+  _gt: Int
+  _gte: Int
+  _in: [Int!]
+  _is_null: Boolean
+  _lt: Int
+  _lte: Int
+  _neq: Int
+  _nin: [Int!]
+}
+
+"""
+Boolean expression to compare columns of type "String". All fields are combined with logical 'AND'.
+"""
+input String_comparison_exp {
+  _eq: String
+  _gt: String
+  _gte: String
+
+  """does the column match the given case-insensitive pattern"""
+  _ilike: String
+  _in: [String!]
+
+  """
+  does the column match the given POSIX regular expression, case insensitive
+  """
+  _iregex: String
+  _is_null: Boolean
+
+  """does the column match the given pattern"""
+  _like: String
+  _lt: String
+  _lte: String
+  _neq: String
+
+  """does the column NOT match the given case-insensitive pattern"""
+  _nilike: String
+  _nin: [String!]
+
+  """
+  does the column NOT match the given POSIX regular expression, case insensitive
+  """
+  _niregex: String
+
+  """does the column NOT match the given pattern"""
+  _nlike: String
+
+  """
+  does the column NOT match the given POSIX regular expression, case sensitive
+  """
+  _nregex: String
+
+  """does the column NOT match the given SQL regular expression"""
+  _nsimilar: String
+
+  """
+  does the column match the given POSIX regular expression, case sensitive
+  """
+  _regex: String
+
+  """does the column match the given SQL regular expression"""
+  _similar: String
+}
+
+"""
+columns and relationships of "UserBlock"
+"""
+type blocklists {
+  """An object relationship"""
+  UserAccount: users!
+  blockerId: uuid!
+  createdAt: timestamp!
+  id: Int!
+  targetId: uuid!
+  updatedAt: timestamp!
+
+  """An object relationship"""
+  userAccountByTargetid: users!
+}
+
+"""
+aggregated selection of "UserBlock"
+"""
+type blocklists_aggregate {
+  aggregate: blocklists_aggregate_fields
+  nodes: [blocklists!]!
+}
+
+"""
+aggregate fields of "UserBlock"
+"""
+type blocklists_aggregate_fields {
+  avg: blocklists_avg_fields
+  count(columns: [blocklists_select_column!], distinct: Boolean): Int!
+  max: blocklists_max_fields
+  min: blocklists_min_fields
+  stddev: blocklists_stddev_fields
+  stddev_pop: blocklists_stddev_pop_fields
+  stddev_samp: blocklists_stddev_samp_fields
+  sum: blocklists_sum_fields
+  var_pop: blocklists_var_pop_fields
+  var_samp: blocklists_var_samp_fields
+  variance: blocklists_variance_fields
+}
+
+"""
+order by aggregate values of table "UserBlock"
+"""
+input blocklists_aggregate_order_by {
+  avg: blocklists_avg_order_by
+  count: order_by
+  max: blocklists_max_order_by
+  min: blocklists_min_order_by
+  stddev: blocklists_stddev_order_by
+  stddev_pop: blocklists_stddev_pop_order_by
+  stddev_samp: blocklists_stddev_samp_order_by
+  sum: blocklists_sum_order_by
+  var_pop: blocklists_var_pop_order_by
+  var_samp: blocklists_var_samp_order_by
+  variance: blocklists_variance_order_by
+}
+
+"""
+input type for inserting array relation for remote table "UserBlock"
+"""
+input blocklists_arr_rel_insert_input {
+  data: [blocklists_insert_input!]!
+
+  """on conflict condition"""
+  on_conflict: blocklists_on_conflict
+}
+
+"""aggregate avg on columns"""
+type blocklists_avg_fields {
+  id: Float
+}
+
+"""
+order by avg() on columns of table "UserBlock"
+"""
+input blocklists_avg_order_by {
+  id: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "UserBlock". All fields are combined with a logical 'AND'.
+"""
+input blocklists_bool_exp {
+  UserAccount: users_bool_exp
+  _and: [blocklists_bool_exp!]
+  _not: blocklists_bool_exp
+  _or: [blocklists_bool_exp!]
+  blockerId: uuid_comparison_exp
+  createdAt: timestamp_comparison_exp
+  id: Int_comparison_exp
+  targetId: uuid_comparison_exp
+  updatedAt: timestamp_comparison_exp
+  userAccountByTargetid: users_bool_exp
+}
+
+"""
+unique or primary key constraints on table "UserBlock"
+"""
+enum blocklists_constraint {
+  """unique or primary key constraint"""
+  UserBlock_pkey
+}
+
+"""
+input type for incrementing numeric columns in table "UserBlock"
+"""
+input blocklists_inc_input {
+  id: Int
+}
+
+"""
+input type for inserting data into table "UserBlock"
+"""
+input blocklists_insert_input {
+  UserAccount: users_obj_rel_insert_input
+  blockerId: uuid
+  createdAt: timestamp
+  id: Int
+  targetId: uuid
+  updatedAt: timestamp
+  userAccountByTargetid: users_obj_rel_insert_input
+}
+
+"""aggregate max on columns"""
+type blocklists_max_fields {
+  blockerId: uuid
+  createdAt: timestamp
+  id: Int
+  targetId: uuid
+  updatedAt: timestamp
+}
+
+"""
+order by max() on columns of table "UserBlock"
+"""
+input blocklists_max_order_by {
+  blockerId: order_by
+  createdAt: order_by
+  id: order_by
+  targetId: order_by
+  updatedAt: order_by
+}
+
+"""aggregate min on columns"""
+type blocklists_min_fields {
+  blockerId: uuid
+  createdAt: timestamp
+  id: Int
+  targetId: uuid
+  updatedAt: timestamp
+}
+
+"""
+order by min() on columns of table "UserBlock"
+"""
+input blocklists_min_order_by {
+  blockerId: order_by
+  createdAt: order_by
+  id: order_by
+  targetId: order_by
+  updatedAt: order_by
+}
+
+"""
+response of any mutation on the table "UserBlock"
+"""
+type blocklists_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [blocklists!]!
+}
+
+"""
+on conflict condition type for table "UserBlock"
+"""
+input blocklists_on_conflict {
+  constraint: blocklists_constraint!
+  update_columns: [blocklists_update_column!]! = []
+  where: blocklists_bool_exp
+}
+
+"""Ordering options when selecting data from "UserBlock"."""
+input blocklists_order_by {
+  UserAccount: users_order_by
+  blockerId: order_by
+  createdAt: order_by
+  id: order_by
+  targetId: order_by
+  updatedAt: order_by
+  userAccountByTargetid: users_order_by
+}
+
+"""primary key columns input for table: blocklists"""
+input blocklists_pk_columns_input {
+  id: Int!
+}
+
+"""
+select columns of table "UserBlock"
+"""
+enum blocklists_select_column {
+  """column name"""
+  blockerId
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  targetId
+
+  """column name"""
+  updatedAt
+}
+
+"""
+input type for updating data in table "UserBlock"
+"""
+input blocklists_set_input {
+  blockerId: uuid
+  createdAt: timestamp
+  id: Int
+  targetId: uuid
+  updatedAt: timestamp
+}
+
+"""aggregate stddev on columns"""
+type blocklists_stddev_fields {
+  id: Float
+}
+
+"""
+order by stddev() on columns of table "UserBlock"
+"""
+input blocklists_stddev_order_by {
+  id: order_by
+}
+
+"""aggregate stddev_pop on columns"""
+type blocklists_stddev_pop_fields {
+  id: Float
+}
+
+"""
+order by stddev_pop() on columns of table "UserBlock"
+"""
+input blocklists_stddev_pop_order_by {
+  id: order_by
+}
+
+"""aggregate stddev_samp on columns"""
+type blocklists_stddev_samp_fields {
+  id: Float
+}
+
+"""
+order by stddev_samp() on columns of table "UserBlock"
+"""
+input blocklists_stddev_samp_order_by {
+  id: order_by
+}
+
+"""aggregate sum on columns"""
+type blocklists_sum_fields {
+  id: Int
+}
+
+"""
+order by sum() on columns of table "UserBlock"
+"""
+input blocklists_sum_order_by {
+  id: order_by
+}
+
+"""
+update columns of table "UserBlock"
+"""
+enum blocklists_update_column {
+  """column name"""
+  blockerId
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  targetId
+
+  """column name"""
+  updatedAt
+}
+
+"""aggregate var_pop on columns"""
+type blocklists_var_pop_fields {
+  id: Float
+}
+
+"""
+order by var_pop() on columns of table "UserBlock"
+"""
+input blocklists_var_pop_order_by {
+  id: order_by
+}
+
+"""aggregate var_samp on columns"""
+type blocklists_var_samp_fields {
+  id: Float
+}
+
+"""
+order by var_samp() on columns of table "UserBlock"
+"""
+input blocklists_var_samp_order_by {
+  id: order_by
+}
+
+"""aggregate variance on columns"""
+type blocklists_variance_fields {
+  id: Float
+}
+
+"""
+order by variance() on columns of table "UserBlock"
+"""
+input blocklists_variance_order_by {
+  id: order_by
+}
+
+"""
+columns and relationships of "Channel"
+"""
+type channels {
+  """An array relationship"""
+  ChannelSubscriptions(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): [subscriptions!]!
+
+  """An aggregate relationship"""
+  ChannelSubscriptions_aggregate(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): subscriptions_aggregate!
+
+  """An object relationship"""
+  UserAccount: users!
+  createdAt: timestamp!
+  id: uuid!
+  name: String!
+  ownerId: uuid!
+  title: String!
+  updatedAt: timestamp!
+}
+
+"""
+aggregated selection of "Channel"
+"""
+type channels_aggregate {
+  aggregate: channels_aggregate_fields
+  nodes: [channels!]!
+}
+
+"""
+aggregate fields of "Channel"
+"""
+type channels_aggregate_fields {
+  count(columns: [channels_select_column!], distinct: Boolean): Int!
+  max: channels_max_fields
+  min: channels_min_fields
+}
+
+"""
+order by aggregate values of table "Channel"
+"""
+input channels_aggregate_order_by {
+  count: order_by
+  max: channels_max_order_by
+  min: channels_min_order_by
+}
+
+"""
+input type for inserting array relation for remote table "Channel"
+"""
+input channels_arr_rel_insert_input {
+  data: [channels_insert_input!]!
+
+  """on conflict condition"""
+  on_conflict: channels_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "Channel". All fields are combined with a logical 'AND'.
+"""
+input channels_bool_exp {
+  ChannelSubscriptions: subscriptions_bool_exp
+  UserAccount: users_bool_exp
+  _and: [channels_bool_exp!]
+  _not: channels_bool_exp
+  _or: [channels_bool_exp!]
+  createdAt: timestamp_comparison_exp
+  id: uuid_comparison_exp
+  name: String_comparison_exp
+  ownerId: uuid_comparison_exp
+  title: String_comparison_exp
+  updatedAt: timestamp_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "Channel"
+"""
+enum channels_constraint {
+  """unique or primary key constraint"""
+  Channel_name_key
+
+  """unique or primary key constraint"""
+  Channel_ownerId_unique
+
+  """unique or primary key constraint"""
+  Channel_pkey
+}
+
+"""
+input type for inserting data into table "Channel"
+"""
+input channels_insert_input {
+  ChannelSubscriptions: subscriptions_arr_rel_insert_input
+  UserAccount: users_obj_rel_insert_input
+  createdAt: timestamp
+  id: uuid
+  name: String
+  ownerId: uuid
+  title: String
+  updatedAt: timestamp
+}
+
+"""aggregate max on columns"""
+type channels_max_fields {
+  createdAt: timestamp
+  id: uuid
+  name: String
+  ownerId: uuid
+  title: String
+  updatedAt: timestamp
+}
+
+"""
+order by max() on columns of table "Channel"
+"""
+input channels_max_order_by {
+  createdAt: order_by
+  id: order_by
+  name: order_by
+  ownerId: order_by
+  title: order_by
+  updatedAt: order_by
+}
+
+"""aggregate min on columns"""
+type channels_min_fields {
+  createdAt: timestamp
+  id: uuid
+  name: String
+  ownerId: uuid
+  title: String
+  updatedAt: timestamp
+}
+
+"""
+order by min() on columns of table "Channel"
+"""
+input channels_min_order_by {
+  createdAt: order_by
+  id: order_by
+  name: order_by
+  ownerId: order_by
+  title: order_by
+  updatedAt: order_by
+}
+
+"""
+response of any mutation on the table "Channel"
+"""
+type channels_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [channels!]!
+}
+
+"""
+input type for inserting object relation for remote table "Channel"
+"""
+input channels_obj_rel_insert_input {
+  data: channels_insert_input!
+
+  """on conflict condition"""
+  on_conflict: channels_on_conflict
+}
+
+"""
+on conflict condition type for table "Channel"
+"""
+input channels_on_conflict {
+  constraint: channels_constraint!
+  update_columns: [channels_update_column!]! = []
+  where: channels_bool_exp
+}
+
+"""Ordering options when selecting data from "Channel"."""
+input channels_order_by {
+  ChannelSubscriptions_aggregate: subscriptions_aggregate_order_by
+  UserAccount: users_order_by
+  createdAt: order_by
+  id: order_by
+  name: order_by
+  ownerId: order_by
+  title: order_by
+  updatedAt: order_by
+}
+
+"""primary key columns input for table: channels"""
+input channels_pk_columns_input {
+  id: uuid!
+}
+
+"""
+select columns of table "Channel"
+"""
+enum channels_select_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+
+  """column name"""
+  ownerId
+
+  """column name"""
+  title
+
+  """column name"""
+  updatedAt
+}
+
+"""
+input type for updating data in table "Channel"
+"""
+input channels_set_input {
+  createdAt: timestamp
+  id: uuid
+  name: String
+  ownerId: uuid
+  title: String
+  updatedAt: timestamp
+}
+
+"""
+update columns of table "Channel"
+"""
+enum channels_update_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+
+  """column name"""
+  ownerId
+
+  """column name"""
+  title
+
+  """column name"""
+  updatedAt
+}
+
+"""
+columns and relationships of "UserEmail"
+"""
+type emails {
+  """An object relationship"""
+  UserAccount: users!
+  accountId: uuid!
+  createdAt: timestamp!
+  id: Int!
+  original: String!
+  simplified: String!
+  updatedAt: timestamp!
+  verified: Boolean!
+}
+
+"""
+aggregated selection of "UserEmail"
+"""
+type emails_aggregate {
+  aggregate: emails_aggregate_fields
+  nodes: [emails!]!
+}
+
+"""
+aggregate fields of "UserEmail"
+"""
+type emails_aggregate_fields {
+  avg: emails_avg_fields
+  count(columns: [emails_select_column!], distinct: Boolean): Int!
+  max: emails_max_fields
+  min: emails_min_fields
+  stddev: emails_stddev_fields
+  stddev_pop: emails_stddev_pop_fields
+  stddev_samp: emails_stddev_samp_fields
+  sum: emails_sum_fields
+  var_pop: emails_var_pop_fields
+  var_samp: emails_var_samp_fields
+  variance: emails_variance_fields
+}
+
+"""
+order by aggregate values of table "UserEmail"
+"""
+input emails_aggregate_order_by {
+  avg: emails_avg_order_by
+  count: order_by
+  max: emails_max_order_by
+  min: emails_min_order_by
+  stddev: emails_stddev_order_by
+  stddev_pop: emails_stddev_pop_order_by
+  stddev_samp: emails_stddev_samp_order_by
+  sum: emails_sum_order_by
+  var_pop: emails_var_pop_order_by
+  var_samp: emails_var_samp_order_by
+  variance: emails_variance_order_by
+}
+
+"""
+input type for inserting array relation for remote table "UserEmail"
+"""
+input emails_arr_rel_insert_input {
+  data: [emails_insert_input!]!
+
+  """on conflict condition"""
+  on_conflict: emails_on_conflict
+}
+
+"""aggregate avg on columns"""
+type emails_avg_fields {
+  id: Float
+}
+
+"""
+order by avg() on columns of table "UserEmail"
+"""
+input emails_avg_order_by {
+  id: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "UserEmail". All fields are combined with a logical 'AND'.
+"""
+input emails_bool_exp {
+  UserAccount: users_bool_exp
+  _and: [emails_bool_exp!]
+  _not: emails_bool_exp
+  _or: [emails_bool_exp!]
+  accountId: uuid_comparison_exp
+  createdAt: timestamp_comparison_exp
+  id: Int_comparison_exp
+  original: String_comparison_exp
+  simplified: String_comparison_exp
+  updatedAt: timestamp_comparison_exp
+  verified: Boolean_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "UserEmail"
+"""
+enum emails_constraint {
+  """unique or primary key constraint"""
+  UserEmail_original_key
+
+  """unique or primary key constraint"""
+  UserEmail_pkey
+}
+
+"""
+input type for incrementing numeric columns in table "UserEmail"
+"""
+input emails_inc_input {
+  id: Int
+}
+
+"""
+input type for inserting data into table "UserEmail"
+"""
+input emails_insert_input {
+  UserAccount: users_obj_rel_insert_input
+  accountId: uuid
+  createdAt: timestamp
+  id: Int
+  original: String
+  simplified: String
+  updatedAt: timestamp
+  verified: Boolean
+}
+
+"""aggregate max on columns"""
+type emails_max_fields {
+  accountId: uuid
+  createdAt: timestamp
+  id: Int
+  original: String
+  simplified: String
+  updatedAt: timestamp
+}
+
+"""
+order by max() on columns of table "UserEmail"
+"""
+input emails_max_order_by {
+  accountId: order_by
+  createdAt: order_by
+  id: order_by
+  original: order_by
+  simplified: order_by
+  updatedAt: order_by
+}
+
+"""aggregate min on columns"""
+type emails_min_fields {
+  accountId: uuid
+  createdAt: timestamp
+  id: Int
+  original: String
+  simplified: String
+  updatedAt: timestamp
+}
+
+"""
+order by min() on columns of table "UserEmail"
+"""
+input emails_min_order_by {
+  accountId: order_by
+  createdAt: order_by
+  id: order_by
+  original: order_by
+  simplified: order_by
+  updatedAt: order_by
+}
+
+"""
+response of any mutation on the table "UserEmail"
+"""
+type emails_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [emails!]!
+}
+
+"""
+on conflict condition type for table "UserEmail"
+"""
+input emails_on_conflict {
+  constraint: emails_constraint!
+  update_columns: [emails_update_column!]! = []
+  where: emails_bool_exp
+}
+
+"""Ordering options when selecting data from "UserEmail"."""
+input emails_order_by {
+  UserAccount: users_order_by
+  accountId: order_by
+  createdAt: order_by
+  id: order_by
+  original: order_by
+  simplified: order_by
+  updatedAt: order_by
+  verified: order_by
+}
+
+"""primary key columns input for table: emails"""
+input emails_pk_columns_input {
+  id: Int!
+}
+
+"""
+select columns of table "UserEmail"
+"""
+enum emails_select_column {
+  """column name"""
+  accountId
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  original
+
+  """column name"""
+  simplified
+
+  """column name"""
+  updatedAt
+
+  """column name"""
+  verified
+}
+
+"""
+input type for updating data in table "UserEmail"
+"""
+input emails_set_input {
+  accountId: uuid
+  createdAt: timestamp
+  id: Int
+  original: String
+  simplified: String
+  updatedAt: timestamp
+  verified: Boolean
+}
+
+"""aggregate stddev on columns"""
+type emails_stddev_fields {
+  id: Float
+}
+
+"""
+order by stddev() on columns of table "UserEmail"
+"""
+input emails_stddev_order_by {
+  id: order_by
+}
+
+"""aggregate stddev_pop on columns"""
+type emails_stddev_pop_fields {
+  id: Float
+}
+
+"""
+order by stddev_pop() on columns of table "UserEmail"
+"""
+input emails_stddev_pop_order_by {
+  id: order_by
+}
+
+"""aggregate stddev_samp on columns"""
+type emails_stddev_samp_fields {
+  id: Float
+}
+
+"""
+order by stddev_samp() on columns of table "UserEmail"
+"""
+input emails_stddev_samp_order_by {
+  id: order_by
+}
+
+"""aggregate sum on columns"""
+type emails_sum_fields {
+  id: Int
+}
+
+"""
+order by sum() on columns of table "UserEmail"
+"""
+input emails_sum_order_by {
+  id: order_by
+}
+
+"""
+update columns of table "UserEmail"
+"""
+enum emails_update_column {
+  """column name"""
+  accountId
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  original
+
+  """column name"""
+  simplified
+
+  """column name"""
+  updatedAt
+
+  """column name"""
+  verified
+}
+
+"""aggregate var_pop on columns"""
+type emails_var_pop_fields {
+  id: Float
+}
+
+"""
+order by var_pop() on columns of table "UserEmail"
+"""
+input emails_var_pop_order_by {
+  id: order_by
+}
+
+"""aggregate var_samp on columns"""
+type emails_var_samp_fields {
+  id: Float
+}
+
+"""
+order by var_samp() on columns of table "UserEmail"
+"""
+input emails_var_samp_order_by {
+  id: order_by
+}
+
+"""aggregate variance on columns"""
+type emails_variance_fields {
+  id: Float
+}
+
+"""
+order by variance() on columns of table "UserEmail"
+"""
+input emails_variance_order_by {
+  id: order_by
+}
+
+"""mutation root"""
+type mutation_root {
+  """
+  delete data from the table: "UserBlock"
+  """
+  delete_blocklists(
+    """filter the rows which have to be deleted"""
+    where: blocklists_bool_exp!
+  ): blocklists_mutation_response
+
+  """
+  delete single row from the table: "UserBlock"
+  """
+  delete_blocklists_by_pk(id: Int!): blocklists
+
+  """
+  delete data from the table: "Channel"
+  """
+  delete_channels(
+    """filter the rows which have to be deleted"""
+    where: channels_bool_exp!
+  ): channels_mutation_response
+
+  """
+  delete single row from the table: "Channel"
+  """
+  delete_channels_by_pk(id: uuid!): channels
+
+  """
+  delete data from the table: "UserEmail"
+  """
+  delete_emails(
+    """filter the rows which have to be deleted"""
+    where: emails_bool_exp!
+  ): emails_mutation_response
+
+  """
+  delete single row from the table: "UserEmail"
+  """
+  delete_emails_by_pk(id: Int!): emails
+
+  """
+  delete data from the table: "UserRole"
+  """
+  delete_roles(
+    """filter the rows which have to be deleted"""
+    where: roles_bool_exp!
+  ): roles_mutation_response
+
+  """
+  delete single row from the table: "UserRole"
+  """
+  delete_roles_by_pk(id: uuid!): roles
+
+  """
+  delete data from the table: "ChannelSubscription"
+  """
+  delete_subscriptions(
+    """filter the rows which have to be deleted"""
+    where: subscriptions_bool_exp!
+  ): subscriptions_mutation_response
+
+  """
+  delete single row from the table: "ChannelSubscription"
+  """
+  delete_subscriptions_by_pk(id: Int!): subscriptions
+
+  """
+  delete data from the table: "UserAccount"
+  """
+  delete_users(
+    """filter the rows which have to be deleted"""
+    where: users_bool_exp!
+  ): users_mutation_response
+
+  """
+  delete single row from the table: "UserAccount"
+  """
+  delete_users_by_pk(id: uuid!): users
+
+  """
+  insert data into the table: "UserBlock"
+  """
+  insert_blocklists(
+    """the rows to be inserted"""
+    objects: [blocklists_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: blocklists_on_conflict
+  ): blocklists_mutation_response
+
+  """
+  insert a single row into the table: "UserBlock"
+  """
+  insert_blocklists_one(
+    """the row to be inserted"""
+    object: blocklists_insert_input!
+
+    """on conflict condition"""
+    on_conflict: blocklists_on_conflict
+  ): blocklists
+
+  """
+  insert data into the table: "Channel"
+  """
+  insert_channels(
+    """the rows to be inserted"""
+    objects: [channels_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: channels_on_conflict
+  ): channels_mutation_response
+
+  """
+  insert a single row into the table: "Channel"
+  """
+  insert_channels_one(
+    """the row to be inserted"""
+    object: channels_insert_input!
+
+    """on conflict condition"""
+    on_conflict: channels_on_conflict
+  ): channels
+
+  """
+  insert data into the table: "UserEmail"
+  """
+  insert_emails(
+    """the rows to be inserted"""
+    objects: [emails_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: emails_on_conflict
+  ): emails_mutation_response
+
+  """
+  insert a single row into the table: "UserEmail"
+  """
+  insert_emails_one(
+    """the row to be inserted"""
+    object: emails_insert_input!
+
+    """on conflict condition"""
+    on_conflict: emails_on_conflict
+  ): emails
+
+  """
+  insert data into the table: "UserRole"
+  """
+  insert_roles(
+    """the rows to be inserted"""
+    objects: [roles_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: roles_on_conflict
+  ): roles_mutation_response
+
+  """
+  insert a single row into the table: "UserRole"
+  """
+  insert_roles_one(
+    """the row to be inserted"""
+    object: roles_insert_input!
+
+    """on conflict condition"""
+    on_conflict: roles_on_conflict
+  ): roles
+
+  """
+  insert data into the table: "ChannelSubscription"
+  """
+  insert_subscriptions(
+    """the rows to be inserted"""
+    objects: [subscriptions_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: subscriptions_on_conflict
+  ): subscriptions_mutation_response
+
+  """
+  insert a single row into the table: "ChannelSubscription"
+  """
+  insert_subscriptions_one(
+    """the row to be inserted"""
+    object: subscriptions_insert_input!
+
+    """on conflict condition"""
+    on_conflict: subscriptions_on_conflict
+  ): subscriptions
+
+  """
+  insert data into the table: "UserAccount"
+  """
+  insert_users(
+    """the rows to be inserted"""
+    objects: [users_insert_input!]!
+
+    """on conflict condition"""
+    on_conflict: users_on_conflict
+  ): users_mutation_response
+
+  """
+  insert a single row into the table: "UserAccount"
+  """
+  insert_users_one(
+    """the row to be inserted"""
+    object: users_insert_input!
+
+    """on conflict condition"""
+    on_conflict: users_on_conflict
+  ): users
+
+  """
+  update data of the table: "UserBlock"
+  """
+  update_blocklists(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: blocklists_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: blocklists_set_input
+
+    """filter the rows which have to be updated"""
+    where: blocklists_bool_exp!
+  ): blocklists_mutation_response
+
+  """
+  update single row of the table: "UserBlock"
+  """
+  update_blocklists_by_pk(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: blocklists_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: blocklists_set_input
+    pk_columns: blocklists_pk_columns_input!
+  ): blocklists
+
+  """
+  update data of the table: "Channel"
+  """
+  update_channels(
+    """sets the columns of the filtered rows to the given values"""
+    _set: channels_set_input
+
+    """filter the rows which have to be updated"""
+    where: channels_bool_exp!
+  ): channels_mutation_response
+
+  """
+  update single row of the table: "Channel"
+  """
+  update_channels_by_pk(
+    """sets the columns of the filtered rows to the given values"""
+    _set: channels_set_input
+    pk_columns: channels_pk_columns_input!
+  ): channels
+
+  """
+  update data of the table: "UserEmail"
+  """
+  update_emails(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: emails_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: emails_set_input
+
+    """filter the rows which have to be updated"""
+    where: emails_bool_exp!
+  ): emails_mutation_response
+
+  """
+  update single row of the table: "UserEmail"
+  """
+  update_emails_by_pk(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: emails_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: emails_set_input
+    pk_columns: emails_pk_columns_input!
+  ): emails
+
+  """
+  update data of the table: "UserRole"
+  """
+  update_roles(
+    """sets the columns of the filtered rows to the given values"""
+    _set: roles_set_input
+
+    """filter the rows which have to be updated"""
+    where: roles_bool_exp!
+  ): roles_mutation_response
+
+  """
+  update single row of the table: "UserRole"
+  """
+  update_roles_by_pk(
+    """sets the columns of the filtered rows to the given values"""
+    _set: roles_set_input
+    pk_columns: roles_pk_columns_input!
+  ): roles
+
+  """
+  update data of the table: "ChannelSubscription"
+  """
+  update_subscriptions(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: subscriptions_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: subscriptions_set_input
+
+    """filter the rows which have to be updated"""
+    where: subscriptions_bool_exp!
+  ): subscriptions_mutation_response
+
+  """
+  update single row of the table: "ChannelSubscription"
+  """
+  update_subscriptions_by_pk(
+    """increments the numeric columns with given value of the filtered values"""
+    _inc: subscriptions_inc_input
+
+    """sets the columns of the filtered rows to the given values"""
+    _set: subscriptions_set_input
+    pk_columns: subscriptions_pk_columns_input!
+  ): subscriptions
+
+  """
+  update data of the table: "UserAccount"
+  """
+  update_users(
+    """sets the columns of the filtered rows to the given values"""
+    _set: users_set_input
+
+    """filter the rows which have to be updated"""
+    where: users_bool_exp!
+  ): users_mutation_response
+
+  """
+  update single row of the table: "UserAccount"
+  """
+  update_users_by_pk(
+    """sets the columns of the filtered rows to the given values"""
+    _set: users_set_input
+    pk_columns: users_pk_columns_input!
+  ): users
+}
+
+"""column ordering options"""
+enum order_by {
+  """in ascending order, nulls last"""
+  asc
+
+  """in ascending order, nulls first"""
+  asc_nulls_first
+
+  """in ascending order, nulls last"""
+  asc_nulls_last
+
+  """in descending order, nulls first"""
+  desc
+
+  """in descending order, nulls first"""
+  desc_nulls_first
+
+  """in descending order, nulls last"""
+  desc_nulls_last
+}
+
+type query_root {
+  """
+  fetch data from the table: "UserBlock"
+  """
+  blocklists(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): [blocklists!]!
+
+  """
+  fetch aggregated fields from the table: "UserBlock"
+  """
+  blocklists_aggregate(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): blocklists_aggregate!
+
+  """fetch data from the table: "UserBlock" using primary key columns"""
+  blocklists_by_pk(id: Int!): blocklists
+
+  """
+  fetch data from the table: "Channel"
+  """
+  channels(
+    """distinct select on columns"""
+    distinct_on: [channels_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [channels_order_by!]
+
+    """filter the rows returned"""
+    where: channels_bool_exp
+  ): [channels!]!
+
+  """
+  fetch aggregated fields from the table: "Channel"
+  """
+  channels_aggregate(
+    """distinct select on columns"""
+    distinct_on: [channels_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [channels_order_by!]
+
+    """filter the rows returned"""
+    where: channels_bool_exp
+  ): channels_aggregate!
+
+  """fetch data from the table: "Channel" using primary key columns"""
+  channels_by_pk(id: uuid!): channels
+
+  """
+  fetch data from the table: "UserEmail"
+  """
+  emails(
+    """distinct select on columns"""
+    distinct_on: [emails_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [emails_order_by!]
+
+    """filter the rows returned"""
+    where: emails_bool_exp
+  ): [emails!]!
+
+  """
+  fetch aggregated fields from the table: "UserEmail"
+  """
+  emails_aggregate(
+    """distinct select on columns"""
+    distinct_on: [emails_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [emails_order_by!]
+
+    """filter the rows returned"""
+    where: emails_bool_exp
+  ): emails_aggregate!
+
+  """fetch data from the table: "UserEmail" using primary key columns"""
+  emails_by_pk(id: Int!): emails
+
+  """
+  fetch data from the table: "UserRole"
+  """
+  roles(
+    """distinct select on columns"""
+    distinct_on: [roles_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [roles_order_by!]
+
+    """filter the rows returned"""
+    where: roles_bool_exp
+  ): [roles!]!
+
+  """
+  fetch aggregated fields from the table: "UserRole"
+  """
+  roles_aggregate(
+    """distinct select on columns"""
+    distinct_on: [roles_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [roles_order_by!]
+
+    """filter the rows returned"""
+    where: roles_bool_exp
+  ): roles_aggregate!
+
+  """fetch data from the table: "UserRole" using primary key columns"""
+  roles_by_pk(id: uuid!): roles
+
+  """
+  fetch data from the table: "ChannelSubscription"
+  """
+  subscriptions(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): [subscriptions!]!
+
+  """
+  fetch aggregated fields from the table: "ChannelSubscription"
+  """
+  subscriptions_aggregate(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): subscriptions_aggregate!
+
+  """
+  fetch data from the table: "ChannelSubscription" using primary key columns
+  """
+  subscriptions_by_pk(id: Int!): subscriptions
+
+  """
+  fetch data from the table: "UserAccount"
+  """
+  users(
+    """distinct select on columns"""
+    distinct_on: [users_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [users_order_by!]
+
+    """filter the rows returned"""
+    where: users_bool_exp
+  ): [users!]!
+
+  """
+  fetch aggregated fields from the table: "UserAccount"
+  """
+  users_aggregate(
+    """distinct select on columns"""
+    distinct_on: [users_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [users_order_by!]
+
+    """filter the rows returned"""
+    where: users_bool_exp
+  ): users_aggregate!
+
+  """fetch data from the table: "UserAccount" using primary key columns"""
+  users_by_pk(id: uuid!): users
+}
+
+"""
+columns and relationships of "UserRole"
+"""
+type roles {
+  """An array relationship"""
+  UserAccounts(
+    """distinct select on columns"""
+    distinct_on: [users_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [users_order_by!]
+
+    """filter the rows returned"""
+    where: users_bool_exp
+  ): [users!]!
+
+  """An aggregate relationship"""
+  UserAccounts_aggregate(
+    """distinct select on columns"""
+    distinct_on: [users_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [users_order_by!]
+
+    """filter the rows returned"""
+    where: users_bool_exp
+  ): users_aggregate!
+  createdAt: timestamp!
+  description: String!
+  displayName: String!
+  id: uuid!
+  name: String!
+  updatedAt: timestamp!
+}
+
+"""
+aggregated selection of "UserRole"
+"""
+type roles_aggregate {
+  aggregate: roles_aggregate_fields
+  nodes: [roles!]!
+}
+
+"""
+aggregate fields of "UserRole"
+"""
+type roles_aggregate_fields {
+  count(columns: [roles_select_column!], distinct: Boolean): Int!
+  max: roles_max_fields
+  min: roles_min_fields
+}
+
+"""
+Boolean expression to filter rows from the table "UserRole". All fields are combined with a logical 'AND'.
+"""
+input roles_bool_exp {
+  UserAccounts: users_bool_exp
+  _and: [roles_bool_exp!]
+  _not: roles_bool_exp
+  _or: [roles_bool_exp!]
+  createdAt: timestamp_comparison_exp
+  description: String_comparison_exp
+  displayName: String_comparison_exp
+  id: uuid_comparison_exp
+  name: String_comparison_exp
+  updatedAt: timestamp_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "UserRole"
+"""
+enum roles_constraint {
+  """unique or primary key constraint"""
+  UserRole_name_key
+
+  """unique or primary key constraint"""
+  UserRole_pkey
+}
+
+"""
+input type for inserting data into table "UserRole"
+"""
+input roles_insert_input {
+  UserAccounts: users_arr_rel_insert_input
+  createdAt: timestamp
+  description: String
+  displayName: String
+  id: uuid
+  name: String
+  updatedAt: timestamp
+}
+
+"""aggregate max on columns"""
+type roles_max_fields {
+  createdAt: timestamp
+  description: String
+  displayName: String
+  id: uuid
+  name: String
+  updatedAt: timestamp
+}
+
+"""aggregate min on columns"""
+type roles_min_fields {
+  createdAt: timestamp
+  description: String
+  displayName: String
+  id: uuid
+  name: String
+  updatedAt: timestamp
+}
+
+"""
+response of any mutation on the table "UserRole"
+"""
+type roles_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [roles!]!
+}
+
+"""
+input type for inserting object relation for remote table "UserRole"
+"""
+input roles_obj_rel_insert_input {
+  data: roles_insert_input!
+
+  """on conflict condition"""
+  on_conflict: roles_on_conflict
+}
+
+"""
+on conflict condition type for table "UserRole"
+"""
+input roles_on_conflict {
+  constraint: roles_constraint!
+  update_columns: [roles_update_column!]! = []
+  where: roles_bool_exp
+}
+
+"""Ordering options when selecting data from "UserRole"."""
+input roles_order_by {
+  UserAccounts_aggregate: users_aggregate_order_by
+  createdAt: order_by
+  description: order_by
+  displayName: order_by
+  id: order_by
+  name: order_by
+  updatedAt: order_by
+}
+
+"""primary key columns input for table: roles"""
+input roles_pk_columns_input {
+  id: uuid!
+}
+
+"""
+select columns of table "UserRole"
+"""
+enum roles_select_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  description
+
+  """column name"""
+  displayName
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+
+  """column name"""
+  updatedAt
+}
+
+"""
+input type for updating data in table "UserRole"
+"""
+input roles_set_input {
+  createdAt: timestamp
+  description: String
+  displayName: String
+  id: uuid
+  name: String
+  updatedAt: timestamp
+}
+
+"""
+update columns of table "UserRole"
+"""
+enum roles_update_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  description
+
+  """column name"""
+  displayName
+
+  """column name"""
+  id
+
+  """column name"""
+  name
+
+  """column name"""
+  updatedAt
+}
+
+type subscription_root {
+  """
+  fetch data from the table: "UserBlock"
+  """
+  blocklists(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): [blocklists!]!
+
+  """
+  fetch aggregated fields from the table: "UserBlock"
+  """
+  blocklists_aggregate(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): blocklists_aggregate!
+
+  """fetch data from the table: "UserBlock" using primary key columns"""
+  blocklists_by_pk(id: Int!): blocklists
+
+  """
+  fetch data from the table: "Channel"
+  """
+  channels(
+    """distinct select on columns"""
+    distinct_on: [channels_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [channels_order_by!]
+
+    """filter the rows returned"""
+    where: channels_bool_exp
+  ): [channels!]!
+
+  """
+  fetch aggregated fields from the table: "Channel"
+  """
+  channels_aggregate(
+    """distinct select on columns"""
+    distinct_on: [channels_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [channels_order_by!]
+
+    """filter the rows returned"""
+    where: channels_bool_exp
+  ): channels_aggregate!
+
+  """fetch data from the table: "Channel" using primary key columns"""
+  channels_by_pk(id: uuid!): channels
+
+  """
+  fetch data from the table: "UserEmail"
+  """
+  emails(
+    """distinct select on columns"""
+    distinct_on: [emails_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [emails_order_by!]
+
+    """filter the rows returned"""
+    where: emails_bool_exp
+  ): [emails!]!
+
+  """
+  fetch aggregated fields from the table: "UserEmail"
+  """
+  emails_aggregate(
+    """distinct select on columns"""
+    distinct_on: [emails_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [emails_order_by!]
+
+    """filter the rows returned"""
+    where: emails_bool_exp
+  ): emails_aggregate!
+
+  """fetch data from the table: "UserEmail" using primary key columns"""
+  emails_by_pk(id: Int!): emails
+
+  """
+  fetch data from the table: "UserRole"
+  """
+  roles(
+    """distinct select on columns"""
+    distinct_on: [roles_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [roles_order_by!]
+
+    """filter the rows returned"""
+    where: roles_bool_exp
+  ): [roles!]!
+
+  """
+  fetch aggregated fields from the table: "UserRole"
+  """
+  roles_aggregate(
+    """distinct select on columns"""
+    distinct_on: [roles_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [roles_order_by!]
+
+    """filter the rows returned"""
+    where: roles_bool_exp
+  ): roles_aggregate!
+
+  """fetch data from the table: "UserRole" using primary key columns"""
+  roles_by_pk(id: uuid!): roles
+
+  """
+  fetch data from the table: "ChannelSubscription"
+  """
+  subscriptions(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): [subscriptions!]!
+
+  """
+  fetch aggregated fields from the table: "ChannelSubscription"
+  """
+  subscriptions_aggregate(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): subscriptions_aggregate!
+
+  """
+  fetch data from the table: "ChannelSubscription" using primary key columns
+  """
+  subscriptions_by_pk(id: Int!): subscriptions
+
+  """
+  fetch data from the table: "UserAccount"
+  """
+  users(
+    """distinct select on columns"""
+    distinct_on: [users_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [users_order_by!]
+
+    """filter the rows returned"""
+    where: users_bool_exp
+  ): [users!]!
+
+  """
+  fetch aggregated fields from the table: "UserAccount"
+  """
+  users_aggregate(
+    """distinct select on columns"""
+    distinct_on: [users_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [users_order_by!]
+
+    """filter the rows returned"""
+    where: users_bool_exp
+  ): users_aggregate!
+
+  """fetch data from the table: "UserAccount" using primary key columns"""
+  users_by_pk(id: uuid!): users
+}
+
+"""
+columns and relationships of "ChannelSubscription"
+"""
+type subscriptions {
+  """An object relationship"""
+  Channel: channels!
+
+  """An object relationship"""
+  UserAccount: users!
+  channelId: uuid!
+  createdAt: timestamp!
+  id: Int!
+  updatedAt: timestamp!
+  userId: uuid!
+}
+
+"""
+aggregated selection of "ChannelSubscription"
+"""
+type subscriptions_aggregate {
+  aggregate: subscriptions_aggregate_fields
+  nodes: [subscriptions!]!
+}
+
+"""
+aggregate fields of "ChannelSubscription"
+"""
+type subscriptions_aggregate_fields {
+  avg: subscriptions_avg_fields
+  count(columns: [subscriptions_select_column!], distinct: Boolean): Int!
+  max: subscriptions_max_fields
+  min: subscriptions_min_fields
+  stddev: subscriptions_stddev_fields
+  stddev_pop: subscriptions_stddev_pop_fields
+  stddev_samp: subscriptions_stddev_samp_fields
+  sum: subscriptions_sum_fields
+  var_pop: subscriptions_var_pop_fields
+  var_samp: subscriptions_var_samp_fields
+  variance: subscriptions_variance_fields
+}
+
+"""
+order by aggregate values of table "ChannelSubscription"
+"""
+input subscriptions_aggregate_order_by {
+  avg: subscriptions_avg_order_by
+  count: order_by
+  max: subscriptions_max_order_by
+  min: subscriptions_min_order_by
+  stddev: subscriptions_stddev_order_by
+  stddev_pop: subscriptions_stddev_pop_order_by
+  stddev_samp: subscriptions_stddev_samp_order_by
+  sum: subscriptions_sum_order_by
+  var_pop: subscriptions_var_pop_order_by
+  var_samp: subscriptions_var_samp_order_by
+  variance: subscriptions_variance_order_by
+}
+
+"""
+input type for inserting array relation for remote table "ChannelSubscription"
+"""
+input subscriptions_arr_rel_insert_input {
+  data: [subscriptions_insert_input!]!
+
+  """on conflict condition"""
+  on_conflict: subscriptions_on_conflict
+}
+
+"""aggregate avg on columns"""
+type subscriptions_avg_fields {
+  id: Float
+}
+
+"""
+order by avg() on columns of table "ChannelSubscription"
+"""
+input subscriptions_avg_order_by {
+  id: order_by
+}
+
+"""
+Boolean expression to filter rows from the table "ChannelSubscription". All fields are combined with a logical 'AND'.
+"""
+input subscriptions_bool_exp {
+  Channel: channels_bool_exp
+  UserAccount: users_bool_exp
+  _and: [subscriptions_bool_exp!]
+  _not: subscriptions_bool_exp
+  _or: [subscriptions_bool_exp!]
+  channelId: uuid_comparison_exp
+  createdAt: timestamp_comparison_exp
+  id: Int_comparison_exp
+  updatedAt: timestamp_comparison_exp
+  userId: uuid_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "ChannelSubscription"
+"""
+enum subscriptions_constraint {
+  """unique or primary key constraint"""
+  ChannelSubscription_pkey
+}
+
+"""
+input type for incrementing numeric columns in table "ChannelSubscription"
+"""
+input subscriptions_inc_input {
+  id: Int
+}
+
+"""
+input type for inserting data into table "ChannelSubscription"
+"""
+input subscriptions_insert_input {
+  Channel: channels_obj_rel_insert_input
+  UserAccount: users_obj_rel_insert_input
+  channelId: uuid
+  createdAt: timestamp
+  id: Int
+  updatedAt: timestamp
+  userId: uuid
+}
+
+"""aggregate max on columns"""
+type subscriptions_max_fields {
+  channelId: uuid
+  createdAt: timestamp
+  id: Int
+  updatedAt: timestamp
+  userId: uuid
+}
+
+"""
+order by max() on columns of table "ChannelSubscription"
+"""
+input subscriptions_max_order_by {
+  channelId: order_by
+  createdAt: order_by
+  id: order_by
+  updatedAt: order_by
+  userId: order_by
+}
+
+"""aggregate min on columns"""
+type subscriptions_min_fields {
+  channelId: uuid
+  createdAt: timestamp
+  id: Int
+  updatedAt: timestamp
+  userId: uuid
+}
+
+"""
+order by min() on columns of table "ChannelSubscription"
+"""
+input subscriptions_min_order_by {
+  channelId: order_by
+  createdAt: order_by
+  id: order_by
+  updatedAt: order_by
+  userId: order_by
+}
+
+"""
+response of any mutation on the table "ChannelSubscription"
+"""
+type subscriptions_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [subscriptions!]!
+}
+
+"""
+on conflict condition type for table "ChannelSubscription"
+"""
+input subscriptions_on_conflict {
+  constraint: subscriptions_constraint!
+  update_columns: [subscriptions_update_column!]! = []
+  where: subscriptions_bool_exp
+}
+
+"""Ordering options when selecting data from "ChannelSubscription"."""
+input subscriptions_order_by {
+  Channel: channels_order_by
+  UserAccount: users_order_by
+  channelId: order_by
+  createdAt: order_by
+  id: order_by
+  updatedAt: order_by
+  userId: order_by
+}
+
+"""primary key columns input for table: subscriptions"""
+input subscriptions_pk_columns_input {
+  id: Int!
+}
+
+"""
+select columns of table "ChannelSubscription"
+"""
+enum subscriptions_select_column {
+  """column name"""
+  channelId
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  updatedAt
+
+  """column name"""
+  userId
+}
+
+"""
+input type for updating data in table "ChannelSubscription"
+"""
+input subscriptions_set_input {
+  channelId: uuid
+  createdAt: timestamp
+  id: Int
+  updatedAt: timestamp
+  userId: uuid
+}
+
+"""aggregate stddev on columns"""
+type subscriptions_stddev_fields {
+  id: Float
+}
+
+"""
+order by stddev() on columns of table "ChannelSubscription"
+"""
+input subscriptions_stddev_order_by {
+  id: order_by
+}
+
+"""aggregate stddev_pop on columns"""
+type subscriptions_stddev_pop_fields {
+  id: Float
+}
+
+"""
+order by stddev_pop() on columns of table "ChannelSubscription"
+"""
+input subscriptions_stddev_pop_order_by {
+  id: order_by
+}
+
+"""aggregate stddev_samp on columns"""
+type subscriptions_stddev_samp_fields {
+  id: Float
+}
+
+"""
+order by stddev_samp() on columns of table "ChannelSubscription"
+"""
+input subscriptions_stddev_samp_order_by {
+  id: order_by
+}
+
+"""aggregate sum on columns"""
+type subscriptions_sum_fields {
+  id: Int
+}
+
+"""
+order by sum() on columns of table "ChannelSubscription"
+"""
+input subscriptions_sum_order_by {
+  id: order_by
+}
+
+"""
+update columns of table "ChannelSubscription"
+"""
+enum subscriptions_update_column {
+  """column name"""
+  channelId
+
+  """column name"""
+  createdAt
+
+  """column name"""
+  id
+
+  """column name"""
+  updatedAt
+
+  """column name"""
+  userId
+}
+
+"""aggregate var_pop on columns"""
+type subscriptions_var_pop_fields {
+  id: Float
+}
+
+"""
+order by var_pop() on columns of table "ChannelSubscription"
+"""
+input subscriptions_var_pop_order_by {
+  id: order_by
+}
+
+"""aggregate var_samp on columns"""
+type subscriptions_var_samp_fields {
+  id: Float
+}
+
+"""
+order by var_samp() on columns of table "ChannelSubscription"
+"""
+input subscriptions_var_samp_order_by {
+  id: order_by
+}
+
+"""aggregate variance on columns"""
+type subscriptions_variance_fields {
+  id: Float
+}
+
+"""
+order by variance() on columns of table "ChannelSubscription"
+"""
+input subscriptions_variance_order_by {
+  id: order_by
+}
+
+scalar timestamp
+
+"""
+Boolean expression to compare columns of type "timestamp". All fields are combined with logical 'AND'.
+"""
+input timestamp_comparison_exp {
+  _eq: timestamp
+  _gt: timestamp
+  _gte: timestamp
+  _in: [timestamp!]
+  _is_null: Boolean
+  _lt: timestamp
+  _lte: timestamp
+  _neq: timestamp
+  _nin: [timestamp!]
+}
+
+"""
+columns and relationships of "UserAccount"
+"""
+type users {
+  """An array relationship"""
+  ChannelSubscriptions(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): [subscriptions!]!
+
+  """An aggregate relationship"""
+  ChannelSubscriptions_aggregate(
+    """distinct select on columns"""
+    distinct_on: [subscriptions_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [subscriptions_order_by!]
+
+    """filter the rows returned"""
+    where: subscriptions_bool_exp
+  ): subscriptions_aggregate!
+
+  """An array relationship"""
+  Channels(
+    """distinct select on columns"""
+    distinct_on: [channels_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [channels_order_by!]
+
+    """filter the rows returned"""
+    where: channels_bool_exp
+  ): [channels!]!
+
+  """An aggregate relationship"""
+  Channels_aggregate(
+    """distinct select on columns"""
+    distinct_on: [channels_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [channels_order_by!]
+
+    """filter the rows returned"""
+    where: channels_bool_exp
+  ): channels_aggregate!
+
+  """An array relationship"""
+  UserBlocks(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): [blocklists!]!
+
+  """An aggregate relationship"""
+  UserBlocks_aggregate(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): blocklists_aggregate!
+
+  """An array relationship"""
+  UserEmails(
+    """distinct select on columns"""
+    distinct_on: [emails_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [emails_order_by!]
+
+    """filter the rows returned"""
+    where: emails_bool_exp
+  ): [emails!]!
+
+  """An aggregate relationship"""
+  UserEmails_aggregate(
+    """distinct select on columns"""
+    distinct_on: [emails_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [emails_order_by!]
+
+    """filter the rows returned"""
+    where: emails_bool_exp
+  ): emails_aggregate!
+  createdAt: timestamp!
+  displayName: String
+  id: uuid!
+
+  """An object relationship"""
+  role: roles!
+  roleId: uuid!
+  updatedAt: timestamp!
+
+  """An array relationship"""
+  userBlocksByTargetid(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): [blocklists!]!
+
+  """An aggregate relationship"""
+  userBlocksByTargetid_aggregate(
+    """distinct select on columns"""
+    distinct_on: [blocklists_select_column!]
+
+    """limit the number of rows returned"""
+    limit: Int
+
+    """skip the first n rows. Use only with order_by"""
+    offset: Int
+
+    """sort the rows by one or more columns"""
+    order_by: [blocklists_order_by!]
+
+    """filter the rows returned"""
+    where: blocklists_bool_exp
+  ): blocklists_aggregate!
+  username: String!
+}
+
+"""
+aggregated selection of "UserAccount"
+"""
+type users_aggregate {
+  aggregate: users_aggregate_fields
+  nodes: [users!]!
+}
+
+"""
+aggregate fields of "UserAccount"
+"""
+type users_aggregate_fields {
+  count(columns: [users_select_column!], distinct: Boolean): Int!
+  max: users_max_fields
+  min: users_min_fields
+}
+
+"""
+order by aggregate values of table "UserAccount"
+"""
+input users_aggregate_order_by {
+  count: order_by
+  max: users_max_order_by
+  min: users_min_order_by
+}
+
+"""
+input type for inserting array relation for remote table "UserAccount"
+"""
+input users_arr_rel_insert_input {
+  data: [users_insert_input!]!
+
+  """on conflict condition"""
+  on_conflict: users_on_conflict
+}
+
+"""
+Boolean expression to filter rows from the table "UserAccount". All fields are combined with a logical 'AND'.
+"""
+input users_bool_exp {
+  ChannelSubscriptions: subscriptions_bool_exp
+  Channels: channels_bool_exp
+  UserBlocks: blocklists_bool_exp
+  UserEmails: emails_bool_exp
+  _and: [users_bool_exp!]
+  _not: users_bool_exp
+  _or: [users_bool_exp!]
+  createdAt: timestamp_comparison_exp
+  displayName: String_comparison_exp
+  id: uuid_comparison_exp
+  role: roles_bool_exp
+  roleId: uuid_comparison_exp
+  updatedAt: timestamp_comparison_exp
+  userBlocksByTargetid: blocklists_bool_exp
+  username: String_comparison_exp
+}
+
+"""
+unique or primary key constraints on table "UserAccount"
+"""
+enum users_constraint {
+  """unique or primary key constraint"""
+  UserAccount_pkey
+
+  """unique or primary key constraint"""
+  UserAccount_username_key
+}
+
+"""
+input type for inserting data into table "UserAccount"
+"""
+input users_insert_input {
+  ChannelSubscriptions: subscriptions_arr_rel_insert_input
+  Channels: channels_arr_rel_insert_input
+  UserBlocks: blocklists_arr_rel_insert_input
+  UserEmails: emails_arr_rel_insert_input
+  createdAt: timestamp
+  displayName: String
+  id: uuid
+  role: roles_obj_rel_insert_input
+  roleId: uuid
+  updatedAt: timestamp
+  userBlocksByTargetid: blocklists_arr_rel_insert_input
+  username: String
+}
+
+"""aggregate max on columns"""
+type users_max_fields {
+  createdAt: timestamp
+  displayName: String
+  id: uuid
+  roleId: uuid
+  updatedAt: timestamp
+  username: String
+}
+
+"""
+order by max() on columns of table "UserAccount"
+"""
+input users_max_order_by {
+  createdAt: order_by
+  displayName: order_by
+  id: order_by
+  roleId: order_by
+  updatedAt: order_by
+  username: order_by
+}
+
+"""aggregate min on columns"""
+type users_min_fields {
+  createdAt: timestamp
+  displayName: String
+  id: uuid
+  roleId: uuid
+  updatedAt: timestamp
+  username: String
+}
+
+"""
+order by min() on columns of table "UserAccount"
+"""
+input users_min_order_by {
+  createdAt: order_by
+  displayName: order_by
+  id: order_by
+  roleId: order_by
+  updatedAt: order_by
+  username: order_by
+}
+
+"""
+response of any mutation on the table "UserAccount"
+"""
+type users_mutation_response {
+  """number of rows affected by the mutation"""
+  affected_rows: Int!
+
+  """data from the rows affected by the mutation"""
+  returning: [users!]!
+}
+
+"""
+input type for inserting object relation for remote table "UserAccount"
+"""
+input users_obj_rel_insert_input {
+  data: users_insert_input!
+
+  """on conflict condition"""
+  on_conflict: users_on_conflict
+}
+
+"""
+on conflict condition type for table "UserAccount"
+"""
+input users_on_conflict {
+  constraint: users_constraint!
+  update_columns: [users_update_column!]! = []
+  where: users_bool_exp
+}
+
+"""Ordering options when selecting data from "UserAccount"."""
+input users_order_by {
+  ChannelSubscriptions_aggregate: subscriptions_aggregate_order_by
+  Channels_aggregate: channels_aggregate_order_by
+  UserBlocks_aggregate: blocklists_aggregate_order_by
+  UserEmails_aggregate: emails_aggregate_order_by
+  createdAt: order_by
+  displayName: order_by
+  id: order_by
+  role: roles_order_by
+  roleId: order_by
+  updatedAt: order_by
+  userBlocksByTargetid_aggregate: blocklists_aggregate_order_by
+  username: order_by
+}
+
+"""primary key columns input for table: users"""
+input users_pk_columns_input {
+  id: uuid!
+}
+
+"""
+select columns of table "UserAccount"
+"""
+enum users_select_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  displayName
+
+  """column name"""
+  id
+
+  """column name"""
+  roleId
+
+  """column name"""
+  updatedAt
+
+  """column name"""
+  username
+}
+
+"""
+input type for updating data in table "UserAccount"
+"""
+input users_set_input {
+  createdAt: timestamp
+  displayName: String
+  id: uuid
+  roleId: uuid
+  updatedAt: timestamp
+  username: String
+}
+
+"""
+update columns of table "UserAccount"
+"""
+enum users_update_column {
+  """column name"""
+  createdAt
+
+  """column name"""
+  displayName
+
+  """column name"""
+  id
+
+  """column name"""
+  roleId
+
+  """column name"""
+  updatedAt
+
+  """column name"""
+  username
+}
+
+scalar uuid
+
+"""
+Boolean expression to compare columns of type "uuid". All fields are combined with logical 'AND'.
+"""
+input uuid_comparison_exp {
+  _eq: uuid
+  _gt: uuid
+  _gte: uuid
+  _in: [uuid!]
+  _is_null: Boolean
+  _lt: uuid
+  _lte: uuid
+  _neq: uuid
+  _nin: [uuid!]
+}
+

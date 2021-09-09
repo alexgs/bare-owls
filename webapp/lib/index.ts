@@ -3,5 +3,6 @@
  * the Open Software License version 3.0.
  */
 
+export * from './apollo-client';
 export * from './constants';
 export * from './seconds';

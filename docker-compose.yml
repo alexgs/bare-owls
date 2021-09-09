@@ -122,6 +122,7 @@ services:
       - IRON_CURRENT_PWD
       - IRON_PASSWORDS
       - IRON_SEAL_TTL
+      - NEXT_PUBLIC_HASURA_SECRET
       - WEBAPP_BASE_URL
       - WEBAPP_PORT
     command: npm run dev
