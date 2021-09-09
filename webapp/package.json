@@ -73,7 +73,8 @@
     "jest": "^27.1.1",
     "jest-mock-extended": "^1.0.18",
     "prettier": "2.3.x",
-    "prisma": "2.30.x"
+    "prisma": "2.30.x",
+    "ts-node": "^10.2.1"
   },
   "volta": {
     "node": "14.17.5",
