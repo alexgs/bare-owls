@@ -12,6 +12,7 @@ import { seconds } from 'lib';
 
 interface BaseConfig {
   AUTH_API_KEY: string;
+  AUTH_DEFAULT_PASSWORD: string;
   AUTH_ORIGIN_EXTERNAL: string;
   AUTH_ORIGIN_INTERNAL: string;
   AUTH_PATH_DISCOVERY: string;
@@ -98,6 +99,10 @@ export function getConfig(): Config {
   // Direct vars -- go right into the output without modification
   const AUTH_API_KEY = env
     .get('WEBAPP_AUTH_API_KEY')
+    .required()
+    .asString();
+  const AUTH_DEFAULT_PASSWORD = env
+    .get('AUTH_DEFAULT_PASSWORD')
     .required()
     .asString();
   const AUTH_ORIGIN_EXTERNAL = env
@@ -195,6 +200,7 @@ export function getConfig(): Config {
 
   return {
     AUTH_API_KEY,
+    AUTH_DEFAULT_PASSWORD,
     AUTH_ORIGIN_EXTERNAL,
     AUTH_ORIGIN_INTERNAL,
     AUTH_PATH_DISCOVERY,

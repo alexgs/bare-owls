@@ -15,20 +15,21 @@ export const HTTP_CODE = {
   UNAUTHORIZED: 400,
 } as const;
 
-export const STATUS = {
-  OK: 'status.ok',
+// Status messages for internal or private API calls; see /webapp/lib/constants for public status messages
+export const PRIVATE = {
+  OK: 'status.internal-api.ok',
   ERROR: {
     ACCESS_TOKEN: {
       // HTTP error from the auth server when attempting to exchange a refresh token for a new access token.
-      EXCHANGE_REFRESH_ERROR: 'status.error.unable-to-exchange-refresh-token',
+      EXCHANGE_REFRESH_ERROR: 'status.internal-api.error.unable-to-exchange-refresh-token',
       // JWT failed validation, either locally or with the auth server.
-      INVALID_JWT: 'status.error.invalid-jwt',
+      INVALID_JWT: 'status.internal-api.error.invalid-jwt',
       // No refresh token was found in the request's cookies.
-      NO_REFRESH_TOKEN: 'status.error.no-refresh-token-in-cookies',
+      NO_REFRESH_TOKEN: 'status.internal-api.error.no-refresh-token-in-cookies',
       // Did not receive the new access and refresh tokens from the auth server.
-      NOT_RECEIVED: 'status.error.new-tokens-not-received',
+      NOT_RECEIVED: 'status.internal-api.error.new-tokens-not-received',
     },
-    UNKNOWN: 'status.error.unknown',
+    UNKNOWN: 'status.internal-api.error.unknown',
   },
 } as const;
 // ^^^^^^^ This `as const` cast is critical to defining literal types within an

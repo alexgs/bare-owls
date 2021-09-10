@@ -112,6 +112,7 @@ services:
     environment:
       - AUTH_CLIENT_ID
       - AUTH_CLIENT_SECRET
+      - AUTH_DEFAULT_PASSWORD
       - AUTH_ORIGIN_EXTERNAL
       - AUTH_ORIGIN_INTERNAL
       - AUTH_PATH_DISCOVERY

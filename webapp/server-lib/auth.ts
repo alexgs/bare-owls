@@ -10,7 +10,7 @@ import got from 'got';
 import { NextApiRequest, NextApiResponse } from 'next';
 import join from 'url-join';
 
-import { COOKIE_HEADER, STATUS, getConfig } from 'server-lib';
+import { COOKIE_HEADER, PRIVATE, getConfig } from 'server-lib';
 import { FusionAuthClaims, Session, UserinfoResponse } from 'types';
 
 // --- PRIVATE FUNCTIONS ---
@@ -24,17 +24,17 @@ function isExpired(jwt: string): boolean {
 // --- PUBLIC FUNCTIONS ---
 
 interface AccessTokenOk {
-  status: typeof STATUS.OK;
+  status: typeof PRIVATE.OK;
   token: string;
 }
 
 interface AccessTokenError {
   status:
-    | typeof STATUS.ERROR.ACCESS_TOKEN.EXCHANGE_REFRESH_ERROR
-    | typeof STATUS.ERROR.ACCESS_TOKEN.INVALID_JWT
-    | typeof STATUS.ERROR.ACCESS_TOKEN.NOT_RECEIVED
-    | typeof STATUS.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN
-    | typeof STATUS.ERROR.UNKNOWN;
+    | typeof PRIVATE.ERROR.ACCESS_TOKEN.EXCHANGE_REFRESH_ERROR
+    | typeof PRIVATE.ERROR.ACCESS_TOKEN.INVALID_JWT
+    | typeof PRIVATE.ERROR.ACCESS_TOKEN.NOT_RECEIVED
+    | typeof PRIVATE.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN
+    | typeof PRIVATE.ERROR.UNKNOWN;
   message?: string;
 }
 
@@ -52,7 +52,7 @@ export async function getAccessToken(
   let accessToken: string | undefined = req.cookies[COOKIE.ACCESS_TOKEN.NAME];
   let refreshToken: string | undefined = req.cookies[COOKIE.REFRESH_TOKEN.NAME];
   if (!refreshToken) {
-    return { status: STATUS.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN };
+    return { status: PRIVATE.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN };
   } else if (!accessToken || isExpired(accessToken)) {
     const response = await client.exchangeRefreshTokenForAccessToken(
       refreshToken,
@@ -67,7 +67,7 @@ export async function getAccessToken(
           statusCode: response.statusCode,
           body: response.exception.message,
         }),
-        status: STATUS.ERROR.ACCESS_TOKEN.EXCHANGE_REFRESH_ERROR,
+        status: PRIVATE.ERROR.ACCESS_TOKEN.EXCHANGE_REFRESH_ERROR,
       };
     }
     const tokens = response.response;
@@ -89,19 +89,19 @@ export async function getAccessToken(
       );
       cookies.push(refreshTokenCookie);
     } else {
-      return { status: STATUS.ERROR.ACCESS_TOKEN.NOT_RECEIVED };
+      return { status: PRIVATE.ERROR.ACCESS_TOKEN.NOT_RECEIVED };
     }
   } else {
     const response = await client.validateJWT(accessToken);
     if (response.statusCode !== 200) {
-      return { status: STATUS.ERROR.ACCESS_TOKEN.INVALID_JWT };
+      return { status: PRIVATE.ERROR.ACCESS_TOKEN.INVALID_JWT };
     }
   }
   if (cookies.length > 0) {
     res.setHeader(COOKIE_HEADER, cookies);
   }
   return {
-    status: STATUS.OK,
+    status: PRIVATE.OK,
     token: accessToken,
   };
 }

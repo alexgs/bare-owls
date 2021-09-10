@@ -8,7 +8,7 @@ import { Box, DataTable, Text } from 'grommet';
 import * as React from 'react';
 
 import { NavBar } from 'components';
-import { STATE } from 'lib';
+import { PUBLIC } from 'lib';
 
 interface QueryResult {
   users: UserRecordBase[];
@@ -26,9 +26,9 @@ interface UserRecordBase {
 
 interface UserRecord extends UserRecordBase {
   linkStatus:
-    | typeof STATE.LOADING
-    | typeof STATE.AUTH_LINK.LINKED
-    | typeof STATE.AUTH_LINK.UNLINKED;
+    | typeof PUBLIC.LOADING
+    | typeof PUBLIC.AUTH_LINK.LINKED
+    | typeof PUBLIC.AUTH_LINK.UNLINKED;
 }
 
 type UserDb = Record<string, UserRecord>;
@@ -74,7 +74,7 @@ function structureData(data?: QueryResult): UserDb {
 
   data.users.reduce((output, user) => {
     output[user.id] = {
-      linkStatus: STATE.LOADING,
+      linkStatus: PUBLIC.LOADING,
       ...user,
     };
     return output;
