@@ -4,11 +4,17 @@
  */
 
 import { gql, useQuery } from '@apollo/client';
-import { Box, DataTable, Text } from 'grommet';
+import { Box, Button, ColumnConfig, DataTable, Spinner, Text } from 'grommet';
 import * as React from 'react';
 
 import { NavBar } from 'components';
 import { PUBLIC } from 'lib';
+
+type LinkStatus =
+  | typeof PUBLIC.AUTH_LINK.LINKED
+  | typeof PUBLIC.AUTH_LINK.UNLINKED
+  | typeof PUBLIC.ERROR
+  | typeof PUBLIC.LOADING;
 
 interface QueryResult {
   users: UserRecordBase[];
@@ -25,15 +31,12 @@ interface UserRecordBase {
 }
 
 interface UserRecord extends UserRecordBase {
-  linkStatus:
-    | typeof PUBLIC.LOADING
-    | typeof PUBLIC.AUTH_LINK.LINKED
-    | typeof PUBLIC.AUTH_LINK.UNLINKED;
+  linkStatus: LinkStatus;
 }
 
 type UserDb = Record<string, UserRecord>;
 
-const columns = [
+const columns: ColumnConfig<UserRecord>[] = [
   {
     property: 'username',
     header: <Text>Username</Text>,
@@ -48,23 +51,11 @@ const columns = [
   },
   {
     property: 'linkStatus',
+    align: 'center',
     header: <Text>Link</Text>,
     render: renderLinkStatus,
   },
 ];
-
-function renderLinkStatus(record: UserRecord): React.ReactNode {
-  const status = record.linkStatus;
-  if (status === PUBLIC.LOADING) {
-    return <Text color={'grey'}>Loading...</Text>;
-  } else if (status === PUBLIC.AUTH_LINK.LINKED) {
-    return <Text color={'green'}>Linked</Text>;
-  } else if (status === PUBLIC.AUTH_LINK.UNLINKED) {
-    return <Text color={'purple'}>Unlinked</Text>;
-  } else {
-    return <Text color={'red'}>Unknown error</Text>;
-  }
-}
 
 const query = gql`
   query ListUsers {
@@ -79,6 +70,30 @@ const query = gql`
     }
   }
 `;
+
+async function getLinkStatus(userId: string): Promise<LinkStatus> {
+  const url = `https://localhost.owlbear.tech/api/users/${userId}/link`;
+  const response = await fetch(url);
+  if (response.ok) {
+    const json = (await response.json()) as { linkStatus?: LinkStatus };
+    return json.linkStatus ?? PUBLIC.AUTH_LINK.LINKED;
+  } else {
+    return PUBLIC.ERROR;
+  }
+}
+
+function renderLinkStatus(record: UserRecord): React.ReactNode {
+  const status = record.linkStatus;
+  if (status === PUBLIC.LOADING) {
+    return <Spinner size={'small'} />;
+  } else if (status === PUBLIC.AUTH_LINK.LINKED) {
+    return <Text color={'green'}>Linked</Text>;
+  } else if (status === PUBLIC.AUTH_LINK.UNLINKED) {
+    return <Button size="small" label="CREATE LINK" />;
+  } else {
+    return <Text color={'red'}>Unknown error</Text>;
+  }
+}
 
 function structureData(data?: QueryResult): UserDb {
   const output: UserDb = {};
@@ -112,6 +127,28 @@ const Content: React.FC = () => {
 
     setUserDb(structureData(data));
   }, [data, error]);
+
+  React.useEffect(() => {
+    const userIds = Object.keys(userDb);
+    if (userIds.length === 0) {
+      return;
+    }
+    const userId = userIds[0];
+
+    async function worker() {
+      const result = await getLinkStatus(userId);
+      const newDb = { ...userDb };
+      newDb[userId] = {
+        ...newDb[userId],
+        linkStatus: result,
+      };
+      setUserDb(newDb);
+    }
+
+    if (userDb[userId].linkStatus === PUBLIC.LOADING) {
+      void worker();
+    }
+  }, [userDb]);
 
   return (
     <Box align={'center'}>
