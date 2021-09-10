@@ -49,8 +49,22 @@ const columns = [
   {
     property: 'linkStatus',
     header: <Text>Link</Text>,
+    render: renderLinkStatus,
   },
 ];
+
+function renderLinkStatus(record: UserRecord): React.ReactNode {
+  const status = record.linkStatus;
+  if (status === PUBLIC.LOADING) {
+    return <Text color={'grey'}>Loading...</Text>;
+  } else if (status === PUBLIC.AUTH_LINK.LINKED) {
+    return <Text color={'green'}>Linked</Text>;
+  } else if (status === PUBLIC.AUTH_LINK.UNLINKED) {
+    return <Text color={'purple'}>Unlinked</Text>;
+  } else {
+    return <Text color={'red'}>Unknown error</Text>;
+  }
+}
 
 const query = gql`
   query ListUsers {
