@@ -10,6 +10,16 @@ import * as React from 'react';
 import { NavBar } from 'components';
 import { PUBLIC } from 'lib';
 
+interface Action {
+  type: string;
+  payload: unknown;
+}
+
+interface InitPayload {
+  data: QueryResult;
+  dispatch: (action: Action) => void;
+}
+
 type LinkStatus =
   | typeof PUBLIC.AUTH_LINK.LINKED
   | typeof PUBLIC.AUTH_LINK.UNLINKED
@@ -18,6 +28,11 @@ type LinkStatus =
 
 interface QueryResult {
   users: UserRecordBase[];
+}
+
+interface UpdateLinkStatusPayload {
+  linkStatus: LinkStatus;
+  userId: string;
 }
 
 interface UserRecordBase {
@@ -35,6 +50,11 @@ interface UserRecord extends UserRecordBase {
 }
 
 type UserDb = Record<string, UserRecord>;
+
+const ACTIONS = {
+  INIT: 'initialize-user-database',
+  UPDATE: 'update-link-status',
+} as const;
 
 const columns: ColumnConfig<UserRecord>[] = [
   {
@@ -56,6 +76,8 @@ const columns: ColumnConfig<UserRecord>[] = [
     render: renderLinkStatus,
   },
 ];
+
+const initialState: UserDb = {};
 
 const query = gql`
   query ListUsers {
@@ -82,6 +104,56 @@ async function getLinkStatus(userId: string): Promise<LinkStatus> {
   }
 }
 
+function handleInitAction(payload: InitPayload): UserDb {
+  const { data, dispatch } = payload;
+  const userDb = structureData(data);
+  const userIds = Object.keys(userDb);
+
+  // Fetch link status in the background
+  userIds.map(async (userId) => {
+    if (userDb[userId].linkStatus === PUBLIC.LOADING) {
+      const result = await getLinkStatus(userId);
+      dispatch({
+        type: ACTIONS.UPDATE,
+        payload: {
+          userId,
+          linkStatus: result,
+        },
+      });
+    }
+  });
+
+  return userDb;
+}
+
+function handleUpdateLinkStatusAction(
+  payload: UpdateLinkStatusPayload,
+  state: UserDb,
+): UserDb {
+  const { linkStatus, userId } = payload;
+  return {
+    ...state,
+    [userId]: {
+      ...state[userId],
+      linkStatus,
+    },
+  };
+}
+
+function reducer(state: UserDb, action: Action): UserDb {
+  switch (action.type) {
+    case ACTIONS.INIT:
+      return handleInitAction(action.payload as InitPayload);
+    case ACTIONS.UPDATE:
+      return handleUpdateLinkStatusAction(
+        action.payload as UpdateLinkStatusPayload,
+        state,
+      );
+    default:
+      throw new Error(`Unknown action type "${action.type}"`);
+  }
+}
+
 function renderLinkStatus(record: UserRecord): React.ReactNode {
   const status = record.linkStatus;
   if (status === PUBLIC.LOADING) {
@@ -100,7 +172,6 @@ function structureData(data?: QueryResult): UserDb {
   if (!data) {
     return output;
   }
-
   data.users.reduce((output, user) => {
     output[user.id] = {
       linkStatus: PUBLIC.LOADING,
@@ -114,41 +185,17 @@ function structureData(data?: QueryResult): UserDb {
 const Content: React.FC = () => {
   const { data, error } = useQuery<QueryResult>(query);
 
-  const [userDb, setUserDb] = React.useState<UserDb>({});
+  const [userDb, dispatch] = React.useReducer(reducer, initialState);
 
   React.useEffect(() => {
     if (error) {
       console.error(error);
     }
-
-    if (data) {
-      console.log(data);
-    }
-
-    setUserDb(structureData(data));
+    dispatch({
+      type: ACTIONS.INIT,
+      payload: { data, dispatch },
+    });
   }, [data, error]);
-
-  React.useEffect(() => {
-    const userIds = Object.keys(userDb);
-    if (userIds.length === 0) {
-      return;
-    }
-    const userId = userIds[0];
-
-    async function worker() {
-      const result = await getLinkStatus(userId);
-      const newDb = { ...userDb };
-      newDb[userId] = {
-        ...newDb[userId],
-        linkStatus: result,
-      };
-      setUserDb(newDb);
-    }
-
-    if (userDb[userId].linkStatus === PUBLIC.LOADING) {
-      void worker();
-    }
-  }, [userDb]);
 
   return (
     <Box align={'center'}>
