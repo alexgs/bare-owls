@@ -10,46 +10,15 @@ import * as React from 'react';
 import { PUBLIC } from 'lib';
 
 import { ACTIONS, initialState, reducer } from './reducer';
-import { QueryResult, UserRecord } from './types';
-
-const columns: ColumnConfig<UserRecord>[] = [
-  {
-    property: 'username',
-    header: <Text>Username</Text>,
-  },
-  {
-    property: 'displayName',
-    header: <Text>Display name</Text>,
-  },
-  {
-    property: 'role.displayName',
-    header: <Text>Role</Text>,
-  },
-  {
-    property: 'linkStatus',
-    align: 'center',
-    header: <Text>Link</Text>,
-    render: renderLinkStatus,
-  },
-];
-
-function renderLinkStatus(record: UserRecord): React.ReactNode {
-  const status = record.linkStatus;
-  if (status === PUBLIC.LOADING) {
-    return <Spinner size={'small'} />;
-  } else if (status === PUBLIC.AUTH_LINK.LINKED) {
-    return <Text color={'green'}>Linked</Text>;
-  } else if (status === PUBLIC.AUTH_LINK.UNLINKED) {
-    return <Button size="small" label="CREATE LINK" />;
-  } else {
-    return <Text color={'red'}>Unknown error</Text>;
-  }
-}
+import { Action, QueryResult, UserRecord } from './types';
 
 const query = gql`
   query ListUsers {
     users {
       displayName
+      emails {
+        original
+      }
       id
       role {
         displayName
@@ -75,9 +44,59 @@ export const UsersTable: React.FC = () => {
     });
   }, [data, error]);
 
+  const COLUMNS: ColumnConfig<UserRecord>[] = [
+    {
+      property: 'username',
+      header: <Text>Username</Text>,
+    },
+    {
+      property: 'displayName',
+      header: <Text>Display name</Text>,
+    },
+    {
+      property: 'role.displayName',
+      header: <Text>Role</Text>,
+    },
+    {
+      property: 'linkStatus',
+      align: 'center',
+      header: <Text>Link</Text>,
+      render: renderLinkStatus,
+    },
+  ];
+
+  function handleCreateLinkClick(userId: string): void {
+    dispatch({
+      type: ACTIONS.CREATE,
+      payload: {
+        dispatch,
+        userId,
+      },
+    });
+  }
+
+  function renderLinkStatus(record: UserRecord): React.ReactNode {
+    const status = record.linkStatus;
+    if (status === PUBLIC.LOADING) {
+      return <Spinner size={'small'} />;
+    } else if (status === PUBLIC.AUTH_LINK.LINKED) {
+      return <Text color={'green'}>Linked</Text>;
+    } else if (status === PUBLIC.AUTH_LINK.UNLINKED) {
+      return (
+        <Button
+          size="small"
+          label="CREATE LINK"
+          onClick={() => handleCreateLinkClick(record.id)}
+        />
+      );
+    } else {
+      return <Text color={'red'}>Unknown error</Text>;
+    }
+  }
+
   return (
     <Box align={'center'}>
-      <DataTable columns={columns} data={Object.values(userDb)} />
+      <DataTable columns={COLUMNS} data={Object.values(userDb)} />
     </Box>
   );
 };

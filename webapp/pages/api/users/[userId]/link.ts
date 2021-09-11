@@ -12,9 +12,8 @@ import { PUBLIC } from 'lib';
 import { HTTP_CODE, getConfig } from 'server-lib';
 
 const schema = yup.object().shape({
+  displayName: yup.string().required(),
   email: yup.string().email().required(),
-  firstName: yup.string().required(),
-  lastName: yup.string().required(),
   password: yup.string().required(),
   username: yup.string().required(),
 });
@@ -48,13 +47,22 @@ async function handler(
 
   if (req.method === 'POST') {
     const { AUTH_API_KEY, AUTH_ORIGIN_INTERNAL } = getConfig();
+
+    const requestBody = await schema.validate(req.body);
+    const userData = {
+      email: requestBody.email,
+      fullName: requestBody.displayName,
+      password: requestBody.password,
+      username: requestBody.username,
+    };
+
     const userinfoEndpoint = join(
       AUTH_ORIGIN_INTERNAL,
       `/api/user/${req.query.userId as string}`,
     );
     const userinfoPayload = {
       skipVerification: true,
-      user: await schema.validate(req.body),
+      user: userData,
     };
 
     const response = await got.post(userinfoEndpoint, {

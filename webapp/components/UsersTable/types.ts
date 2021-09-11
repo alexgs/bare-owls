@@ -10,6 +10,11 @@ export interface Action {
   payload: unknown;
 }
 
+export interface CreatePayload {
+  dispatch: (action: Action) => void;
+  userId: string;
+}
+
 export interface InitPayload {
   data: QueryResult;
   dispatch: (action: Action) => void;
@@ -38,6 +43,9 @@ export interface UserRecord extends UserRecordBase {
 
 export interface UserRecordBase {
   displayName: string;
+  emails: Array<{
+    original: string;
+  }>;
   id: string;
   role: {
     displayName: string;

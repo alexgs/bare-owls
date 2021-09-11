@@ -7,6 +7,7 @@ import { PUBLIC } from 'lib';
 
 import {
   Action,
+  CreatePayload,
   InitPayload,
   LinkStatus,
   QueryResult,
@@ -44,6 +45,56 @@ function structureData(data?: QueryResult): UserDb {
 
 // --- ACTION HANDLERS ---
 
+function handleCreateAction(payload: CreatePayload, state: UserDb): UserDb {
+  const { dispatch, userId } = payload;
+
+  const user = state[userId];
+  const data = {
+    email: user.emails[0].original,
+    displayName: user.displayName,
+    password: process.env.NEXT_PUBLIC_DEFAULT_PASSWORD,
+    username: user.username,
+  };
+
+  async function createActionThunk() {
+    const url = `/api/users/${userId}/link`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    let linkStatus: LinkStatus = PUBLIC.LOADING;
+    if (response.ok) {
+      const json = (await response.json()) as { linkStatus?: LinkStatus };
+      linkStatus = json.linkStatus ?? PUBLIC.ERROR;
+    } else {
+      linkStatus = PUBLIC.ERROR;
+    }
+    dispatch({
+      type: ACTIONS.UPDATE,
+      payload: {
+        linkStatus,
+        userId,
+      },
+    });
+
+  }
+
+  // Do the REST request in the background
+  void createActionThunk();
+
+  return {
+    ...state,
+    [userId]: {
+      ...state[userId],
+      linkStatus: PUBLIC.LOADING,
+    },
+  };
+}
+
 function handleInitAction(payload: InitPayload): UserDb {
   const { data, dispatch } = payload;
   const userDb = structureData(data);
@@ -80,6 +131,7 @@ function handleUpdateAction(payload: UpdatePayload, state: UserDb): UserDb {
 // --- EXPORTS ---
 
 export const ACTIONS = {
+  CREATE: 'create-auth-link',
   INIT: 'initialize-user-database',
   UPDATE: 'update-link-status',
 } as const;
@@ -88,6 +140,8 @@ export const initialState: UserDb = {};
 
 export function reducer(state: UserDb, action: Action): UserDb {
   switch (action.type) {
+    case ACTIONS.CREATE:
+      return handleCreateAction(action.payload as CreatePayload, state);
     case ACTIONS.INIT:
       return handleInitAction(action.payload as InitPayload);
     case ACTIONS.UPDATE:

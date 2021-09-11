@@ -1528,9 +1528,7 @@ type query_root {
   """fetch data from the table: "Channel" using primary key columns"""
   channels_by_pk(id: uuid!): channels
 
-  """
-  fetch data from the table: "UserEmail"
-  """
+  """An array relationship"""
   emails(
     """distinct select on columns"""
     distinct_on: [emails_select_column!]
@@ -1548,9 +1546,7 @@ type query_root {
     where: emails_bool_exp
   ): [emails!]!
 
-  """
-  fetch aggregated fields from the table: "UserEmail"
-  """
+  """An aggregate relationship"""
   emails_aggregate(
     """distinct select on columns"""
     distinct_on: [emails_select_column!]
@@ -2018,9 +2014,7 @@ type subscription_root {
   """fetch data from the table: "Channel" using primary key columns"""
   channels_by_pk(id: uuid!): channels
 
-  """
-  fetch data from the table: "UserEmail"
-  """
+  """An array relationship"""
   emails(
     """distinct select on columns"""
     distinct_on: [emails_select_column!]
@@ -2038,9 +2032,7 @@ type subscription_root {
     where: emails_bool_exp
   ): [emails!]!
 
-  """
-  fetch aggregated fields from the table: "UserEmail"
-  """
+  """An aggregate relationship"""
   emails_aggregate(
     """distinct select on columns"""
     distinct_on: [emails_select_column!]
@@ -2656,9 +2648,11 @@ type users {
     """filter the rows returned"""
     where: blocklists_bool_exp
   ): blocklists_aggregate!
+  createdAt: timestamp!
+  displayName: String
 
   """An array relationship"""
-  UserEmails(
+  emails(
     """distinct select on columns"""
     distinct_on: [emails_select_column!]
 
@@ -2676,7 +2670,7 @@ type users {
   ): [emails!]!
 
   """An aggregate relationship"""
-  UserEmails_aggregate(
+  emails_aggregate(
     """distinct select on columns"""
     distinct_on: [emails_select_column!]
 
@@ -2692,8 +2686,6 @@ type users {
     """filter the rows returned"""
     where: emails_bool_exp
   ): emails_aggregate!
-  createdAt: timestamp!
-  displayName: String
   id: uuid!
 
   """An object relationship"""
@@ -2782,12 +2774,12 @@ input users_bool_exp {
   ChannelSubscriptions: subscriptions_bool_exp
   Channels: channels_bool_exp
   UserBlocks: blocklists_bool_exp
-  UserEmails: emails_bool_exp
   _and: [users_bool_exp!]
   _not: users_bool_exp
   _or: [users_bool_exp!]
   createdAt: timestamp_comparison_exp
   displayName: String_comparison_exp
+  emails: emails_bool_exp
   id: uuid_comparison_exp
   role: roles_bool_exp
   roleId: uuid_comparison_exp
@@ -2814,9 +2806,9 @@ input users_insert_input {
   ChannelSubscriptions: subscriptions_arr_rel_insert_input
   Channels: channels_arr_rel_insert_input
   UserBlocks: blocklists_arr_rel_insert_input
-  UserEmails: emails_arr_rel_insert_input
   createdAt: timestamp
   displayName: String
+  emails: emails_arr_rel_insert_input
   id: uuid
   role: roles_obj_rel_insert_input
   roleId: uuid
@@ -2904,9 +2896,9 @@ input users_order_by {
   ChannelSubscriptions_aggregate: subscriptions_aggregate_order_by
   Channels_aggregate: channels_aggregate_order_by
   UserBlocks_aggregate: blocklists_aggregate_order_by
-  UserEmails_aggregate: emails_aggregate_order_by
   createdAt: order_by
   displayName: order_by
+  emails_aggregate: emails_aggregate_order_by
   id: order_by
   role: roles_order_by
   roleId: order_by
