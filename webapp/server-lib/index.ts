@@ -4,6 +4,7 @@
  */
 
 export * from './auth';
+export * from './auth-client';
 export * from './config';
 export * from './constants';
 export { pkce } from './pkce';

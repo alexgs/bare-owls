@@ -45,6 +45,7 @@ async function handler(
         IRON_OPTIONS,
       )) as string;
 
+      // TODO Get rid of FusionAuth client
       const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
       const response = await client.exchangeOAuthCodeForAccessTokenUsingPKCE(
         req.query.code as string,

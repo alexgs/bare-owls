@@ -8,7 +8,8 @@ Handy links for documentation, articles, and other materials used in this projec
   - [Documentation][35]
 - FusionAuth
   - [FusionAuth docs][2]
-  - [OldLogin and authentication workflows][29]
+  - [Login and authentication workflows][29]
+  - [Typescript client][39]
 - GraphQL
   - [Full stack app][3] (with Next.js (React), Apollo Client, Apollo Server and Nexus)
   - [Next.js API example][4] (in the Next.js repo)
@@ -89,3 +90,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [36]: https://doc.traefik.io/traefik/
 [37]: https://github.com/jquense/yup
 [38]: https://formik.org/docs/overview
+[39]: https://github.com/FusionAuth/fusionauth-typescript-client

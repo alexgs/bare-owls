@@ -46,6 +46,7 @@ export async function getAccessToken(
 ): Promise<AccessTokenResult> {
   const { AUTH_ORIGIN_INTERNAL, CLIENT_ID, CLIENT_SECRET, COOKIE } =
     getConfig();
+  // TODO Get rid of FusionAuth client
   const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
   const cookies: string[] = [];
 
