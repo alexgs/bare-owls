@@ -5,6 +5,7 @@
 
 import { gql, useQuery } from '@apollo/client';
 import { Box, Button, ColumnConfig, DataTable, Spinner, Text } from 'grommet';
+import { StatusGood } from 'grommet-icons';
 import * as React from 'react';
 
 import { PUBLIC } from 'lib';
@@ -80,10 +81,11 @@ export const UsersTable: React.FC = () => {
     if (status === PUBLIC.LOADING) {
       return <Spinner size={'small'} />;
     } else if (status === PUBLIC.AUTH_LINK.LINKED) {
-      return <Text color={'green'}>Linked</Text>;
+      return <StatusGood color={'brand'} />;
     } else if (status === PUBLIC.AUTH_LINK.UNLINKED) {
       return (
         <Button
+          style={{ color: '#7D4CDB' }}
           size="small"
           label="CREATE LINK"
           onClick={() => handleCreateLinkClick(record.id)}

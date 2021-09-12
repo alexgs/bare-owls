@@ -17,7 +17,6 @@ export const HTTP_CODE = {
 
 // Status messages for internal or private API calls; see /webapp/lib/constants for public status messages
 export const PRIVATE = {
-  OK: 'status.internal-api.ok',
   ERROR: {
     ACCESS_TOKEN: {
       // HTTP error from the auth server when attempting to exchange a refresh token for a new access token.
@@ -29,8 +28,13 @@ export const PRIVATE = {
       // Did not receive the new access and refresh tokens from the auth server.
       NOT_RECEIVED: 'status.internal-api.error.new-tokens-not-received',
     },
+    AUTH_LINK: {
+      CREATE_USER: 'status.internal-api.error.unable-to-create-user',
+      REGISTER_USER: 'status.internal-api.error.unable-to-register-user',
+    },
     UNKNOWN: 'status.internal-api.error.unknown',
   },
+  OK: 'status.internal-api.ok',
 } as const;
 // ^^^^^^^ This `as const` cast is critical to defining literal types within an
 //   object like this (see ["Literal Inference"][1] in the Typescript docs).

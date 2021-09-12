@@ -52,7 +52,6 @@ function handleCreateAction(payload: CreatePayload, state: UserDb): UserDb {
   const data = {
     email: user.emails[0].original,
     displayName: user.displayName,
-    password: process.env.NEXT_PUBLIC_DEFAULT_PASSWORD,
     username: user.username,
   };
 

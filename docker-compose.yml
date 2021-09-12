@@ -110,6 +110,7 @@ services:
     networks:
       - owl-network
     environment:
+      - AUTH_APP_IDS
       - AUTH_CLIENT_ID
       - AUTH_CLIENT_SECRET
       - AUTH_DEFAULT_PASSWORD
@@ -123,7 +124,6 @@ services:
       - IRON_CURRENT_PWD
       - IRON_PASSWORDS
       - IRON_SEAL_TTL
-      - NEXT_PUBLIC_DEFAULT_PASSWORD
       - NEXT_PUBLIC_HASURA_SECRET
       - WEBAPP_AUTH_API_KEY
       - WEBAPP_BASE_URL
