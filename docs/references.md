@@ -47,6 +47,7 @@ Handy links for documentation, articles, and other materials used in this projec
   - [uuid-apikey][32]
   - [uuid][31]
 - [Volta reference][23]
+- [Yup][37] for validating JSON objects and other values
 
 [1]: https://date-fns.org/docs/Getting-Started
 [2]: https://fusionauth.io/docs/v1/tech/
@@ -84,3 +85,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [34]: https://dashboard.doppler.com/workplace/98a6b3ff79724119c892/projects/bare-owls
 [35]: https://docs.doppler.com/docs
 [36]: https://doc.traefik.io/traefik/
+[37]: https://github.com/jquense/yup

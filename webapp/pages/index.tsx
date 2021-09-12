@@ -8,7 +8,7 @@ import { GetServerSideProps, NextApiRequest, NextApiResponse } from 'next';
 import * as React from 'react';
 
 import { NavBar, useSession } from 'components';
-import { STATUS, getAccessToken, getSession } from 'server-lib';
+import { PRIVATE, getAccessToken, getSession } from 'server-lib';
 import { Session } from 'types';
 
 interface Props {
@@ -41,7 +41,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     context.req as NextApiRequest,
     context.res as NextApiResponse,
   );
-  if (result.status === STATUS.OK) {
+  if (result.status === PRIVATE.OK) {
     const session = await getSession(result.token);
     return { props: { session } };
   }

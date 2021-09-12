@@ -6,3 +6,4 @@
 export { AppBar } from './AppBar';
 export { NavBar } from './NavBar';
 export { SessionProvider, useSession } from './Session';
+export { UsersTable } from './UsersTable';

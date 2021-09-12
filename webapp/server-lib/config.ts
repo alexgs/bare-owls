@@ -11,6 +11,9 @@ import ms from 'ms';
 import { seconds } from 'lib';
 
 interface BaseConfig {
+  AUTH_API_KEY: string;
+  AUTH_APP_IDS: string[];
+  AUTH_DEFAULT_PASSWORD: string;
   AUTH_ORIGIN_EXTERNAL: string;
   AUTH_ORIGIN_INTERNAL: string;
   AUTH_PATH_DISCOVERY: string;
@@ -95,6 +98,18 @@ export function getConfig(): Config {
   const IRON_SEAL_TTL = env.get('IRON_SEAL_TTL').required().asString();
 
   // Direct vars -- go right into the output without modification
+  const AUTH_API_KEY = env
+    .get('WEBAPP_AUTH_API_KEY')
+    .required()
+    .asString();
+  const AUTH_APP_IDS = env
+    .get('AUTH_APP_IDS')
+    .required()
+    .asJsonArray() as string[];
+  const AUTH_DEFAULT_PASSWORD = env
+    .get('AUTH_DEFAULT_PASSWORD')
+    .required()
+    .asString();
   const AUTH_ORIGIN_EXTERNAL = env
     .get('AUTH_ORIGIN_EXTERNAL')
     .required()
@@ -189,6 +204,9 @@ export function getConfig(): Config {
   const IRON_UNSEAL = formatUnsealPasswords(IRON_PASSWORDS);
 
   return {
+    AUTH_API_KEY,
+    AUTH_APP_IDS,
+    AUTH_DEFAULT_PASSWORD,
     AUTH_ORIGIN_EXTERNAL,
     AUTH_ORIGIN_INTERNAL,
     AUTH_PATH_DISCOVERY,

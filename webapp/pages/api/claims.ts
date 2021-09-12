@@ -5,19 +5,19 @@
 
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { HTTP_CODE, STATUS, getAccessToken, getClaims } from 'server-lib';
+import { HTTP_CODE, PRIVATE, getAccessToken, getClaims } from 'server-lib';
 
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<void> {
   const result = await getAccessToken(req, res);
-  if (result.status === STATUS.OK) {
+  if (result.status === PRIVATE.OK) {
     const claims = getClaims(result.token);
     res.json({ claims });
   } else if (
-    result.status === STATUS.ERROR.ACCESS_TOKEN.INVALID_JWT ||
-    result.status === STATUS.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN
+    result.status === PRIVATE.ERROR.ACCESS_TOKEN.INVALID_JWT ||
+    result.status === PRIVATE.ERROR.ACCESS_TOKEN.NO_REFRESH_TOKEN
   ) {
     res.status(HTTP_CODE.UNAUTHORIZED).end();
   } else {
