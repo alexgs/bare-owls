@@ -3,6 +3,11 @@
  * the Open Software License version 3.0.
  */
 
+export const PATHS = {
+  LOGIN: '/login',
+  LOGOUT: '/logout',
+} as const;
+
 // Status messages for public (i.e. REST) API calls; see /webapp/server-lib/constants for private status messages
 export const PUBLIC = {
   AUTH_LINK: {
