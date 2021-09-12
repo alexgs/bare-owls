@@ -6,9 +6,11 @@
 export interface LoginResult {
   status: string;
   tokens: {
-    [key: string]: {
-      accessToken: string;
-      refreshToken: string;
-    };
+    [key: string]: Tokens;
   };
+}
+
+export interface Tokens {
+  accessToken: string;
+  refreshToken: string;
 }

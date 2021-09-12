@@ -5,7 +5,7 @@
 
 import got from 'got';
 
-import { getConfig } from '../';
+import { getConfig } from '../config';
 
 const { AUTH_API_KEY, AUTH_ORIGIN_INTERNAL } = getConfig();
 

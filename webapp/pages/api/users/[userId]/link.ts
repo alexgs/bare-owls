@@ -9,7 +9,8 @@ import join from 'url-join';
 import * as yup from 'yup';
 
 import { PUBLIC } from 'lib';
-import { HTTP_CODE, PRIVATE, getConfig } from 'server-lib';
+import { PRIVATE, getConfig } from 'server-lib';
+import { unsupportedMethod } from 'server-lib/rest-helpers';
 
 type CreateResult =
   | typeof PRIVATE.ERROR.AUTH_LINK.CREATE_USER
@@ -150,9 +151,7 @@ async function handler(
   }
 
   if (!['GET', 'POST'].includes(req.method ?? '')) {
-    res.status(HTTP_CODE.BAD_REQUEST).json({
-      message: `Unsupported method ${req.method?.toUpperCase() ?? '<NONE>'}`,
-    });
+    return unsupportedMethod(req, res);
   }
 }
 
