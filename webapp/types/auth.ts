@@ -16,13 +16,11 @@ export interface FusionAuthClaims {
 }
 
 export interface Session {
-  firstName?: string;
-  lastName?: string;
   displayName: string;
-  username: string
   email: string;
   emailVerified: boolean;
   userId: string;
+  username: string
 }
 
 // https://fusionauth.io/docs/v1/tech/oauth/endpoints/#userinfo

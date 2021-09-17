@@ -46,6 +46,7 @@ export async function getAccessToken(
 ): Promise<AccessTokenResult> {
   const { AUTH_ORIGIN_INTERNAL, CLIENT_ID, CLIENT_SECRET, COOKIE } =
     getConfig();
+  // TODO Get rid of FusionAuth client
   const client = new FusionAuthClient(CLIENT_ID, AUTH_ORIGIN_INTERNAL);
   const cookies: string[] = [];
 
@@ -148,8 +149,6 @@ export async function getSession(jwt: string): Promise<Session> {
     email: user.email,
     displayName: user.given_name ?? user.preferred_username,
     emailVerified: user.email_verified,
-    firstName: user.given_name,
-    lastName: user.family_name,
     userId: user.sub,
     username: user.preferred_username,
   };

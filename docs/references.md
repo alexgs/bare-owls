@@ -9,6 +9,8 @@ Handy links for documentation, articles, and other materials used in this projec
 - FusionAuth
   - [FusionAuth docs][2]
   - [Login and authentication workflows][29]
+  - [Typescript client][39]
+- [Got][40]
 - GraphQL
   - [Full stack app][3] (with Next.js (React), Apollo Client, Apollo Server and Nexus)
   - [Next.js API example][4] (in the Next.js repo)
@@ -38,6 +40,8 @@ Handy links for documentation, articles, and other materials used in this projec
   - [Standard claims][18]
 - [OpenID client][19] for Node.js
 - [Prisma documentation][20]
+- React libraries, docs, and articles
+  - [Formik][38]
 - [SWR docs][21]
 - [Task][22] (aka "Taskfile" or "Gotask")
 - [Traefik][36]
@@ -86,3 +90,6 @@ Handy links for documentation, articles, and other materials used in this projec
 [35]: https://docs.doppler.com/docs
 [36]: https://doc.traefik.io/traefik/
 [37]: https://github.com/jquense/yup
+[38]: https://formik.org/docs/overview
+[39]: https://github.com/FusionAuth/fusionauth-typescript-client
+[40]: https://github.com/sindresorhus/got

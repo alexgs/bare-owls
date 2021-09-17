@@ -3,78 +3,81 @@
  * the Open Software License version 3.0.
  */
 
-import Iron from '@hapi/iron';
-import * as cookie from 'cookie';
-import { Anchor, Box } from 'grommet';
-import { GetServerSidePropsContext, GetServerSidePropsResult } from 'next';
-import * as querystring from 'query-string';
+import { Formik, FormikHelpers } from 'formik';
+import { Box, Heading, Text } from 'grommet';
+import { useRouter } from 'next/router';
 import * as React from 'react';
+import * as Yup from 'yup';
 
 import { NavBar } from 'components';
-import { COOKIE_HEADER, getConfig, pkce } from 'server-lib';
+import { LoginForm, LoginFormData } from 'components/Login';
 
-const showLink = false; // Useful for debugging
+const schema = Yup.object({
+  email: Yup.string().email('Please enter a valid email address.').required('Please enter a valid email address.'),
+  password: Yup.string().required('Please enter your password.'),
+});
 
-interface Props {
-  url?: string;
-}
-
-const Login: React.FC<Props> = (props: Props) => {
-  if (showLink && props.url) {
-    return (
-      <>
-        <NavBar />
-        <Box flex align="start" direction="column" justify="start" pad="medium">
-          <Anchor label="Do it" href={props.url} />
-        </Box>
-      </>
-    );
-  }
-  return <div>Login Page</div>;
-};
-
-export async function getServerSideProps(
-  context: GetServerSidePropsContext,
-): Promise<GetServerSidePropsResult<unknown>> {
-  const codeVerifier = pkce.generateVerifier();
-  const codeChallenge = pkce.generateChallenge(codeVerifier);
-
-  const {
-    AUTH_ORIGIN_EXTERNAL,
-    CALLBACK_URL,
-    CLIENT_ID,
-    COOKIE,
-    IRON_OPTIONS,
-    IRON_SEAL,
-  } = getConfig();
-
-  const query = querystring.stringify({
-    client_id: CLIENT_ID,
-    code_challenge: codeChallenge,
-    code_challenge_method: 'S256',
-    redirect_uri: CALLBACK_URL,
-    response_type: 'code',
-    scope: 'openid offline_access',
-  });
-  const url = `${AUTH_ORIGIN_EXTERNAL}/oauth2/authorize?${query}`;
-
-  const sealedVerifier = await Iron.seal(codeVerifier, IRON_SEAL, IRON_OPTIONS);
-  const verifierCookie = cookie.serialize(
-    COOKIE.VERIFY.NAME,
-    sealedVerifier,
-    COOKIE.VERIFY.SET,
-  );
-  context.res.setHeader(COOKIE_HEADER, verifierCookie);
-
-  if (showLink) {
-    return { props: { url } };
-  }
-  return {
-    redirect: {
-      destination: url,
-      statusCode: 302,
-    },
+const Login: React.FC = () => {
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const router = useRouter();
+  const initialData: LoginFormData = {
+    email: '',
+    password: '',
   };
-}
+
+  async function handleSubmit(
+    values: LoginFormData,
+    formik: FormikHelpers<LoginFormData>,
+  ) {
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(values),
+    };
+
+    const response = await fetch('/api/login', options);
+    if (response.ok) {
+      // TODO Handle storing access token(s) locally
+      // const payload = (await response.json()) as Record<string, unknown>;
+      await router.push('/');
+    } else if (response.status === 400) {
+      setErrorMessage('Please check your credentials and try again.');
+    } else if (response.status >= 500 && response.status < 600) {
+      setErrorMessage(
+        'Something went wrong on the server. Please try again later.',
+      );
+    } else {
+      setErrorMessage(`Unexpected status code ${response.status}.`);
+    }
+    formik.setSubmitting(false);
+  }
+
+  return (
+    <>
+      <NavBar />
+      <Box flex align="center" pad="medium" width="100%">
+        <Heading level={1} margin="none">
+          Welcome back!
+        </Heading>
+        <Text color="status-error" margin="small">
+          {errorMessage}
+        </Text>
+        <Box width={'50%'}>
+          <Formik
+            initialValues={initialData}
+            onSubmit={handleSubmit}
+            validationSchema={schema}
+          >
+            {(formik) => (
+              <LoginForm formik={formik} initialValues={initialData} />
+            )}
+          </Formik>
+        </Box>
+      </Box>
+    </>
+  );
+};
 
 export default Login;
