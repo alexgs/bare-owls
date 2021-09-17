@@ -4,7 +4,8 @@
  */
 
 import { Formik, FormikHelpers } from 'formik';
-import { Box, Heading } from 'grommet';
+import { Box, Heading, Text } from 'grommet';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 import * as Yup from 'yup';
 
@@ -17,12 +18,17 @@ const schema = Yup.object({
 });
 
 const Login: React.FC = () => {
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const router = useRouter();
   const initialData: LoginFormData = {
     email: '',
     password: '',
   };
 
-  function handleSubmit(values: LoginFormData, formik: FormikHelpers<LoginFormData>) {
+  async function handleSubmit(
+    values: LoginFormData,
+    formik: FormikHelpers<LoginFormData>,
+  ) {
     const options = {
       method: 'POST',
       headers: {
@@ -31,22 +37,21 @@ const Login: React.FC = () => {
       body: JSON.stringify(values),
     };
 
-    fetch('/api/login', options)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-        throw new Error(JSON.stringify(response));
-      })
-      .then((payload) => {
-        console.log(`<<- ${JSON.stringify(payload)} ->>`);
-      })
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => {
-        formik.setSubmitting(false);
-      });
+    const response = await fetch('/api/login', options);
+    if (response.ok) {
+      // TODO Handle storing access token(s) locally
+      // const payload = (await response.json()) as Record<string, unknown>;
+      await router.push('/');
+    } else if (response.status === 400) {
+      setErrorMessage('Please check your credentials and try again.');
+    } else if (response.status >= 500 && response.status < 600) {
+      setErrorMessage(
+        'Something went wrong on the server. Please try again later.',
+      );
+    } else {
+      setErrorMessage(`Unexpected status code ${response.status}.`);
+    }
+    formik.setSubmitting(false);
   }
 
   return (
@@ -56,6 +61,9 @@ const Login: React.FC = () => {
         <Heading level={1} margin="none">
           Welcome back!
         </Heading>
+        <Text color="status-error" margin="small">
+          {errorMessage}
+        </Text>
         <Box width={'50%'}>
           <Formik
             initialValues={initialData}
@@ -63,10 +71,7 @@ const Login: React.FC = () => {
             validationSchema={schema}
           >
             {(formik) => (
-              <LoginForm
-                formik={formik}
-                initialValues={initialData}
-              />
+              <LoginForm formik={formik} initialValues={initialData} />
             )}
           </Formik>
         </Box>

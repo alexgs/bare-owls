@@ -21,7 +21,19 @@ async function handler(
 ): Promise<void> {
   if (req.method === 'POST') {
     const { AUTH_APP_TOKEN_CONTEXT } = getConfig();
-    const requestBody = await schema.validate(req.body);
+    let requestBody = null;
+    try {
+      requestBody = await schema.validate(req.body);
+    } catch (e) {
+      if (e instanceof Error) {
+        console.log(`| Warn | Validation error: ${e.message}`);
+      } else {
+        console.log('| Warn | Unknown error during schema validation:', e);
+      }
+    }
+    if (!requestBody) {
+      return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
+    }
 
     const result = await prisma.userEmail
       .findUnique({ where: { original: requestBody.email } })

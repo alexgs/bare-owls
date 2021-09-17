@@ -149,8 +149,6 @@ export async function getSession(jwt: string): Promise<Session> {
     email: user.email,
     displayName: user.given_name ?? user.preferred_username,
     emailVerified: user.email_verified,
-    firstName: user.given_name,
-    lastName: user.family_name,
     userId: user.sub,
     username: user.preferred_username,
   };
