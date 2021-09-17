@@ -16,6 +16,7 @@ export const PUBLIC = {
   },
   ERROR: 'status.public-api.error',
   LOADING: 'status.public-api.loading',
+  OK: 'status.public-api.ok',
 } as const;
 export const LOGIN_PATH = '/login';
 export const LOGOUT_PATH = '/logout';

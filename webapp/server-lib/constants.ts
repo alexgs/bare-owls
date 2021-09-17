@@ -39,3 +39,8 @@ export const PRIVATE = {
 // ^^^^^^^ This `as const` cast is critical to defining literal types within an
 //   object like this (see ["Literal Inference"][1] in the Typescript docs).
 // [1]: https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#literal-inference
+
+export const TOKEN_CONTEXT = {
+  OPEN: 'token-context.open',
+  SECURE: 'token-context.secure',
+} as const;

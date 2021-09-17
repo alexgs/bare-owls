@@ -7,8 +7,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import * as yup from 'yup';
 
 import { PUBLIC } from 'lib';
-import { HTTP_CODE, auth, prisma } from 'server-lib';
-import { unsupportedMethod } from 'server-lib/rest-helpers';
+import { HTTP_CODE, TOKEN_CONTEXT, auth, getConfig, prisma } from 'server-lib';
+import { setTokenCookies, unsupportedMethod } from 'server-lib/rest-helpers';
 
 const schema = yup.object().shape({
   email: yup.string().email().required(),
@@ -20,6 +20,7 @@ async function handler(
   res: NextApiResponse,
 ): Promise<void> {
   if (req.method === 'POST') {
+    const { AUTH_APP_TOKEN_CONTEXT } = getConfig();
     const requestBody = await schema.validate(req.body);
 
     const result = await prisma.userEmail
@@ -27,9 +28,31 @@ async function handler(
       ?.account({ select: { username: true } });
     if (result) {
       const payload = await auth.login(result.username, requestBody.password);
-      res.json({ payload });
+      // TODO Use constants for `payload.status`
+      if (payload.status === 'ok') {
+        console.log(`| Info | Successfully authenticated user ${result.username}.`);
+        const body: Record<string, string> = { message: PUBLIC.OK };
+
+        // Send tokens to the client. **NB:** If more than one app is set to
+        // "secure," then only one will get its tokens into the cookies. Which
+        // app wins is non-deterministic.
+        Object.keys(payload.tokens).forEach((appId) => {
+          if (AUTH_APP_TOKEN_CONTEXT[appId] === TOKEN_CONTEXT.SECURE) {
+            setTokenCookies(res, payload.tokens[appId]);
+          } else if (AUTH_APP_TOKEN_CONTEXT[appId] === TOKEN_CONTEXT.OPEN) {
+            // Send **only** access token to "open" apps
+            body[appId] = payload.tokens[appId].accessToken;
+          } else {
+            console.log(`| Warn | Unknown token context "${AUTH_APP_TOKEN_CONTEXT[appId]}"`);
+          }
+        });
+        return res.json(body);
+      }
+      console.log(`| Warn | Failed to authenticate user ${result.username}.`);
+      return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     } else {
-      res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
+      console.log(`| Warn | No account matched to email address ${requestBody.email}.`);
+      return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     }
   } else {
     return unsupportedMethod(req, res);
