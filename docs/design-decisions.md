@@ -4,9 +4,10 @@ This document records why things in the product are done a certain way.
 
 ## JWT Signing Keys
 
-### Current
+### Previously
 
 - Start date: 2021-09-05
+- End date: 2021-09-18
 
 I'm just using a single "Application" and "Tenant" in FusionAuth, and I'm currently using the default OpenID-connect compatible HMAC signing key.
 
@@ -14,13 +15,15 @@ Reference: See "Creating Tokens > Signature Algorithms" subsection of the [Build
 
 [1]: https://fusionauth.io/learn/expert-advice/tokens/building-a-secure-jwt/
 
-### Future
+### Current & Near-Future
 
-We will need to use separate applications in FusionAuth: one for the "core" application and one for the CDN. There is one main reason: FusionAuth uses the application ID for the "audience" claim in the JWT.
+- Start date: 2021-09-18
 
-This configuration will also give us more control over the JWT claims and signing keys. The core application can use the default tenant settings (although it may make life easier to set them directly on the application). The CDN application will use custom settings.
+We either have or shortly will have two applications configured in FusionAuth: a "core" application representing the Docker Compose project and a "CDN" application representing CloudFlare. The JWT for the core application is signed with HMAC for speed. For this reason, the Hasura auth webhook validates JWTs for all GraphQL methods against the FA API. It's just easier and faster. We _could_ look at the different methods and validate some locally (within the webhook) and others (namely mutations) against the API. With HMAC, however, that requires sharing the secret and stuff; it seems like a lot of work for an indefinite gain.
 
-I don't like how the OpenID-connect compatible HMAC signing key uses the client secret. I guess there's not much point in having two secrets (one for OAuth and another for HMAC) because anyone who can access one can access the other. There may be implications for changing or rotating the client secret and the HMAC secret. I'm not sure if there's a good reason to change this or not. I'm not concerned about complying with the OIDC standard, so that is not a consideration.
+The CDN JWT, in contrast to the core JWT, will be signed with a public/private key pair. This will allow CloudFlare workers to validate the JWT locally without having to contact the central auth server. In this scenario, a JWT could be revoked and the client wouldn't know until it needed to get a new JWT. For this reason, the CDN application is **strictly read-only**.
+
+If someone has illicit access and it is revoked, it's not a big deal for the bad actor to have an extra 15 minutes of access. The power to create and delete content, is much more dangerous. We will require token validation for every request to create, update, or delete content.
 
 ## Next.js API Middleware
 
@@ -28,7 +31,6 @@ The Next.js examples include a [middleware][2] pattern. [The documentation][3], 
 
 [2]: https://github.com/vercel/next.js/tree/canary/examples/api-routes-middleware
 [3]: https://nextjs.org/docs/api-routes/api-middlewares#extending-the-reqres-objects-with-typescript
-
 
 ## Session Provider
 
