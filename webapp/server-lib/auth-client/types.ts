@@ -17,7 +17,7 @@ export interface RefreshTokenData {
   applicationId: string;
   id: string;
   insertInstant: number;
-  metadata: {
+  metaData: {
     device: {
       description?: string;
       lastAccessedAddress?: string;
