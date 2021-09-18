@@ -7,9 +7,18 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import * as yup from 'yup';
 
 import { PUBLIC } from 'lib';
-import { HTTP_CODE, TOKEN_CONTEXT, auth, getConfig, prisma } from 'server-lib';
+import {
+  HTTP_CODE,
+  TOKEN_CONTEXT,
+  auth,
+  createLogger,
+  formatFilename,
+  getConfig,
+  prisma,
+} from 'server-lib';
 import { setTokenCookies, unsupportedMethod } from 'server-lib/rest-helpers';
 
+const logger = createLogger(formatFilename(__filename));
 const schema = yup.object().shape({
   email: yup.string().email().required(),
   password: yup.string().required(),
@@ -26,9 +35,9 @@ async function handler(
       requestBody = await schema.validate(req.body);
     } catch (e) {
       if (e instanceof Error) {
-        console.log(`| Warn | Validation error: ${e.message}`);
+        logger.warn(`Validation error: ${e.message}`);
       } else {
-        console.log('| Warn | Unknown error during schema validation:', e);
+        logger.warn('Unknown error during schema validation:', e);
       }
     }
     if (!requestBody) {
@@ -42,7 +51,7 @@ async function handler(
       const payload = await auth.login(result.username, requestBody.password);
       // TODO Use constants for `payload.status`
       if (payload.status === 'ok') {
-        console.log(`| Info | Successfully authenticated user ${result.username}.`);
+        logger.info(`Successfully authenticated user \`${result.username}\`.`);
         const body: Record<string, string> = { message: PUBLIC.OK };
 
         // Send tokens to the client. **NB:** If more than one app is set to
@@ -55,15 +64,15 @@ async function handler(
             // Send **only** access token to "open" apps
             body[appId] = payload.tokens[appId].accessToken;
           } else {
-            console.log(`| Warn | Unknown token context "${AUTH_APP_TOKEN_CONTEXT[appId]}"`);
+            logger.warn(`Unknown token context "${AUTH_APP_TOKEN_CONTEXT[appId]}".`);
           }
         });
         return res.json(body);
       }
-      console.log(`| Warn | Failed to authenticate user ${result.username}.`);
+      logger.warn(`Failed to authenticate user \`${result.username}\`.`);
       return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     } else {
-      console.log(`| Warn | No account matched to email address ${requestBody.email}.`);
+      logger.warn(`No account matched to email address \`${requestBody.email}\`.`);
       return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     }
   } else {

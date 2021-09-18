@@ -6,8 +6,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { PUBLIC } from 'lib';
-import { HTTP_CODE, auth, getConfig } from 'server-lib';
+import {
+  HTTP_CODE,
+  auth,
+  createLogger,
+  formatFilename,
+  getConfig,
+} from 'server-lib';
 import { clearTokenCookies, unsupportedMethod } from 'server-lib/rest-helpers';
+
+const logger = createLogger(formatFilename(__filename));
 
 async function handler(
   req: NextApiRequest,
@@ -20,7 +28,7 @@ async function handler(
 
     const refreshToken: string | undefined = req.cookies[COOKIE.REFRESH_TOKEN.NAME];
     if (!refreshToken) {
-      console.log(`| Warn | No refresh token in request cookies.`);
+      logger.warn(`No refresh token in request cookies.`);
       return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     }
 

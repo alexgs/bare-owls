@@ -9,7 +9,7 @@ import join from 'url-join';
 import * as yup from 'yup';
 
 import { PUBLIC } from 'lib';
-import { PRIVATE, getConfig } from 'server-lib';
+import { PRIVATE, createLogger, formatFilename, getConfig } from 'server-lib';
 import { unsupportedMethod } from 'server-lib/rest-helpers';
 
 type CreateResult =
@@ -26,6 +26,7 @@ interface UserData {
   username: string;
 }
 
+const logger = createLogger(formatFilename(__filename));
 const schema = yup.object().shape({
   displayName: yup.string().required(),
   email: yup.string().email().required(),
@@ -56,9 +57,9 @@ async function createUser(
   });
 
   if (response.statusCode !== 200) {
-    console.log(
+    logger.warn(
       `Error creating user in auth system: ${response.statusCode} ` +
-        `${response.statusMessage ?? ''}`,
+        `${response.statusMessage ?? ''}.`,
     );
     return PRIVATE.ERROR.AUTH_LINK.CREATE_USER;
   }
@@ -85,9 +86,9 @@ async function registerUser(userId: string, appId: string): Promise<RegisterResu
   });
 
   if (response.statusCode !== 200) {
-    console.log(
+    logger.warn(
       `Error registering user with app {${appId}}: ${response.statusCode} ` +
-      `${response.statusMessage ?? ''}`,
+      `${response.statusMessage ?? ''}.`,
     );
     return PRIVATE.ERROR.AUTH_LINK.REGISTER_USER;
   }
