@@ -50,6 +50,8 @@ services:
     environment:
       - DATABASE_URL
       - HASURA_GRAPHQL_ADMIN_SECRET=${HASURA_ADMIN_SECRET}
+      - HASURA_GRAPHQL_AUTH_HOOK
+      - HASURA_GRAPHQL_AUTH_HOOK_MODE
       - HASURA_GRAPHQL_DEV_MODE=true
       - HASURA_GRAPHQL_ENABLED_LOG_TYPES=startup, http-log, webhook-log, websocket-log, query-log
       - HASURA_GRAPHQL_ENABLE_CONSOLE=true
@@ -128,6 +130,7 @@ services:
       - NEXT_PUBLIC_HASURA_SECRET
       - WEBAPP_AUTH_API_KEY
       - WEBAPP_BASE_URL
+      - WEBAPP_LOG_LEVEL
       - WEBAPP_LOG_PATH
       - WEBAPP_PORT
     command: npm run dev
