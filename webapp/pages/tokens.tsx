@@ -55,7 +55,7 @@ const Content: React.FC<Props> = (props: Props) => {
   return <div>You must be logged in!</div>;
 };
 
-const HomePage: React.FC<Props> = (props: Props) => {
+const Tokens: React.FC<Props> = (props: Props) => {
   const { session, tokens } = props;
   return (
     <>
@@ -92,4 +92,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return { props: { session, tokens } };
 };
 
-export default HomePage;
+export default Tokens;
