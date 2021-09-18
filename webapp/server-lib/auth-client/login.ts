@@ -27,6 +27,7 @@ export async function login(
 ): Promise<LoginResult> {
   const { AUTH_APP_IDS } = getConfig();
   const responses = await Promise.all(
+    // TODO Change this to use WEBAPP_CORE_API_ID and WEBAPP_CDN_APP_ID
     AUTH_APP_IDS.map(async (applicationId): Promise<Response<ResponseBody>> => {
       return server.post<ResponseBody>('api/login', {
         json: {

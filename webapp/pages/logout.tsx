@@ -4,11 +4,46 @@
  */
 
 import { Box, Button, Heading, Text } from 'grommet';
+import { useRouter } from 'next/router';
 import * as React from 'react';
 
 import { NavBar } from 'components';
 
 const Logout: React.FC = () => {
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const router = useRouter();
+
+  async function handleAllDevicesClick() {
+    await handleApiCall(true);
+  }
+
+  async function handleApiCall(global: boolean) {
+    const response = await fetch('/api/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ global }),
+    });
+
+    if (response.status >= 500 && response.status < 600) {
+      setErrorMessage(
+        'Something went wrong on the server. Please try again later.',
+      );
+    } else {
+      // If the logout was successful or the request was malformed, redirect to homepage
+      await router.push('/');
+    }
+  }
+
+  async function handleCancelClick() {
+    await router.push('/');
+  }
+
+  async function handleLogoutClick() {
+    await handleApiCall(false);
+  }
+
   return (
     <>
       <NavBar />
@@ -26,21 +61,26 @@ const Logout: React.FC = () => {
           <Text alignSelf={'center'} margin={{ bottom: 'medium' }}>
             We hope to see you again soon.
           </Text>
+          <Text alignSelf={'center'} color="status-error" margin="small">
+            {errorMessage}
+          </Text>
           <Text alignSelf={'center'}>
             Do you want to logout on this device only, or on all of your
             devices?
           </Text>
           <Box direction="row" gap="medium" margin={{ top: 'large' }}>
-            <Button label="Cancel" />
+            <Button label="Cancel" onClick={handleCancelClick} />
             <Button
               label="All devices"
-              tip={'Logout of all devices.'}
               margin={{ left: 'auto' }}
+              onClick={handleAllDevicesClick}
+              tip={'Logout of all devices.'}
             />
             <Button
-              label="Logout"
-              tip={'Logout of this device only.'}
               primary
+              label="Logout"
+              onClick={handleLogoutClick}
+              tip={'Logout of this device only.'}
             />
           </Box>
         </Box>
