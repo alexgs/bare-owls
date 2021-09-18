@@ -16,11 +16,6 @@ interface GraphQlRequest {
   variables?: Record<string, number | string>;
 }
 
-interface PrefaceData {
-  method: string;
-  operation: string;
-}
-
 interface WebhookBody {
   headers: Record<string, string>;
   request: GraphQlRequest;
@@ -59,37 +54,14 @@ function getTokensFromWebhook(webhook: WebhookBody): Tokens {
   return output;
 }
 
-function parseGraphQlPreface(request: GraphQlRequest): PrefaceData {
-  const query = request.query.trim();
-  const methodStopIndex = query.indexOf(' ');
-
-  let operation = request.operationName;
-  if (!operation) {
-    const braceStopIndex = query.indexOf('{');
-    const preface = query.substring(0, braceStopIndex).trim();
-    const opName = preface.split(' ')[1];
-    operation = opName ?? '<unnamed>';
-  }
-  return {
-    operation,
-    method: query.substring(0, methodStopIndex).trim(),
-  };
-}
-
 async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ): Promise<void> {
   if (req.method === 'POST') {
     const webhook = req.body as WebhookBody;
-    const {method, operation} = parseGraphQlPreface(webhook.request);
-    if (method !== 'query') {
-      return res.status(RESP_CODE.FAILURE).end();
-    }
-
     const tokens = getTokensFromWebhook(webhook);
     const result = await auth.validateJwt(tokens.accessToken);
-    logger.debug(`JWT validation result: ${JSON.stringify(result)}`);
     if (!result.isValid) {
       return res.status(RESP_CODE.FAILURE).end();
     }
