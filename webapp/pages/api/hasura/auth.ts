@@ -6,8 +6,8 @@
 import cookie from 'cookie';
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { createLogger, formatFilename } from 'server-lib';
-import { Tokens } from 'server-lib/auth-client/types';
+import { auth, createLogger, formatFilename } from 'server-lib';
+import { Tokens } from 'server-lib/auth-client';
 import { unsupportedMethod } from 'server-lib/rest-helpers';
 
 interface GraphQlRequest {
@@ -35,12 +35,28 @@ const RESP_CODE = {
 
 const logger = createLogger(formatFilename(__filename));
 
-function getTokensFromHeaders(headers: Record<string, string>): Tokens {
-  const cookies = cookie.parse(headers.Cookie ?? '');
-  return {
-    accessToken: cookies['access-token'] ?? '<missing>',
-    refreshToken: cookies['refresh-token'] ?? '<missing>',
+function getTokensFromWebhook(webhook: WebhookBody): Tokens {
+  const { headers } = webhook;
+  const output: Tokens = {
+    accessToken: '<missing>',
+    refreshToken: '<missing>',
+  };
+
+  const headerKeys = Object.keys(headers);
+  let index = 0;
+  let done = false;
+  while (index < headerKeys.length && !done) {
+    const currentKey = headerKeys[index];
+    if (currentKey.toUpperCase() === 'COOKIE') {
+      const cookies = cookie.parse(headers[currentKey]);
+      output.accessToken = cookies['access-token'];
+      output.refreshToken = cookies['refresh-token'];
+      done = true;
+    }
+    index++;
   }
+
+  return output;
 }
 
 function parseGraphQlPreface(request: GraphQlRequest): PrefaceData {
@@ -71,14 +87,18 @@ async function handler(
       return res.status(RESP_CODE.FAILURE).end();
     }
 
-    // logger.debug(`Header keys: ${Object.keys(webhook.headers).join()}`);
-    // logger.debug(`Cookie: ${webhook.headers.Cookie}`);
-    // const cookies = cookie.parse(webhook.headers.Cookie)
-    // logger.debug(`Cookies: ${JSON.stringify(cookies)}`);
-    const tokens = getTokensFromHeaders(webhook.headers);
-    logger.debug(`Tokens: ${JSON.stringify(tokens)}`);
+    const tokens = getTokensFromWebhook(webhook);
+    const result = await auth.validateJwt(tokens.accessToken);
+    logger.debug(`JWT validation result: ${JSON.stringify(result)}`);
+    if (!result.isValid) {
+      return res.status(RESP_CODE.FAILURE).end();
+    }
 
-    return res.json({ message: 'ok' });
+    const { jwt } = result;
+    return res.json({
+      'X-Hasura-Role': jwt.roles.join(','),
+      'X-Hasura-User-Id': jwt.sub,
+    });
   } else {
     logger.info(`Unsupported method ${req.method?.toUpperCase() ?? '<NONE>'}`);
     return unsupportedMethod(req, res);
