@@ -4,49 +4,43 @@
  */
 
 import { server } from './auth-server';
+import { RefreshTokenData, RefreshTokenResult } from './types';
 
 // See https://fusionauth.io/docs/v1/tech/apis/jwt/#retrieve-refresh-tokens
 interface DangerousRefreshTokenData extends RefreshTokenData {
   token: string;
 }
 
-// See https://fusionauth.io/docs/v1/tech/apis/jwt/#retrieve-refresh-tokens
-interface RefreshTokenData {
-  applicationId: string;
-  id: string;
-  insertInstant: number;
-  metadata: {
-    device: {
-      description?: string;
-      lastAccessedAddress?: string;
-      lastAccessedInstant: number;
-      name?: string;
-      type: string;
-    }
-    scopes?: string[];
-  },
-  userId: string;
-}
-
 interface ResponseBody {
   refreshTokens: DangerousRefreshTokenData[];
 }
 
-export async function getRefreshTokens(accessToken: string): Promise<DangerousRefreshTokenData[]> {
+export async function getRefreshTokens(
+  accessToken: string,
+): Promise<RefreshTokenResult> {
   const response = await server.get<ResponseBody>('api/jwt/refresh', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
 
-  // const output = {
-  //   body: response.body,
-  //   request: {
-  //     headers: response.request.options.headers,
-  //   },
-  //   statusCode: response.statusCode,
-  //   statusMessage: response.statusMessage,
-  // }
-  // console.log('>--+--<\n' + JSON.stringify(output) + '\n>--+--<');
-  return response.body.refreshTokens;
+  if (response.statusCode === 200) {
+    const safeTokens = response.body.refreshTokens.map((dangerousToken) => {
+      const safe = {
+        ...dangerousToken,
+        token: undefined,
+      };
+      delete safe.token;
+      return safe;
+    });
+    return {
+      status: 'ok',
+      tokens: safeTokens,
+    };
+  } else {
+    return {
+      status: 'error',
+      tokens: [],
+    };
+  }
 }

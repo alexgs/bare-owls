@@ -39,11 +39,11 @@ const HomePage: React.FC<Props> = (props: Props) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const result = await getAccessToken(
+  const accessTokenResult = await getAccessToken(
     context.req as NextApiRequest,
     context.res as NextApiResponse,
   );
-  if (result.status !== PRIVATE.OK) {
+  if (accessTokenResult.status !== PRIVATE.OK) {
     return {
       props: {
         session: null,
@@ -52,18 +52,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const session = await getSession(result.token);
-  const dangerousTokens = await auth.getRefreshTokens(result.token);
-  const safeTokens = dangerousTokens.map((dangerousToken) => {
-    const safe = {
-      ...dangerousToken,
-      token: undefined,
-    };
-    delete safe.token;
-    return safe;
-  })
-  // console.log('>---<\n' + JSON.stringify(safeTokens, null, 2) + '\n>---<');
-  return { props: { session, tokens: safeTokens } };
+  const session = await getSession(accessTokenResult.token);
+  const refreshTokenResult = await auth.getRefreshTokens(
+    accessTokenResult.token,
+  );
+  const tokens =
+    refreshTokenResult.status === 'ok' ? refreshTokenResult.tokens : null;
+  return { props: { session, tokens } };
 };
 
 export default HomePage;
