@@ -7,6 +7,7 @@ import * as env from 'env-var';
 import path from 'path';
 import winston, { Logger } from 'winston';
 
+const WEBAPP_LOG_LEVEL = env.get('WEBAPP_LOG_LEVEL').default('info').asString();
 const WEBAPP_LOG_PATH = env.get('WEBAPP_LOG_PATH').required().asString();
 
 const LOG_FILE = path.resolve(WEBAPP_LOG_PATH, `webapp.log`);
@@ -29,14 +30,14 @@ export function createLogger(filename: string): Logger {
       new winston.transports.File({ filename: TRACE_FILE }),
       new winston.transports.File({
         filename: LOG_FILE,
-        level: 'info',
+        level: WEBAPP_LOG_LEVEL,
         format: winston.format.combine(
           winston.format.timestamp(),
           winston.format.printf(customFormatA),
         ),
       }),
       new winston.transports.Console({
-        level: 'info',
+        level: WEBAPP_LOG_LEVEL,
         format: winston.format.combine(
           winston.format.timestamp(),
           winston.format.printf(customFormatA),

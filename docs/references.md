@@ -51,6 +51,9 @@ Handy links for documentation, articles, and other materials used in this projec
   - [uuid-apikey][32]
   - [uuid][31]
 - [Volta reference][23]
+- Winston
+  - [Docs][41]
+  - [Log levels][42]
 - [Yup][37] for validating JSON objects and other values
 
 [1]: https://date-fns.org/docs/Getting-Started
@@ -93,3 +96,5 @@ Handy links for documentation, articles, and other materials used in this projec
 [38]: https://formik.org/docs/overview
 [39]: https://github.com/FusionAuth/fusionauth-typescript-client
 [40]: https://github.com/sindresorhus/got
+[41]: https://github.com/winstonjs/winston#table-of-contents
+[42]: https://github.com/winstonjs/winston#logging-levels
