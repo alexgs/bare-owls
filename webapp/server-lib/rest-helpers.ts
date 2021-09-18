@@ -10,6 +10,27 @@ import { Tokens } from './auth-client/types';
 import { getConfig } from './config';
 import { COOKIE_HEADER, HTTP_CODE } from './constants';
 
+export function clearTokenCookies(res: NextApiResponse): void {
+  const { COOKIE } = getConfig();
+  const cookies: string[] = [];
+
+  const accessTokenCookie = cookie.serialize(
+    COOKIE.ACCESS_TOKEN.NAME,
+    '',
+    COOKIE.ACCESS_TOKEN.RM,
+  );
+  cookies.push(accessTokenCookie);
+
+  const refreshTokenCookie = cookie.serialize(
+    COOKIE.REFRESH_TOKEN.NAME,
+    '',
+    COOKIE.REFRESH_TOKEN.RM,
+  );
+  cookies.push(refreshTokenCookie);
+
+  res.setHeader(COOKIE_HEADER, cookies);
+}
+
 export function setTokenCookies(res: NextApiResponse, tokens: Tokens): void {
   const { COOKIE } = getConfig();
   const cookies: string[] = [];

@@ -12,6 +12,30 @@ export interface LoginResult {
   };
 }
 
+// See https://fusionauth.io/docs/v1/tech/apis/jwt/#retrieve-refresh-tokens
+export interface RefreshTokenData {
+  applicationId: string;
+  id: string;
+  insertInstant: number;
+  metaData: {
+    device: {
+      description?: string;
+      lastAccessedAddress?: string;
+      lastAccessedInstant: number;
+      name?: string;
+      type: string;
+    };
+    scopes?: string[];
+  };
+  startInstant: number;
+  userId: string;
+}
+
+export interface RefreshTokenResult {
+  status: string;
+  tokens: RefreshTokenData[];
+}
+
 export type TokenContext =
   | typeof TOKEN_CONTEXT.OPEN
   | typeof TOKEN_CONTEXT.SECURE;
