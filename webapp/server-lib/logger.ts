@@ -45,3 +45,29 @@ export function createLogger(filename: string): Logger {
     ],
   });
 }
+
+const logger = createLogger(formatFilename(__filename));
+
+export function formatFilename(filename: string): string {
+  const TARGET = '/.next/server/';
+  const startIndex = filename.indexOf(TARGET) + TARGET.length;
+
+  let output = filename;
+  if (startIndex === -1) {
+    logger.info(`Target not found in "${filename}".`);
+  } else {
+    output = filename.substring(startIndex);
+  }
+
+  const extIndex = output.lastIndexOf('.');
+  const extension = output.substring(extIndex);
+  if (extension === '.js') {
+    output = output.substring(0, extIndex) + '.ts';
+  } else if (extension === '.jsx') {
+    output = output.substring(0, extIndex) + '.tsx';
+  } else {
+    logger.info(`Unknown extension "${extension}".`);
+  }
+
+  return output;
+}

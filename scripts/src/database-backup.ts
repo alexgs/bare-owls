@@ -61,7 +61,7 @@ async function main() {
   } else {
     console.log(
       TEXT.ERROR,
-      `The following commands are missing: ${missingCommands.join(', ')}`,
+      `The following commands are missing: ${missingCommands.join(', ')}.`,
     );
     shell.exit(2);
   }
@@ -104,7 +104,7 @@ async function main() {
     // [1]: https://fusionauth.io/learn/expert-advice/security/guide-to-user-data-security/#3112-backups
   });
 
-  console.log(TEXT.INFO, 'Backup complete');
+  console.log(TEXT.INFO, 'Backup complete.');
 }
 
 main()

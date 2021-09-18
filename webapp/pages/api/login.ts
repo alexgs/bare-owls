@@ -12,12 +12,13 @@ import {
   TOKEN_CONTEXT,
   auth,
   createLogger,
+  formatFilename,
   getConfig,
   prisma,
 } from 'server-lib';
 import { setTokenCookies, unsupportedMethod } from 'server-lib/rest-helpers';
 
-const logger = createLogger(__filename);
+const logger = createLogger(formatFilename(__filename));
 const schema = yup.object().shape({
   email: yup.string().email().required(),
   password: yup.string().required(),
@@ -50,7 +51,7 @@ async function handler(
       const payload = await auth.login(result.username, requestBody.password);
       // TODO Use constants for `payload.status`
       if (payload.status === 'ok') {
-        logger.info(`Successfully authenticated user ${result.username}.`);
+        logger.info(`Successfully authenticated user \`${result.username}\`.`);
         const body: Record<string, string> = { message: PUBLIC.OK };
 
         // Send tokens to the client. **NB:** If more than one app is set to
@@ -63,15 +64,15 @@ async function handler(
             // Send **only** access token to "open" apps
             body[appId] = payload.tokens[appId].accessToken;
           } else {
-            logger.warn(`Unknown token context "${AUTH_APP_TOKEN_CONTEXT[appId]}"`);
+            logger.warn(`Unknown token context "${AUTH_APP_TOKEN_CONTEXT[appId]}".`);
           }
         });
         return res.json(body);
       }
-      logger.warn(`Failed to authenticate user ${result.username}.`);
+      logger.warn(`Failed to authenticate user \`${result.username}\`.`);
       return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     } else {
-      logger.warn(`No account matched to email address ${requestBody.email}.`);
+      logger.warn(`No account matched to email address \`${requestBody.email}\`.`);
       return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     }
   } else {
