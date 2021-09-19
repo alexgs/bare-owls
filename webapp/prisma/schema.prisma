@@ -51,34 +51,22 @@ model ChannelTier {
 }
 
 model Post {
-  id           String             @id @default(uuid()) @db.Uuid
-  publicId     String             @db.VarChar(5)
-  posttype     PostType           @relation(fields: [postTypeName], references: [name])
-  postTypeName String
-  channel      Channel            @relation(fields: [channelId], references: [id])
-  channelId    String             @db.Uuid
-  tier         ChannelTier        @relation(fields: [tierId], references: [id])
-  tierId       Int
-  author       UserAccount        @relation(fields: [authorId], references: [id])
-  authorId     String             @db.Uuid
-  createdAt    DateTime           @default(now())
-  publishedAt  DateTime
-  updatedAt    DateTime           @updatedAt
-  ppvPrice     Int? // PPV cost of the post in US cents ($1 = 100). If price is null, then PPV is disabled for the post.
-  ppvUsers     UserUnlockedPost[]
+  id          String             @id @default(uuid()) @db.Uuid
+  publicId    String             @db.VarChar(5)
+  body        String
+  channel     Channel            @relation(fields: [channelId], references: [id])
+  channelId   String             @db.Uuid
+  tier        ChannelTier        @relation(fields: [tierId], references: [id])
+  tierId      Int
+  author      UserAccount        @relation(fields: [authorId], references: [id])
+  authorId    String             @db.Uuid
+  createdAt   DateTime           @default(now())
+  publishedAt DateTime
+  updatedAt   DateTime           @updatedAt
+  ppvPrice    Int? // PPV cost of the post in US cents ($1 = 100). If price is null, then PPV is disabled for the post.
+  ppvUsers    UserUnlockedPost[]
 
   @@unique([channelId, publicId])
-}
-
-// This table doesn't use an `id` field so that its column names are consistent
-// with UserRole, which also acts as an enumerable data type.
-model PostType {
-  name        String   @id
-  displayName String
-  description String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  posts       Post[]
 }
 
 model UserAccount {
