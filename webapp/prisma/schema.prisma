@@ -13,7 +13,7 @@ generator client {
 
 model Channel {
   id          String                @id @default(uuid()) @db.Uuid
-  name        String                @unique
+  slug        String                @unique
   title       String
   owner       UserAccount           @relation(fields: [ownerId], references: [id])
   ownerId     String                @db.Uuid

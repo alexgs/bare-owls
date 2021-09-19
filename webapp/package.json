@@ -15,6 +15,7 @@
     "build": "next build",
     "check": "npx tsc --noEmit",
     "dev": "next dev -p $WEBAPP_PORT",
+    "gen": "npx prisma generate",
     "lint": "next lint",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
