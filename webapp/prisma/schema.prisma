@@ -64,7 +64,7 @@ model Post {
   author      UserAccount        @relation(fields: [authorId], references: [id])
   authorId    String             @db.Uuid
   createdAt   DateTime           @default(now())
-  publishedAt DateTime
+  publishedAt DateTime?
   updatedAt   DateTime           @updatedAt
   ppvPrice    Int? // PPV cost of the post in US cents ($1 = 100). If price is null, then PPV is disabled for the post.
   ppvUsers    UserUnlockedPost[]

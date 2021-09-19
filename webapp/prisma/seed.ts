@@ -7,6 +7,7 @@ import {
   Channel,
   ChannelSubscription,
   ChannelTier,
+  Post,
   PrismaClient,
   UserAccount,
   UserEmail,
@@ -16,6 +17,7 @@ import {
 import channelSubscriptions from './seed-data/channel-subscriptions';
 import channelTiers from './seed-data/channel-tiers';
 import channels from './seed-data/channels';
+import posts from './seed-data/posts';
 import userAccounts from './seed-data/user-accounts';
 import userEmails from './seed-data/user-emails';
 import userRoles from './seed-data/user-roles';
@@ -46,6 +48,18 @@ async function upsertChannels(): Promise<Channel[]> {
   return Promise.all(
     channels.map((data) => {
       return prisma.channel.upsert({
+        where: { id: data.id },
+        create: data,
+        update: data,
+      });
+    }),
+  );
+}
+
+async function upsertPosts(): Promise<Post[]> {
+  return Promise.all(
+    posts.map((data) => {
+      return prisma.post.upsert({
         where: { id: data.id },
         create: data,
         update: data,
@@ -93,7 +107,7 @@ async function upsertUserRoles(): Promise<UserRole[]> {
 
 async function seed(): Promise<void> {
   // Application data needs to be seeded in this order: (1) roles; (2) accounts;
-  // (3) emails; (4) channels; (5) tiers; (6) subscriptions.
+  // (3) emails; (4) channels; (5) tiers; (6) subscriptions; (7) posts.
   const roles = await upsertUserRoles();
   console.log(`\n>> Upserted ${roles.length} user roles.`);
 
@@ -111,6 +125,9 @@ async function seed(): Promise<void> {
 
   const channelSubs = await createChannelSubscriptions();
   console.log(`>> Created ${channelSubs.length} total subscriptions.`);
+
+  const posts = await upsertPosts();
+  console.log(`>> Upserted ${posts.length} posts.`);
 }
 
 seed()
