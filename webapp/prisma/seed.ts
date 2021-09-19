@@ -3,15 +3,72 @@
  * the Open Software License version 3.0.
  */
 
-import { PrismaClient, UserAccount, UserEmail, UserRole } from '@prisma/client';
+import {
+  Channel,
+  ChannelSubscription,
+  ChannelTier,
+  Post,
+  PrismaClient,
+  UserAccount,
+  UserEmail,
+  UserRole,
+} from '@prisma/client';
 
+import channelSubscriptions from './seed-data/channel-subscriptions';
+import channelTiers from './seed-data/channel-tiers';
+import channels from './seed-data/channels';
+import posts from './seed-data/posts';
 import userAccounts from './seed-data/user-accounts';
 import userEmails from './seed-data/user-emails';
 import userRoles from './seed-data/user-roles';
 
 const prisma = new PrismaClient();
 
-async function upsertUserAccounts(): Promise<Array<UserAccount>> {
+async function createChannelSubscriptions(): Promise<ChannelSubscription[]> {
+  // Since this doesn't use `upsert`, there is a possibility of duplicated data,
+  // but that should be prevented by the `UNIQUE` constraint on the table.
+  return Promise.all(
+    channelSubscriptions.map((data) => {
+      return prisma.channelSubscription.create({ data });
+    }),
+  );
+}
+
+async function createChannelTiers(): Promise<ChannelTier[]> {
+  // Since this doesn't use `upsert`, there is a possibility of duplicated data,
+  // but that should be prevented by the `UNIQUE` constraint on the table.
+  return Promise.all(
+    channelTiers.map((data) => {
+      return prisma.channelTier.create({ data });
+    }),
+  );
+}
+
+async function upsertChannels(): Promise<Channel[]> {
+  return Promise.all(
+    channels.map((data) => {
+      return prisma.channel.upsert({
+        where: { id: data.id },
+        create: data,
+        update: data,
+      });
+    }),
+  );
+}
+
+async function upsertPosts(): Promise<Post[]> {
+  return Promise.all(
+    posts.map((data) => {
+      return prisma.post.upsert({
+        where: { id: data.id },
+        create: data,
+        update: data,
+      });
+    }),
+  );
+}
+
+async function upsertUserAccounts(): Promise<UserAccount[]> {
   const keys = Object.keys(userAccounts);
   return Promise.all(
     keys.map((key) =>
@@ -24,7 +81,7 @@ async function upsertUserAccounts(): Promise<Array<UserAccount>> {
   );
 }
 
-async function upsertUserEmails(): Promise<Array<UserEmail>> {
+async function upsertUserEmails(): Promise<UserEmail[]> {
   return Promise.all(
     userEmails.map((data) => {
       return prisma.userEmail.upsert({
@@ -36,7 +93,7 @@ async function upsertUserEmails(): Promise<Array<UserEmail>> {
   );
 }
 
-async function upsertUserRoles(): Promise<Array<UserRole>> {
+async function upsertUserRoles(): Promise<UserRole[]> {
   return Promise.all(
     userRoles.map((data) =>
       prisma.userRole.upsert({
@@ -49,7 +106,8 @@ async function upsertUserRoles(): Promise<Array<UserRole>> {
 }
 
 async function seed(): Promise<void> {
-  // User data needs to be seeded in this order: (1) roles; (2) accounts; (3) tokens; (4) emails
+  // Application data needs to be seeded in this order: (1) roles; (2) accounts;
+  // (3) emails; (4) channels; (5) tiers; (6) subscriptions; (7) posts.
   const roles = await upsertUserRoles();
   console.log(`\n>> Upserted ${roles.length} user roles.`);
 
@@ -58,6 +116,18 @@ async function seed(): Promise<void> {
 
   const emails = await upsertUserEmails();
   console.log(`>> Upserted ${emails.length} email addresses.`);
+
+  const channels = await upsertChannels();
+  console.log(`>> Upserted ${channels.length} channels.`);
+
+  const channelTiers = await createChannelTiers();
+  console.log(`>> Created ${channelTiers.length} total channel tiers.`);
+
+  const channelSubs = await createChannelSubscriptions();
+  console.log(`>> Created ${channelSubs.length} total subscriptions.`);
+
+  const posts = await upsertPosts();
+  console.log(`>> Upserted ${posts.length} posts.`);
 }
 
 seed()

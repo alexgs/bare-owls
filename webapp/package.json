@@ -14,7 +14,9 @@
   "scripts": {
     "build": "next build",
     "check": "npx tsc --noEmit",
+    "danger:reset-db": "npx prisma db push --force-reset",
     "dev": "next dev -p $WEBAPP_PORT",
+    "gen": "npx prisma generate",
     "lint": "next lint",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
