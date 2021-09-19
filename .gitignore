@@ -37,6 +37,7 @@
 **/.pgpass
 webapp/prisma/seed-data/*.json
 webapp/prisma/seed-data/*.ts
+webapp/prisma/seed-data/*.zip
 
 # artifacts and dependencies
 **/dist

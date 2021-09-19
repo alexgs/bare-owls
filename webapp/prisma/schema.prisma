@@ -43,6 +43,7 @@ model ChannelTier {
   name        String
   description String
   slug        String
+  order       Int // 0 is the bottom tier, 1 is next, 2 is about that, and so on.
   channel     Channel               @relation(fields: [channelId], references: [id])
   channelId   String                @db.Uuid
   createdAt   DateTime              @default(now())
@@ -50,6 +51,7 @@ model ChannelTier {
   posts       Post[]
   subs        ChannelSubscription[]
 
+  @@unique([channelId, order])
   @@unique([channelId, slug])
 }
 
