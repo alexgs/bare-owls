@@ -6,14 +6,16 @@
 import {
   Channel,
   ChannelSubscription,
+  ChannelTier,
   PrismaClient,
   UserAccount,
   UserEmail,
   UserRole,
 } from '@prisma/client';
 
-import channels from './seed-data/channels';
 import channelSubscriptions from './seed-data/channel-subscriptions';
+import channelTiers from './seed-data/channel-tiers';
+import channels from './seed-data/channels';
 import userAccounts from './seed-data/user-accounts';
 import userEmails from './seed-data/user-emails';
 import userRoles from './seed-data/user-roles';
@@ -26,6 +28,16 @@ async function createChannelSubscriptions(): Promise<ChannelSubscription[]> {
   return Promise.all(
     channelSubscriptions.map((data) => {
       return prisma.channelSubscription.create({ data });
+    }),
+  );
+}
+
+async function createChannelTiers(): Promise<ChannelTier[]> {
+  // Since this doesn't use `upsert`, there is a possibility of duplicated data,
+  // but that should be prevented by the `UNIQUE` constraint on the table.
+  return Promise.all(
+    channelTiers.map((data) => {
+      return prisma.channelTier.create({ data });
     }),
   );
 }
@@ -81,7 +93,7 @@ async function upsertUserRoles(): Promise<UserRole[]> {
 
 async function seed(): Promise<void> {
   // Application data needs to be seeded in this order: (1) roles; (2) accounts;
-  // (3) emails; (4) channels; (5) subscriptions.
+  // (3) emails; (4) channels; (5) tiers; (6) subscriptions.
   const roles = await upsertUserRoles();
   console.log(`\n>> Upserted ${roles.length} user roles.`);
 
@@ -94,8 +106,11 @@ async function seed(): Promise<void> {
   const channels = await upsertChannels();
   console.log(`>> Upserted ${channels.length} channels.`);
 
+  const channelTiers = await createChannelTiers();
+  console.log(`>> Created ${channelTiers.length} total channel tiers.`);
+
   const channelSubs = await createChannelSubscriptions();
-  console.log(`>> Created ${channelSubs.length} subscriptions.`);
+  console.log(`>> Created ${channelSubs.length} total subscriptions.`);
 }
 
 seed()

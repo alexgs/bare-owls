@@ -28,6 +28,8 @@ model ChannelSubscription {
   id        Int         @id @default(autoincrement())
   channel   Channel     @relation(fields: [channelId], references: [id])
   channelId String      @db.Uuid
+  tier      ChannelTier @relation(fields: [tierId], references: [id])
+  tierId    Int
   user      UserAccount @relation(fields: [userId], references: [id])
   userId    String      @db.Uuid
   createdAt DateTime    @default(now())
@@ -37,15 +39,16 @@ model ChannelSubscription {
 }
 
 model ChannelTier {
-  id          Int      @id @default(autoincrement())
+  id          Int                   @id @default(autoincrement())
   name        String
   description String
   slug        String
-  channel     Channel  @relation(fields: [channelId], references: [id])
-  channelId   String   @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  channel     Channel               @relation(fields: [channelId], references: [id])
+  channelId   String                @db.Uuid
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
   posts       Post[]
+  subs        ChannelSubscription[]
 
   @@unique([channelId, slug])
 }
