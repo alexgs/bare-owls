@@ -21,7 +21,8 @@ import userRoles from './seed-data/user-roles';
 const prisma = new PrismaClient();
 
 async function createChannelSubscriptions(): Promise<ChannelSubscription[]> {
-  // Since this doesn't use `upsert`, there is a possibility of duplicated data
+  // Since this doesn't use `upsert`, there is a possibility of duplicated data,
+  // but that should be prevented by the `UNIQUE` constraint on the table.
   return Promise.all(
     channelSubscriptions.map((data) => {
       return prisma.channelSubscription.create({ data });

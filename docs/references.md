@@ -39,7 +39,14 @@ Handy links for documentation, articles, and other materials used in this projec
   - [ID token][17]
   - [Standard claims][18]
 - [OpenID client][19] for Node.js
-- [Prisma documentation][20]
+- Prisma and PostgreSQL
+  - [Documentation][20]
+  - Check constraints
+    - Great StockOverflow post on [referencing different tables][45] (similar to my idea for a post type _XOR_)
+    - [Prisma tutorial][46] on how to do this in Postgres (**NB:** not supported on Prisma schema as of v2.30.3 and v3.0.2)
+  - Unique constraints
+    - Adding [constraints in PostgreSQL][43], including multi-column constraints
+    - Specifying [constraints in a Prisma schema][44]
 - React libraries, docs, and articles
   - [Formik][38]
 - [SWR docs][21]
@@ -98,3 +105,7 @@ Handy links for documentation, articles, and other materials used in this projec
 [40]: https://github.com/sindresorhus/got
 [41]: https://github.com/winstonjs/winston#table-of-contents
 [42]: https://github.com/winstonjs/winston#logging-levels
+[43]: https://www.prisma.io/docs/guides/general-guides/database-workflows/unique-constraints-and-indexes/postgresql
+[44]: https://www.prisma.io/docs/concepts/components/prisma-schema/data-model#defining-a-unique-field
+[45]: https://stackoverflow.com/questions/10068033/postgresql-foreign-key-referencing-primary-keys-of-two-different-tables
+[46]: https://www.prisma.io/docs/guides/database/advanced-database-tasks/data-validation/postgresql

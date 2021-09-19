@@ -20,6 +20,7 @@ model Channel {
   subscribers ChannelSubscription[]
   createdAt   DateTime              @default(now())
   updatedAt   DateTime              @updatedAt
+  posts       Post[]
 }
 
 model ChannelSubscription {
@@ -30,6 +31,36 @@ model ChannelSubscription {
   userId    String      @db.Uuid
   createdAt DateTime    @default(now())
   updatedAt DateTime    @updatedAt
+
+  @@unique([channelId, userId])
+}
+
+model Post {
+  id          String      @id @default(uuid()) @db.Uuid
+  publicId    String      @db.VarChar(5)
+  posttype    PostType    @relation(fields: [postTypeId], references: [name])
+  postTypeId  String
+  channel     Channel     @relation(fields: [channelId], references: [id])
+  channelId   String      @db.Uuid
+  author      UserAccount @relation(fields: [authorId], references: [id])
+  authorId    String      @db.Uuid
+  createdAt   DateTime    @default(now())
+  publishedAt DateTime
+  updatedAt   DateTime    @updatedAt
+
+  UserUnlockedPost UserUnlockedPost[]
+  @@unique([channelId, publicId])
+}
+
+// This table doesn't use an `id` field so that its column names are consistent
+// with UserRole, which also acts as an enumerable data type.
+model PostType {
+  name        String   @id
+  displayName String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
 }
 
 model UserAccount {
@@ -45,6 +76,8 @@ model UserAccount {
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @updatedAt
   roleId        String                @db.Uuid
+  posts         Post[]
+  unlockedPosts UserUnlockedPost[]
 }
 
 // The `blocker` is the person doing the block, and the `target` is the person
@@ -80,4 +113,17 @@ model UserRole {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   users       UserAccount[]
+}
+
+// Unlocked posts for PPV content
+model UserUnlockedPost {
+  id        Int         @id @default(autoincrement())
+  user      UserAccount @relation(fields: [userId], references: [id])
+  userId    String      @db.Uuid
+  post      Post        @relation(fields: [postId], references: [id])
+  postId    String      @db.Uuid
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([postId, userId])
 }

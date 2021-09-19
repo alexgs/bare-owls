@@ -32,6 +32,16 @@ The Next.js examples include a [middleware][2] pattern. [The documentation][3], 
 [2]: https://github.com/vercel/next.js/tree/canary/examples/api-routes-middleware
 [3]: https://nextjs.org/docs/api-routes/api-middlewares#extending-the-reqres-objects-with-typescript
 
+## Post Public IDs
+
+Each post needs a safe, publicly accessible ID that is unique within the post's channel. In other words, a path like `/c/[channelId]/p/[postId]` needs to have a unique combination of `channelID` and `postId`, but post IDs do not need to be globally unique.
+
+I assume that creators will **NOT** be giving their posts titles and therefore we cannot construct a slug from the title.
+
+To make post IDs human-readable, we will use Crockford base32 encoding. Three random bytes gives a limit of more than 16 million posts _per channel_, which seems like more than enough. With base32 encoding, this gives a 5 character code for the post. This is what we are using for the `publicId` for each post. (See [this RunKit code][6] for some examples.)
+
+[6]: https://runkit.com/embed/8mbkvpgjwrrl
+
 ## Session Provider
 
 The pattern I used for the `SessionProvider` (see [Session.tsx][4]) looks more like the normal React Context pattern than the [SWR pattern][5]. I previously used the SWR pattern and found it more cumbersome than the Context pattern. It's more a matter of taste at this stage, and this is easier. :shrug: It can always be revisited in the future if there's a need.
