@@ -1,0 +1,67 @@
+table:
+  name: Post
+  schema: public
+configuration:
+  custom_column_names: {}
+  custom_name: posts
+  custom_root_fields: {}
+object_relationships:
+- name: Channel
+  using:
+    foreign_key_constraint_on: channelId
+- name: ChannelTier
+  using:
+    foreign_key_constraint_on: tierId
+- name: UserAccount
+  using:
+    foreign_key_constraint_on: authorId
+array_relationships:
+- name: UserUnlockedPosts
+  using:
+    foreign_key_constraint_on:
+      column: postId
+      table:
+        name: UserUnlockedPost
+        schema: public
+computed_fields:
+- comment: ""
+  definition:
+    function:
+      name: post_authorized_claim
+      schema: public
+  name: authorized_claim
+select_permissions:
+- permission:
+    columns:
+    - id
+    - publicId
+    - body
+    - channelId
+    - tierId
+    - authorId
+    - createdAt
+    - publishedAt
+    - updatedAt
+    - ppvPrice
+    computed_fields:
+    - authorized_claim
+    filter:
+      authorized_claim:
+        _in: X-Hasura-Claims
+  role: CREATOR
+- permission:
+    columns:
+    - publicId
+    - ppvPrice
+    - tierId
+    - body
+    - createdAt
+    - publishedAt
+    - updatedAt
+    - authorId
+    - channelId
+    - id
+    computed_fields:
+    - authorized_claim
+    filter: {}
+  role: FAN

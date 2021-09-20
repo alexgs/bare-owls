@@ -1,0 +1,33 @@
+table:
+  name: Channel
+  schema: public
+configuration:
+  custom_column_names: {}
+  custom_name: channels
+  custom_root_fields: {}
+object_relationships:
+- name: UserAccount
+  using:
+    foreign_key_constraint_on: ownerId
+array_relationships:
+- name: ChannelSubscriptions
+  using:
+    foreign_key_constraint_on:
+      column: channelId
+      table:
+        name: ChannelSubscription
+        schema: public
+- name: ChannelTiers
+  using:
+    foreign_key_constraint_on:
+      column: channelId
+      table:
+        name: ChannelTier
+        schema: public
+- name: Posts
+  using:
+    foreign_key_constraint_on:
+      column: channelId
+      table:
+        name: Post
+        schema: public

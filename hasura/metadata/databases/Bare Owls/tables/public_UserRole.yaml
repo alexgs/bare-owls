@@ -1,0 +1,26 @@
+table:
+  name: UserRole
+  schema: public
+configuration:
+  custom_column_names: {}
+  custom_name: roles
+  custom_root_fields: {}
+array_relationships:
+- name: UserAccounts
+  using:
+    foreign_key_constraint_on:
+      column: roleId
+      table:
+        name: UserAccount
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - id
+    - name
+    - description
+    - createdAt
+    - updatedAt
+    - displayName
+    filter: {}
+  role: FAN

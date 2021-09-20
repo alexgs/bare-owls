@@ -1,0 +1,72 @@
+table:
+  name: UserAccount
+  schema: public
+configuration:
+  custom_column_names: {}
+  custom_name: users
+  custom_root_fields: {}
+object_relationships:
+- name: role
+  using:
+    foreign_key_constraint_on: roleId
+array_relationships:
+- name: ChannelSubscriptions
+  using:
+    foreign_key_constraint_on:
+      column: userId
+      table:
+        name: ChannelSubscription
+        schema: public
+- name: Channels
+  using:
+    foreign_key_constraint_on:
+      column: ownerId
+      table:
+        name: Channel
+        schema: public
+- name: Posts
+  using:
+    foreign_key_constraint_on:
+      column: authorId
+      table:
+        name: Post
+        schema: public
+- name: UserBlocks
+  using:
+    foreign_key_constraint_on:
+      column: blockerId
+      table:
+        name: UserBlock
+        schema: public
+- name: UserUnlockedPosts
+  using:
+    foreign_key_constraint_on:
+      column: userId
+      table:
+        name: UserUnlockedPost
+        schema: public
+- name: emails
+  using:
+    foreign_key_constraint_on:
+      column: accountId
+      table:
+        name: UserEmail
+        schema: public
+- name: userBlocksByTargetid
+  using:
+    foreign_key_constraint_on:
+      column: targetId
+      table:
+        name: UserBlock
+        schema: public
+select_permissions:
+- permission:
+    columns:
+    - id
+    - username
+    - displayName
+    - createdAt
+    - updatedAt
+    - roleId
+    filter: {}
+  role: FAN
