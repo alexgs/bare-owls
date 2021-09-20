@@ -68,8 +68,14 @@ async function handler(
 
     const { jwt } = result;
     return res.json({
-      'X-Hasura-Role': jwt.roles.join(','),
+      // 'X-Hasura-Role': jwt.roles.join(','),
+      // 'X-Hasura-User-Id': jwt.sub,
+
+      // TODO Generate claims
+      'X-Hasura-Role': 'CREATOR',
       'X-Hasura-User-Id': jwt.sub,
+      'X-Hasura-Claims': 'c6e492a2-03ec-44a6-9587-50437c0b0cef:free',
+      'X-Hasura-Channel-Id': '45994caf-4d50-4e9b-b6af-f9244133cf1b',
     });
   } else {
     logger.info(`Unsupported method ${req.method?.toUpperCase() ?? '<NONE>'}`);
