@@ -44,6 +44,7 @@ Handy links for documentation, articles, and other materials used in this projec
   - Check constraints
     - Great StockOverflow post on [referencing different tables][45] (similar to my idea for a post type _XOR_)
     - [Prisma tutorial][46] on how to do this in Postgres (**NB:** not supported on Prisma schema as of v2.30.3 and v3.0.2)
+  - How to include [stored procedures and other unsupported features in a migration][47].
   - Unique constraints
     - Adding [constraints in PostgreSQL][43], including multi-column constraints
     - Specifying [constraints in a Prisma schema][44]
@@ -109,3 +110,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [44]: https://www.prisma.io/docs/concepts/components/prisma-schema/data-model#defining-a-unique-field
 [45]: https://stackoverflow.com/questions/10068033/postgresql-foreign-key-referencing-primary-keys-of-two-different-tables
 [46]: https://www.prisma.io/docs/guides/database/advanced-database-tasks/data-validation/postgresql
+[47]: https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/include-unsupported-database-features
