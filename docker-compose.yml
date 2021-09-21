@@ -24,11 +24,13 @@ services:
       - ./flyway/conf:/flyway/conf
       - ./flyway/sql:/flyway/sql
     environment:
-      - DATABASE_PASSWORD
-      - DATABASE_URL
-      - DATABASE_USER
+      - FLYWAY_PASSWORD=${DATABASE_PASSWORD}
+      - FLYWAY_URL=jdbc:postgresql://database:5432/${DATABASE_NAME}
+      - FLYWAY_USER=${DATABASE_USER}
     depends_on:
       - database
+    labels:
+      - "traefik.enable=false"
 
   fusionauth:
     image: fusionauth/fusionauth-app:latest
