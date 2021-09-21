@@ -6,6 +6,7 @@ Handy links for documentation, articles, and other materials used in this projec
 - Doppler
   - ["Bare Owls" project][34]
   - [Documentation][35]
+- [Flyway][48], an open-source database migration tool
 - FusionAuth
   - [FusionAuth docs][2]
   - [Login and authentication workflows][29]
@@ -111,3 +112,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [45]: https://stackoverflow.com/questions/10068033/postgresql-foreign-key-referencing-primary-keys-of-two-different-tables
 [46]: https://www.prisma.io/docs/guides/database/advanced-database-tasks/data-validation/postgresql
 [47]: https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/include-unsupported-database-features
+[48]: https://flywaydb.org/documentation/

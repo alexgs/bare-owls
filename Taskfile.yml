@@ -16,6 +16,11 @@ tasks:
       - "{{.COMPOSE}} config"
     desc: Print the compose file with variables expanded
 
+  flyway:
+    cmds:
+      - "{{.COMPOSE}} run flyway"
+    desc: Open an interactive shell for working with Flyway
+
   down:
     cmds:
       - "{{.COMPOSE}} down --remove-orphans"
