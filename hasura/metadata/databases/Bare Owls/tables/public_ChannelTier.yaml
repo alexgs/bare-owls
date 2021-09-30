@@ -1,0 +1,22 @@
+table:
+  name: ChannelTier
+  schema: public
+object_relationships:
+- name: Channel
+  using:
+    foreign_key_constraint_on: channelId
+array_relationships:
+- name: ChannelSubscriptions
+  using:
+    foreign_key_constraint_on:
+      column: tierId
+      table:
+        name: ChannelSubscription
+        schema: public
+- name: Posts
+  using:
+    foreign_key_constraint_on:
+      column: tierId
+      table:
+        name: Post
+        schema: public

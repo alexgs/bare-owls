@@ -1,0 +1,14 @@
+table:
+  name: UserBlock
+  schema: public
+configuration:
+  custom_column_names: {}
+  custom_name: blocklists
+  custom_root_fields: {}
+object_relationships:
+- name: UserAccount
+  using:
+    foreign_key_constraint_on: blockerId
+- name: userAccountByTargetid
+  using:
+    foreign_key_constraint_on: targetId

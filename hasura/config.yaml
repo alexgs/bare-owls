@@ -1,0 +1,8 @@
+# Specify admin key in .env with HASURA_GRAPHQL_ADMIN_SECRET
+
+version: 3
+actions:
+  kind: synchronous
+  handler_webhook_baseurl: http://localhost:3000 # Override in .env
+endpoint: http://localhost:8080 # Override in .env with HASURA_GRAPHQL_ENDPOINT
+metadata_directory: metadata

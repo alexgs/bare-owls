@@ -14,6 +14,24 @@ services:
     labels:
       - "traefik.enable=false"
 
+  flyway:
+    image: alexgs99/flyway:1
+    container_name: flyway
+    restart: "no"
+    networks:
+      - owl-network
+    volumes:
+      - ./flyway/conf:/flyway/conf
+      - ./flyway/sql:/flyway/sql
+    environment:
+      - FLYWAY_PASSWORD=${DATABASE_PASSWORD}
+      - FLYWAY_URL=jdbc:postgresql://database:5432/${DATABASE_NAME}
+      - FLYWAY_USER=${DATABASE_USER}
+    depends_on:
+      - database
+    labels:
+      - "traefik.enable=false"
+
   fusionauth:
     image: fusionauth/fusionauth-app:latest
     container_name: fusionauth
