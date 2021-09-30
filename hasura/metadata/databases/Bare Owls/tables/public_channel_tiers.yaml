@@ -1,0 +1,26 @@
+table:
+  name: channel_tiers
+  schema: public
+configuration:
+  custom_column_names: {}
+  custom_name: tiers
+  custom_root_fields: {}
+object_relationships:
+- name: channel
+  using:
+    foreign_key_constraint_on: channel_id
+array_relationships:
+- name: subs
+  using:
+    foreign_key_constraint_on:
+      column: tier_id
+      table:
+        name: channel_subscriptions
+        schema: public
+- name: posts
+  using:
+    foreign_key_constraint_on:
+      column: tier_id
+      table:
+        name: posts
+        schema: public
