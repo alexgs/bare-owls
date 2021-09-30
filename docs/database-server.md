@@ -38,7 +38,8 @@ CREATE ROLE $DATABASE_USER
 REVOKE ALL ON DATABASE $DATABASE_NAME
   FROM $DATABASE_USER;
 
-GRANT CONNECT ON DATABASE $DATABASE_NAME
+-- "Create" privilege is required for installing extensions in the migrations
+GRANT CONNECT, CREATE ON DATABASE $DATABASE_NAME
   TO $DATABASE_USER;
 
 REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
@@ -49,7 +50,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO $DATABASE_USER;
 
 ALTER ROLE $DATABASE_USER WITH CREATEDB;
 ```
-NB: The last command is required for the [shadow database][3] used by Prisma 2.25 and later.
+NB: The last command is required for the [shadow database][3] used by Prisma 2.25 and later. Now that we're not using Prisma's `migrate` feature, I think we can get rid of it, although it was maybe used to create the databases for Hasura and FusionAuth. :shrug:
 
 7. Use `\q` to exit the client.
 1. Run `rm ~/.psql_history` to clear the client history (which contains the `$DATABASE_PASSWORD`).

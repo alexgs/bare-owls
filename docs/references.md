@@ -40,12 +40,14 @@ Handy links for documentation, articles, and other materials used in this projec
   - [ID token][17]
   - [Standard claims][18]
 - [OpenID client][19] for Node.js
-- Prisma and PostgreSQL
+- Prisma
   - [Documentation][20]
+  - How to include [stored procedures and other unsupported features in a migration][47]. Note that we ran into problems when we tried to do this, which prompted our migration to [Flyway][48].
+- PostgreSQL
+  - [Automatic `updated_at` timestamps][49]
   - Check constraints
-    - Great StockOverflow post on [referencing different tables][45] (similar to my idea for a post type _XOR_)
+    - Great StackOverflow post on [referencing different tables][45] (similar to my idea for a post type _XOR_)
     - [Prisma tutorial][46] on how to do this in Postgres (**NB:** not supported on Prisma schema as of v2.30.3 and v3.0.2)
-  - How to include [stored procedures and other unsupported features in a migration][47].
   - Unique constraints
     - Adding [constraints in PostgreSQL][43], including multi-column constraints
     - Specifying [constraints in a Prisma schema][44]
@@ -113,3 +115,4 @@ Handy links for documentation, articles, and other materials used in this projec
 [46]: https://www.prisma.io/docs/guides/database/advanced-database-tasks/data-validation/postgresql
 [47]: https://www.prisma.io/docs/guides/database/developing-with-prisma-migrate/include-unsupported-database-features
 [48]: https://flywaydb.org/documentation/
+[49]: https://x-team.com/blog/automatic-timestamps-with-postgresql/
