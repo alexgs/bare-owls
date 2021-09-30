@@ -1,140 +1,163 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["namedConstraints"]
+}
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  previewFeatures = ["namedConstraints"]
-  provider        = "prisma-client-js"
-}
-
 model Channel {
-  id          String                @id @default(uuid()) @db.Uuid
+  id          String                @id(map: "channels_pk") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   slug        String                @unique
   title       String
-  owner       UserAccount           @relation(fields: [ownerId], references: [id])
-  ownerId     String                @db.Uuid
+  ownerId     String                @unique(map: "channels_owner_id_unique") @map("owner_id") @db.Uuid
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime              @default(now()) @map("updated_at")
+  owner       UserAccount           @relation(fields: [ownerId], references: [id], map: "channels_owner_id_fk")
   subscribers ChannelSubscription[]
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
-  posts       Post[]
   tiers       ChannelTier[]
+  posts       Post[]
+
+  @@map("channels")
 }
 
 model ChannelSubscription {
-  id        Int         @id @default(autoincrement())
-  channel   Channel     @relation(fields: [channelId], references: [id])
-  channelId String      @db.Uuid
-  tier      ChannelTier @relation(fields: [tierId], references: [id])
-  tierId    Int
-  user      UserAccount @relation(fields: [userId], references: [id])
-  userId    String      @db.Uuid
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id        Int         @id(map: "channel_subscriptions_pk") @default(autoincrement())
+  channelId String      @map("channel_id") @db.Uuid
+  tierId    Int         @map("tier_id")
+  userId    String      @map("user_id") @db.Uuid
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @default(now()) @map("updated_at")
+  channel   Channel     @relation(fields: [channelId], references: [id], map: "channel_subscriptions_channel_id_fk")
+  tier      ChannelTier @relation(fields: [tierId], references: [id], map: "channel_subscriptions_tier_id_fk")
+  user      UserAccount @relation(fields: [userId], references: [id], map: "channel_subscriptions_user_id_fk")
 
   @@unique([channelId, userId])
+  @@map("channel_subscriptions")
 }
 
 model ChannelTier {
-  id          Int                   @id @default(autoincrement())
+  id          Int                   @id(map: "channel_tiers_pk") @default(autoincrement())
   name        String
   description String
   slug        String
-  order       Int // 0 is the bottom tier, 1 is next, 2 is about that, and so on.
-  channel     Channel               @relation(fields: [channelId], references: [id])
-  channelId   String                @db.Uuid
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
-  posts       Post[]
+  level       Int
+  channelId   String                @map("channel_id") @db.Uuid
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime              @default(now()) @map("updated_at")
+  channel     Channel               @relation(fields: [channelId], references: [id], map: "channel_tiers_channel_id_fk")
   subs        ChannelSubscription[]
+  posts       Post[]
 
-  @@unique([channelId, order])
+  @@unique([channelId, level])
   @@unique([channelId, slug])
+  @@map("channel_tiers")
 }
 
 model Post {
-  id          String             @id @default(uuid()) @db.Uuid
-  publicId    String             @db.VarChar(5)
+  id          String             @id(map: "posts_pk") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  publicId    String             @map("public_id") @db.VarChar(5)
   body        String
-  channel     Channel            @relation(fields: [channelId], references: [id])
-  channelId   String             @db.Uuid
-  tier        ChannelTier        @relation(fields: [tierId], references: [id])
-  tierId      Int
-  author      UserAccount        @relation(fields: [authorId], references: [id])
-  authorId    String             @db.Uuid
-  createdAt   DateTime           @default(now())
-  publishedAt DateTime?
-  updatedAt   DateTime           @updatedAt
-  ppvPrice    Int? // PPV cost of the post in US cents ($1 = 100). If price is null, then PPV is disabled for the post.
+  channelId   String             @map("channel_id") @db.Uuid
+  tierId      Int                @map("tier_id")
+  authorId    String             @map("author_id") @db.Uuid
+  ppvPrice    Int?               @map("ppv_price")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  publishedAt DateTime?          @map("published_at")
+  updatedAt   DateTime           @default(now()) @map("updated_at")
+  author      UserAccount        @relation(fields: [authorId], references: [id], map: "posts_author_id_fk")
+  channel     Channel            @relation(fields: [channelId], references: [id], map: "posts_channel_id_fk")
+  tier        ChannelTier        @relation(fields: [tierId], references: [id], map: "posts_tier_id_fk")
   ppvUsers    UserUnlockedPost[]
 
   @@unique([channelId, publicId])
+  @@map("posts")
 }
 
 model UserAccount {
-  id            String                @id @default(uuid()) @db.Uuid
+  id            String                @id(map: "user_accounts_pk") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   username      String                @unique
-  displayName   String?
-  role          UserRole              @relation(fields: [roleId], references: [id])
-  channel       Channel?
+  displayName   String?               @map("display_name")
+  roleId        String                @map("role_id") @db.Uuid
+  createdAt     DateTime              @default(now()) @map("created_at")
+  updatedAt     DateTime              @default(now()) @map("updated_at")
+  role          UserRole              @relation(fields: [roleId], references: [id], map: "user_accounts_role_id_fk")
   subscriptions ChannelSubscription[]
-  emails        UserEmail[]
+  channel       Channel?
+  posts         Post[]
   blockTargets  UserBlock[]           @relation("Blocker")
   blockedBy     UserBlock[]           @relation("BlockedBy")
-  createdAt     DateTime              @default(now())
-  updatedAt     DateTime              @updatedAt
-  roleId        String                @db.Uuid
-  posts         Post[]
+  emails        UserEmail[]
   unlockedPosts UserUnlockedPost[]
+
+  @@map("user_accounts")
 }
 
-// The `blocker` is the person doing the block, and the `target` is the person
-// getting blocked. In other words, the `target` is blocked by the `blocker`.
 model UserBlock {
-  id        Int         @id @default(autoincrement())
-  blocker   UserAccount @relation("Blocker", fields: [blockerId], references: [id])
-  blockerId String      @db.Uuid
-  target    UserAccount @relation("BlockedBy", fields: [targetId], references: [id])
-  targetId  String      @db.Uuid
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id        Int         @id(map: "user_block_pk") @default(autoincrement())
+  blockerId String      @map("blocker_id") @db.Uuid
+  targetId  String      @map("target_id") @db.Uuid
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @default(now()) @map("updated_at")
+  blocker   UserAccount @relation("Blocker", fields: [blockerId], references: [id], map: "user_block_blocker_id_fk")
+  target    UserAccount @relation("BlockedBy", fields: [targetId], references: [id], map: "user_block_target_id_fk")
+
+  @@map("user_blocks")
 }
 
 model UserEmail {
-  id         Int         @id @default(autoincrement())
-  original   String      @unique
+  id         Int         @id(map: "user_email_pk") @default(autoincrement())
+  original   String      @unique(map: "user_email_original_key")
   simplified String
-  account    UserAccount @relation(fields: [accountId], references: [id])
-  accountId  String      @db.Uuid
+  accountId  String      @map("account_id") @db.Uuid
   verified   Boolean     @default(false)
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @default(now()) @map("updated_at")
+  account    UserAccount @relation(fields: [accountId], references: [id], map: "user_email_account_id_fk")
 
-  @@index(fields: [simplified], name: "UserEmail.simplified_index")
+  @@index([simplified], map: "user_email_simplified_index")
+  @@map("user_emails")
 }
 
 model UserRole {
-  id          String        @id @default(uuid()) @db.Uuid
-  name        String        @unique
-  displayName String
+  id          String        @id(map: "user_role_pk") @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String        @unique(map: "user_role_name_key")
+  displayName String        @map("display_name")
   description String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @default(now()) @map("updated_at")
   users       UserAccount[]
+
+  @@map("user_roles")
 }
 
-// Unlocked posts for PPV content
 model UserUnlockedPost {
-  id        Int         @id @default(autoincrement())
-  user      UserAccount @relation(fields: [userId], references: [id])
-  userId    String      @db.Uuid
-  post      Post        @relation(fields: [postId], references: [id])
-  postId    String      @db.Uuid
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id        Int         @id(map: "user_unlocked_posts_pk") @default(autoincrement())
+  userId    String      @map("user_id") @db.Uuid
+  postId    String      @map("post_id") @db.Uuid
+  createdAt DateTime    @default(now()) @map("created_at")
+  updatedAt DateTime    @default(now()) @map("updated_at")
+  post      Post        @relation(fields: [postId], references: [id], map: "user_unlocked_posts_post_id_fk")
+  user      UserAccount @relation(fields: [userId], references: [id], map: "user_unlocked_posts_user_id_fk")
 
   @@unique([postId, userId])
+  @@map("user_unlocked_posts")
+}
+
+model flyway_schema_history {
+  installed_rank Int      @id(map: "flyway_schema_history_pk")
+  version        String?  @db.VarChar(50)
+  description    String   @db.VarChar(200)
+  type           String   @db.VarChar(20)
+  script         String   @db.VarChar(1000)
+  checksum       Int?
+  installed_by   String   @db.VarChar(100)
+  installed_on   DateTime @default(now()) @db.Timestamp(6)
+  execution_time Int
+  success        Boolean
+
+  @@index([success], map: "flyway_schema_history_s_idx")
+  @@ignore
 }

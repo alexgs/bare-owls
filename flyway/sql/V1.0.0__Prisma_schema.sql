@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.user_roles
     display_name TEXT                                                      NOT NULL,
     description  TEXT                                                      NOT NULL,
     created_at   TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL,
-    updated_at   TIMESTAMP(3) WITHOUT TIME ZONE                            NOT NULL
+    updated_at   TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL
 );
 
 CREATE UNIQUE INDEX user_role_name_key
@@ -49,13 +49,13 @@ CREATE TABLE IF NOT EXISTS public.user_accounts
             PRIMARY KEY,
     username     TEXT                                                      NOT NULL,
     display_name TEXT,
-    created_at   TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL,
-    updated_at   TIMESTAMP(3) WITHOUT TIME ZONE                            NOT NULL,
     role_id      UUID                                                      NOT NULL
         CONSTRAINT user_accounts_role_id_fk
             REFERENCES user_roles
             ON DELETE CASCADE
-            ON UPDATE CASCADE
+            ON UPDATE CASCADE,
+    created_at   TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL,
+    updated_at   TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL
 );
 
 CREATE UNIQUE INDEX user_accounts_username_key
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS public.channels
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL,
-    updated_at TIMESTAMP(3) WITHOUT TIME ZONE                            NOT NULL
+    updated_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL
 );
 
 CREATE UNIQUE INDEX channels_slug_key
@@ -107,6 +107,7 @@ CREATE TABLE IF NOT EXISTS public.channel_tiers
     name        TEXT                                                     NOT NULL,
     description TEXT                                                     NOT NULL,
     slug        TEXT                                                     NOT NULL,
+    -- Level 0 is the bottom tier, level 1 is next, level 2 is above that, and so on.
     level       INTEGER                                                  NOT NULL,
     channel_id  UUID                                                     NOT NULL
         CONSTRAINT channel_tiers_channel_id_fk
@@ -114,7 +115,7 @@ CREATE TABLE IF NOT EXISTS public.channel_tiers
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     created_at  TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at  TIMESTAMP(3) WITHOUT TIME ZONE                           NOT NULL
+    updated_at  TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE UNIQUE INDEX channel_tiers_channel_id_level_key
@@ -152,7 +153,7 @@ CREATE TABLE IF NOT EXISTS public.channel_subscriptions
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP(3) WITHOUT TIME ZONE                           NOT NULL
+    updated_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE UNIQUE INDEX channel_subscriptions_channel_id_user_id_key
@@ -187,10 +188,11 @@ CREATE TABLE IF NOT EXISTS public.posts
             REFERENCES public.user_accounts
             ON DELETE CASCADE
             ON UPDATE CASCADE,
+    -- PPV cost of the post in US cents ($1 = 100). If price is null, then PPV is disabled for the post.
+    ppv_price    INTEGER,
     created_at   TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL,
     published_at TIMESTAMP(3) WITHOUT TIME ZONE,
-    updated_at   TIMESTAMP(3) WITHOUT TIME ZONE                            NOT NULL,
-    ppv_price    INTEGER
+    updated_at   TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP  NOT NULL
 );
 
 CREATE UNIQUE INDEX posts_channel_id_public_id_key
@@ -204,6 +206,8 @@ EXECUTE PROCEDURE trigger_set_updated_at();
 
 --[ # TABLE public.user_blocks # ]--
 
+-- The `blocker` is the person doing the block, and the `target` is the person getting blocked. In other words, the
+-- `target` is blocked by the `blocker`.
 CREATE TABLE IF NOT EXISTS public.user_blocks
 (
     id         SERIAL                                                   NOT NULL
@@ -220,7 +224,7 @@ CREATE TABLE IF NOT EXISTS public.user_blocks
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP(3) WITHOUT TIME ZONE                           NOT NULL
+    updated_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE TRIGGER set_user_blocks_updated_at
@@ -245,7 +249,7 @@ CREATE TABLE IF NOT EXISTS public.user_emails
             ON UPDATE CASCADE,
     verified   BOOLEAN                        DEFAULT FALSE             NOT NULL,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP(3) WITHOUT TIME ZONE                           NOT NULL
+    updated_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE UNIQUE INDEX user_email_original_key
@@ -262,6 +266,7 @@ EXECUTE PROCEDURE trigger_set_updated_at();
 
 --[ # TABLE public.user_unlocked_posts # ]--
 
+-- Unlocked posts for PPV content
 CREATE TABLE IF NOT EXISTS public.user_unlocked_posts
 (
     id         SERIAL                                                   NOT NULL
@@ -278,7 +283,7 @@ CREATE TABLE IF NOT EXISTS public.user_unlocked_posts
             ON DELETE CASCADE
             ON UPDATE CASCADE,
     created_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP(3) WITHOUT TIME ZONE                           NOT NULL
+    updated_at TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 CREATE UNIQUE INDEX user_unlocked_posts_post_id_user_id_key
