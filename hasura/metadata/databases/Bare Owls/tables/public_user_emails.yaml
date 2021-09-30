@@ -1,11 +1,11 @@
 table:
-  name: UserEmail
+  name: user_emails
   schema: public
 configuration:
   custom_column_names: {}
   custom_name: emails
   custom_root_fields: {}
 object_relationships:
-- name: UserAccount
+- name: account
   using:
-    foreign_key_constraint_on: accountId
+    foreign_key_constraint_on: account_id

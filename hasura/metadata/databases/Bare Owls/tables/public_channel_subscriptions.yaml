@@ -1,0 +1,17 @@
+table:
+  name: channel_subscriptions
+  schema: public
+configuration:
+  custom_column_names: {}
+  custom_name: subscriptions
+  custom_root_fields: {}
+object_relationships:
+- name: channel
+  using:
+    foreign_key_constraint_on: channel_id
+- name: tier
+  using:
+    foreign_key_constraint_on: tier_id
+- name: user
+  using:
+    foreign_key_constraint_on: user_id

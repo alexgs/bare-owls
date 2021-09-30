@@ -1,27 +1,27 @@
 table:
-  name: Post
+  name: posts
   schema: public
 configuration:
   custom_column_names: {}
   custom_name: posts
   custom_root_fields: {}
 object_relationships:
-- name: Channel
+- name: channel
   using:
-    foreign_key_constraint_on: channelId
-- name: ChannelTier
+    foreign_key_constraint_on: channel_id
+- name: tier
   using:
-    foreign_key_constraint_on: tierId
-- name: UserAccount
+    foreign_key_constraint_on: tier_id
+- name: author
   using:
-    foreign_key_constraint_on: authorId
+    foreign_key_constraint_on: author_id
 array_relationships:
-- name: UserUnlockedPosts
+- name: authorized_users
   using:
     foreign_key_constraint_on:
-      column: postId
+      column: post_id
       table:
-        name: UserUnlockedPost
+        name: user_unlocked_posts
         schema: public
 computed_fields:
 - comment: ""
@@ -34,15 +34,15 @@ select_permissions:
 - permission:
     columns:
     - id
-    - publicId
+    - public_id
     - body
-    - channelId
-    - tierId
-    - authorId
-    - createdAt
-    - publishedAt
-    - updatedAt
-    - ppvPrice
+    - channel_id
+    - tier_id
+    - author_id
+    - created_at
+    - published_at
+    - updated_at
+    - ppv_price
     computed_fields:
     - authorized_claim
     filter:
@@ -51,15 +51,15 @@ select_permissions:
   role: CREATOR
 - permission:
     columns:
-    - publicId
-    - ppvPrice
-    - tierId
+    - public_id
+    - ppv_price
+    - tier_id
     - body
-    - createdAt
-    - publishedAt
-    - updatedAt
-    - authorId
-    - channelId
+    - created_at
+    - published_at
+    - updated_at
+    - author_id
+    - channel_id
     - id
     computed_fields:
     - authorized_claim

@@ -1,5 +1,5 @@
 table:
-  name: UserAccount
+  name: user_accounts
   schema: public
 configuration:
   custom_column_names: {}
@@ -8,65 +8,65 @@ configuration:
 object_relationships:
 - name: role
   using:
-    foreign_key_constraint_on: roleId
+    foreign_key_constraint_on: role_id
 array_relationships:
-- name: ChannelSubscriptions
+- name: subscriptions
   using:
     foreign_key_constraint_on:
-      column: userId
+      column: user_id
       table:
-        name: ChannelSubscription
+        name: channel_subscriptions
         schema: public
-- name: Channels
+- name: channels
   using:
     foreign_key_constraint_on:
-      column: ownerId
+      column: owner_id
       table:
-        name: Channel
+        name: channels
         schema: public
-- name: Posts
+- name: posts
   using:
     foreign_key_constraint_on:
-      column: authorId
+      column: author_id
       table:
-        name: Post
+        name: posts
         schema: public
-- name: UserBlocks
+- name: blocked_users
   using:
     foreign_key_constraint_on:
-      column: blockerId
+      column: blocker_id
       table:
-        name: UserBlock
+        name: user_blocks
         schema: public
-- name: UserUnlockedPosts
+- name: unlocked_posts
   using:
     foreign_key_constraint_on:
-      column: userId
+      column: user_id
       table:
-        name: UserUnlockedPost
+        name: user_unlocked_posts
         schema: public
 - name: emails
   using:
     foreign_key_constraint_on:
-      column: accountId
+      column: account_id
       table:
-        name: UserEmail
+        name: user_emails
         schema: public
-- name: userBlocksByTargetid
+- name: blocked_by_users
   using:
     foreign_key_constraint_on:
-      column: targetId
+      column: target_id
       table:
-        name: UserBlock
+        name: user_blocks
         schema: public
 select_permissions:
 - permission:
     columns:
     - id
     - username
-    - displayName
-    - createdAt
-    - updatedAt
-    - roleId
+    - display_name
+    - created_at
+    - updated_at
+    - role_id
     filter: {}
   role: FAN
