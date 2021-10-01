@@ -3,7 +3,7 @@
  * the Open Software License version 3.0.
  */
 
-import { createLogger, formatFilename } from '../logger';
+import { createLogger } from '../logger';
 
 import { server } from './auth-server';
 

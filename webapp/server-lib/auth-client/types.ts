@@ -3,8 +3,6 @@
  * the Open Software License version 3.0.
  */
 
-import { TOKEN_CONTEXT } from 'server-lib';
-
 export interface LoginResult {
   status: string;
   tokens: {
@@ -35,10 +33,6 @@ export interface RefreshTokenResult {
   status: string;
   tokens: RefreshTokenData[];
 }
-
-export type TokenContext =
-  | typeof TOKEN_CONTEXT.OPEN
-  | typeof TOKEN_CONTEXT.SECURE;
 
 export interface Tokens {
   accessToken: string;

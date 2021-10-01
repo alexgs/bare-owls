@@ -6,18 +6,13 @@
 import { SealOptions } from '@hapi/iron';
 import * as cookie from 'cookie';
 import * as env from 'env-var';
-import { mapValues } from 'lodash';
 import ms from 'ms';
 
 import { seconds } from 'lib';
-import { TOKEN_CONTEXT } from 'server-lib/constants';
-
-import { TokenContext } from './auth-client/types';
 
 interface BaseConfig {
   AUTH_API_KEY: string;
   AUTH_APP_IDS: string[];
-  AUTH_APP_TOKEN_CONTEXT: Record<string, TokenContext>;
   AUTH_DEFAULT_PASSWORD: string;
   AUTH_ORIGIN_EXTERNAL: string;
   AUTH_ORIGIN_INTERNAL: string;
@@ -73,21 +68,6 @@ function formatSealPassword(
   return output;
 }
 
-function formatTokenContexts(
-  envVar: Record<string, string>,
-): Record<string, TokenContext> {
-  return mapValues(envVar, (value): TokenContext => {
-    // I couldn't figure out how to do this generically, and this is good enough for now.
-    if (value === 'OPEN') {
-      return TOKEN_CONTEXT.OPEN;
-    } else if (value === 'SECURE') {
-      return TOKEN_CONTEXT.SECURE;
-    } else {
-      throw new Error(`Unknown token context "${value}"`);
-    }
-  });
-}
-
 /** @internal */
 function formatUnsealPasswords(passwords: IronPasswords) {
   const output: Record<string, string> = {};
@@ -118,10 +98,6 @@ export function getConfig(): Config {
     .required()
     .asJsonArray() as IronPasswords;
   const IRON_SEAL_TTL = env.get('IRON_SEAL_TTL').required().asString();
-  const tokenContexts = env
-    .get('AUTH_APP_TOKEN_CONTEXT')
-    .required()
-    .asJsonObject() as Record<string, string>;
 
   // Direct vars -- go right into the output without modification
   const AUTH_API_KEY = env.get('WEBAPP_AUTH_API_KEY').required().asString();
@@ -155,7 +131,6 @@ export function getConfig(): Config {
     .asString();
 
   // Computed vars
-  const AUTH_APP_TOKEN_CONTEXT = formatTokenContexts(tokenContexts);
   const CALLBACK_URL = `${BASE_URL}/api/callback`;
   const COOKIE: CookieOptionsSet = {
     ACCESS_TOKEN: {
@@ -235,7 +210,6 @@ export function getConfig(): Config {
   return {
     AUTH_API_KEY,
     AUTH_APP_IDS,
-    AUTH_APP_TOKEN_CONTEXT,
     AUTH_DEFAULT_PASSWORD,
     AUTH_ORIGIN_EXTERNAL,
     AUTH_ORIGIN_INTERNAL,

@@ -3,21 +3,13 @@
  * the Open Software License version 3.0.
  */
 
-import { Response } from 'got';
-
 import { getConfig, prisma } from 'server-lib';
 
-import { createLogger, formatFilename } from '../logger'; // Webpack gets testy if we import these from 'server-lib' :unamused:
+import { createLogger } from '../logger'; // Webpack gets testy if we import these from 'server-lib' :unamused:
 
 import { server } from './auth-server';
 import { LoginResult, Tokens } from './types';
 import { updateUserData } from './update-user-data';
-
-interface RequestPayload {
-  applicationId: string;
-  password: string;
-  loginId: string;
-}
 
 interface ResponseBody {
   refreshToken: string;
