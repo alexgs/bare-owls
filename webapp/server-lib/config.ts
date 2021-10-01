@@ -30,6 +30,8 @@ interface BaseConfig {
   IRON_OPTIONS: SealOptions;
   IRON_SEAL: SealPassword;
   IRON_UNSEAL: Record<string, string>;
+  WEBAPP_CDN_APP_ID: string;
+  WEBAPP_CORE_APP_ID: string;
 }
 
 export type Config = Readonly<BaseConfig>;
@@ -146,6 +148,11 @@ export function getConfig(): Config {
   const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
   const CLIENT_ID = env.get('AUTH_CLIENT_ID').required().asString();
   const CLIENT_SECRET = env.get('AUTH_CLIENT_SECRET').required().asString();
+  const WEBAPP_CDN_APP_ID = env.get('WEBAPP_CDN_APP_ID').required().asString();
+  const WEBAPP_CORE_APP_ID = env
+    .get('WEBAPP_CORE_APP_ID')
+    .required()
+    .asString();
 
   // Computed vars
   const AUTH_APP_TOKEN_CONTEXT = formatTokenContexts(tokenContexts);
@@ -241,5 +248,7 @@ export function getConfig(): Config {
     IRON_OPTIONS,
     IRON_SEAL,
     IRON_UNSEAL,
+    WEBAPP_CDN_APP_ID,
+    WEBAPP_CORE_APP_ID,
   };
 }

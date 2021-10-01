@@ -139,6 +139,7 @@ async function handler(
     }
 
     // Register with each auth application
+    // TODO Change this to use WEBAPP_CORE_APP_ID and WEBAPP_CDN_APP_ID
     const { AUTH_APP_IDS } = getConfig();
     const registerResults = await Promise.all(
       AUTH_APP_IDS.map(async (appId): Promise<RegisterResult> => {
