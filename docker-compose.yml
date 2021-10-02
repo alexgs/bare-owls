@@ -130,8 +130,6 @@ services:
     networks:
       - owl-network
     environment:
-      - AUTH_APP_IDS
-      - AUTH_APP_TOKEN_CONTEXT
       - AUTH_CLIENT_ID
       - AUTH_CLIENT_SECRET
       - AUTH_DEFAULT_PASSWORD

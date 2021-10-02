@@ -7,11 +7,11 @@ import got from 'got';
 
 import { getConfig } from '../config';
 
-const { AUTH_API_KEY, AUTH_ORIGIN_INTERNAL } = getConfig();
+const { AUTH_ORIGIN_INTERNAL, WEBAPP_AUTH_API_KEY } = getConfig();
 
 export const server = got.extend({
   headers: {
-    Authorization: AUTH_API_KEY,
+    Authorization: WEBAPP_AUTH_API_KEY,
   },
   prefixUrl: AUTH_ORIGIN_INTERNAL,
   responseType: 'json',

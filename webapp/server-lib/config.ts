@@ -11,8 +11,6 @@ import ms from 'ms';
 import { seconds } from 'lib';
 
 interface BaseConfig {
-  AUTH_API_KEY: string;
-  AUTH_APP_IDS: string[];
   AUTH_DEFAULT_PASSWORD: string;
   AUTH_ORIGIN_EXTERNAL: string;
   AUTH_ORIGIN_INTERNAL: string;
@@ -25,6 +23,7 @@ interface BaseConfig {
   IRON_OPTIONS: SealOptions;
   IRON_SEAL: SealPassword;
   IRON_UNSEAL: Record<string, string>;
+  WEBAPP_AUTH_API_KEY: string;
   WEBAPP_CDN_APP_ID: string;
   WEBAPP_CORE_APP_ID: string;
 }
@@ -100,11 +99,6 @@ export function getConfig(): Config {
   const IRON_SEAL_TTL = env.get('IRON_SEAL_TTL').required().asString();
 
   // Direct vars -- go right into the output without modification
-  const AUTH_API_KEY = env.get('WEBAPP_AUTH_API_KEY').required().asString();
-  const AUTH_APP_IDS = env
-    .get('AUTH_APP_IDS')
-    .required()
-    .asJsonArray() as string[];
   const AUTH_DEFAULT_PASSWORD = env
     .get('AUTH_DEFAULT_PASSWORD')
     .required()
@@ -124,6 +118,7 @@ export function getConfig(): Config {
   const BASE_URL = env.get('WEBAPP_BASE_URL').required().asString();
   const CLIENT_ID = env.get('AUTH_CLIENT_ID').required().asString();
   const CLIENT_SECRET = env.get('AUTH_CLIENT_SECRET').required().asString();
+  const WEBAPP_AUTH_API_KEY = env.get('WEBAPP_AUTH_API_KEY').required().asString();
   const WEBAPP_CDN_APP_ID = env.get('WEBAPP_CDN_APP_ID').required().asString();
   const WEBAPP_CORE_APP_ID = env
     .get('WEBAPP_CORE_APP_ID')
@@ -208,8 +203,6 @@ export function getConfig(): Config {
   const IRON_UNSEAL = formatUnsealPasswords(IRON_PASSWORDS);
 
   return {
-    AUTH_API_KEY,
-    AUTH_APP_IDS,
     AUTH_DEFAULT_PASSWORD,
     AUTH_ORIGIN_EXTERNAL,
     AUTH_ORIGIN_INTERNAL,
@@ -222,6 +215,7 @@ export function getConfig(): Config {
     IRON_OPTIONS,
     IRON_SEAL,
     IRON_UNSEAL,
+    WEBAPP_AUTH_API_KEY,
     WEBAPP_CDN_APP_ID,
     WEBAPP_CORE_APP_ID,
   };
