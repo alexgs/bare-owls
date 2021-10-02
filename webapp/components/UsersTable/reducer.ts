@@ -51,7 +51,7 @@ function handleCreateAction(payload: CreatePayload, state: UserDb): UserDb {
   const user = state[userId];
   const data = {
     email: user.emails[0].original,
-    displayName: user.displayName,
+    displayName: user.display_name,
     username: user.username,
   };
 
