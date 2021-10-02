@@ -130,8 +130,6 @@ services:
     networks:
       - owl-network
     environment:
-      - AUTH_APP_IDS
-      - AUTH_APP_TOKEN_CONTEXT
       - AUTH_CLIENT_ID
       - AUTH_CLIENT_SECRET
       - AUTH_DEFAULT_PASSWORD
@@ -148,6 +146,8 @@ services:
       - NEXT_PUBLIC_HASURA_SECRET
       - WEBAPP_AUTH_API_KEY
       - WEBAPP_BASE_URL
+      - WEBAPP_CDN_APP_ID
+      - WEBAPP_CORE_APP_ID
       - WEBAPP_LOG_LEVEL
       - WEBAPP_LOG_PATH
       - WEBAPP_PORT

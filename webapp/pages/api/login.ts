@@ -9,7 +9,6 @@ import * as yup from 'yup';
 import { PUBLIC } from 'lib';
 import {
   HTTP_CODE,
-  TOKEN_CONTEXT,
   auth,
   createLogger,
   formatFilename,
@@ -29,7 +28,8 @@ async function handler(
   res: NextApiResponse,
 ): Promise<void> {
   if (req.method === 'POST') {
-    const { AUTH_APP_TOKEN_CONTEXT } = getConfig();
+    const { WEBAPP_CDN_APP_ID, WEBAPP_CORE_APP_ID } =
+      getConfig();
     let requestBody = null;
     try {
       requestBody = await schema.validate(req.body);
@@ -50,29 +50,24 @@ async function handler(
     if (result) {
       const payload = await auth.login(result.username, requestBody.password);
       // TODO Use constants for `payload.status`
-      if (payload.status === 'ok') {
-        logger.info(`Successfully authenticated user \`${result.username}\`.`);
-        const body: Record<string, string> = { message: PUBLIC.OK };
-
-        // Send tokens to the client. **NB:** If more than one app is set to
-        // "secure," then only one will get its tokens into the cookies. Which
-        // app wins is non-deterministic.
-        Object.keys(payload.tokens).forEach((appId) => {
-          if (AUTH_APP_TOKEN_CONTEXT[appId] === TOKEN_CONTEXT.SECURE) {
-            setTokenCookies(res, payload.tokens[appId]);
-          } else if (AUTH_APP_TOKEN_CONTEXT[appId] === TOKEN_CONTEXT.OPEN) {
-            // Send **only** access token to "open" apps
-            body[appId] = payload.tokens[appId].accessToken;
-          } else {
-            logger.warn(`Unknown token context "${AUTH_APP_TOKEN_CONTEXT[appId]}".`);
-          }
-        });
-        return res.json(body);
+      if (payload.status !== 'ok') {
+        logger.warn(`Failed to authenticate user \`${result.username}\`.`);
+        return res
+          .status(HTTP_CODE.BAD_REQUEST)
+          .json({ message: PUBLIC.ERROR });
       }
-      logger.warn(`Failed to authenticate user \`${result.username}\`.`);
-      return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
+
+      logger.info(`Successfully authenticated user \`${result.username}\`.`);
+      const body = {
+        cdnAccessToken: payload.tokens[WEBAPP_CDN_APP_ID].accessToken,
+        message: PUBLIC.OK,
+      };
+      setTokenCookies(res, payload.tokens[WEBAPP_CORE_APP_ID]);
+      return res.json(body);
     } else {
-      logger.warn(`No account matched to email address \`${requestBody.email}\`.`);
+      logger.warn(
+        `No account matched to email address \`${requestBody.email}\`.`,
+      );
       return res.status(HTTP_CODE.BAD_REQUEST).json({ message: PUBLIC.ERROR });
     }
   } else {

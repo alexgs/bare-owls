@@ -37,7 +37,8 @@ async function createUser(
   userId: string,
   data: UserData,
 ): Promise<CreateResult> {
-  const { AUTH_API_KEY, AUTH_DEFAULT_PASSWORD, AUTH_ORIGIN_INTERNAL } = getConfig();
+  const { AUTH_DEFAULT_PASSWORD, AUTH_ORIGIN_INTERNAL, WEBAPP_AUTH_API_KEY } =
+    getConfig();
   const userinfoEndpoint = join(AUTH_ORIGIN_INTERNAL, `/api/user/${userId}`);
   const userinfoPayload = {
     skipVerification: true,
@@ -50,7 +51,7 @@ async function createUser(
   const response = await got.post(userinfoEndpoint, {
     json: userinfoPayload,
     headers: {
-      Authorization: AUTH_API_KEY,
+      Authorization: WEBAPP_AUTH_API_KEY,
     },
     responseType: 'json',
     throwHttpErrors: false,
@@ -66,20 +67,26 @@ async function createUser(
   return PRIVATE.OK;
 }
 
-async function registerUser(userId: string, appId: string): Promise<RegisterResult> {
-  const { AUTH_API_KEY, AUTH_ORIGIN_INTERNAL } = getConfig();
-  const registerEndpoint = join(AUTH_ORIGIN_INTERNAL, `/api/user/registration/${userId}`);
+async function registerUser(
+  userId: string,
+  appId: string,
+): Promise<RegisterResult> {
+  const { AUTH_ORIGIN_INTERNAL, WEBAPP_AUTH_API_KEY } = getConfig();
+  const registerEndpoint = join(
+    AUTH_ORIGIN_INTERNAL,
+    `/api/user/registration/${userId}`,
+  );
   const registerPayload = {
     registration: {
       applicationId: appId,
-      roles: ['FAN']
-    }
+      roles: ['FAN'],
+    },
   };
 
   const response = await got.post(registerEndpoint, {
     json: registerPayload,
     headers: {
-      Authorization: AUTH_API_KEY,
+      Authorization: WEBAPP_AUTH_API_KEY,
     },
     responseType: 'json',
     throwHttpErrors: false,
@@ -88,7 +95,7 @@ async function registerUser(userId: string, appId: string): Promise<RegisterResu
   if (response.statusCode !== 200) {
     logger.warn(
       `Error registering user with app {${appId}}: ${response.statusCode} ` +
-      `${response.statusMessage ?? ''}.`,
+        `${response.statusMessage ?? ''}.`,
     );
     return PRIVATE.ERROR.AUTH_LINK.REGISTER_USER;
   }
@@ -100,14 +107,14 @@ async function handler(
   res: NextApiResponse,
 ): Promise<void> {
   if (req.method === 'GET') {
-    const { AUTH_API_KEY, AUTH_ORIGIN_INTERNAL } = getConfig();
+    const { AUTH_ORIGIN_INTERNAL, WEBAPP_AUTH_API_KEY } = getConfig();
     const userinfoEndpoint = join(
       AUTH_ORIGIN_INTERNAL,
       `/api/user/${req.query.userId as string}`,
     );
     const response = await got.get(userinfoEndpoint, {
       headers: {
-        Authorization: AUTH_API_KEY,
+        Authorization: WEBAPP_AUTH_API_KEY,
       },
       responseType: 'json',
       throwHttpErrors: false,
@@ -139,13 +146,14 @@ async function handler(
     }
 
     // Register with each auth application
-    const { AUTH_APP_IDS } = getConfig();
+    const { WEBAPP_CORE_APP_ID, WEBAPP_CDN_APP_ID } = getConfig();
+    const appIds = [WEBAPP_CORE_APP_ID, WEBAPP_CDN_APP_ID];
     const registerResults = await Promise.all(
-      AUTH_APP_IDS.map(async (appId): Promise<RegisterResult> => {
+      appIds.map(async (appId): Promise<RegisterResult> => {
         return registerUser(userId, appId);
-      })
+      }),
     );
-    if (registerResults.every(result => result === PRIVATE.OK)) {
+    if (registerResults.every((result) => result === PRIVATE.OK)) {
       res.json({ linkStatus: PUBLIC.AUTH_LINK.LINKED });
     }
     return res.json({ linkStatus: PUBLIC.ERROR });
