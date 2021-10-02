@@ -16,13 +16,13 @@ import { Action, QueryResult, UserRecord } from './types';
 const query = gql`
   query ListUsers {
     users {
-      displayName
+      display_name
       emails {
         original
       }
       id
       role {
-        displayName
+        display_name
         name
       }
       username
@@ -51,11 +51,11 @@ export const UsersTable: React.FC = () => {
       header: <Text>Username</Text>,
     },
     {
-      property: 'displayName',
+      property: 'display_name',
       header: <Text>Display name</Text>,
     },
     {
-      property: 'role.displayName',
+      property: 'role.display_name',
       header: <Text>Role</Text>,
     },
     {

@@ -42,13 +42,13 @@ export interface UserRecord extends UserRecordBase {
 }
 
 export interface UserRecordBase {
-  displayName: string;
+  display_name: string;
   emails: Array<{
     original: string;
   }>;
   id: string;
   role: {
-    displayName: string;
+    display_name: string;
     name: string;
   };
   username: string;
